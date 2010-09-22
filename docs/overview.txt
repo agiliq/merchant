@@ -1,0 +1,60 @@
+Django-Merchant provides a set of consistent API
+to make accepting Payments from various providers easy.
+
+SETINGS
+---------------
+
+DEFAULT_CREDIT_CARD_BACKEND
+
+The default backend to use when credit card paymenst are used on site.
+
+API
+-----
+
+1. If you are accpeting credit card payments on you sites.
+
+merchant = Merchant(**just_enough_credentials)
+
+or
+
+merchant = Merchant()#Will read the credentials from the settings.py
+
+or
+
+merchant = MerchantFactory.get("PAYPAL", **just_enough_credentials)
+
+or
+
+merchant = MerchantFactory.get("PAYPAL",)#read credentials from settings.py 
+
+
+Now that you have a merchant.
+
+accept_payment = merchant.charge(**kwargs)
+
+If you are using off site.
+
+Provides templates
+
+{% paypal 10 %}
+
+This will show a Paypal Website Stanradr form to charge 10$ with default settings.
+
+needs to specify
+
+PAYPAL_RECEPIENT_EMAIL, PAYPAL_URL_IPN,  PAYPAL_URL_CANCEL,  PAYPAL_URL_RETURN in settings.py 
+
+
+
+Signals
+-------------
+
+payment_was_succesful
+payment_was_flagged
+subscription_cancel
+subscription_eot
+subscription_modify
+subscription_signup
+
+
+
