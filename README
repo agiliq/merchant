@@ -1,2 +1,23 @@
 Django-Merchant is a Django app to make using multiple
 payment processors easier.
+
+It can talk to the following gateways.
+
+For CreditCard processing. 
+
+1. Authorize.net
+2. Paypal
+3. Eway
+
+For Off-site processing.
+
+1. Paypal
+2. RBS
+3. Google Checkout
+4. Amazon FPS
+
+
+
+
+
+
