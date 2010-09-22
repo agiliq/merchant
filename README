@@ -12,7 +12,7 @@ For CreditCard processing.
 For Off-site processing.
 
 1. Paypal
-2. RBS
+2. RBS WorldPay
 3. Google Checkout
 4. Amazon FPS
 
@@ -20,4 +20,11 @@ For Off-site processing.
 
 
 
+Links to processors.
+
+https://developer.paypal.com 
+http://aws.amazon.com/fps/
+https://checkout.google.com/seller/integrate.html
+http://developer.authorize.net/
+http://www.rbsworldpay.com/support/bg/index.php
 
