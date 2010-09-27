@@ -38,7 +38,7 @@ Provides templates
 
 {% paypal 10 %}
 
-This will show a Paypal Website Stanradr form to charge 10$ with default settings.
+This will show a Paypal Website Standard form to charge 10$ with default settings.
 
 needs to specify
 
