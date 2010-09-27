@@ -21,18 +21,18 @@ class CreditCard(object):
     def __init__(self, first_name=None, last_name=None, month=None, year=None, number=None, card_type=None, verification_value=None):
         self.first_name = first_name
         self.last_name = last_name
-        self.month = month
-        self.year = year
+        self.month = int(month)
+        self.year = int(year)
         self.number = number
         self.card_type = card_type or self.get_card_type(number)
         self.verification_value = verification_value
     
-    def get_card_type(self):
+    def get_card_type(self, number):
         for company, pattern in CARD_COMPANIES.items():
             # Right now the Maestro regexp overlaps with the MasterCard regexp (IIRC).
-            if not company == 'maestro' and re.match(self.number, pattern):
+            if not company == 'maestro' and re.match(number, pattern):
                 return company
-        return 'maestro' if re.match(self.number, CARD_COMPANIES['maestro']) else None
+        return 'maestro' if re.match(number, CARD_COMPANIES['maestro']) else None
     
     def is_luhn_valid(self):
         # Checks the validity of a card number by use of the the Luhn Algorithm. 
@@ -49,7 +49,7 @@ class CreditCard(object):
                self.month and \
                self.year and \
                self.number and \
-               self.verification_value
+               self.verification_value and True
     
     def is_valid(self):
         return self.is_luhn_valid() and \

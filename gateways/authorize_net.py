@@ -30,7 +30,7 @@ class AuthorizeNetGateway:
         self.add_customer_data(post, options)
         # self.add_duplicate_window(post)
 
-        self.commit('AUTH_CAPTURE', money, post)
+        return self.commit('AUTH_CAPTURE', money, post)
     
     def add_invoice(self, post, options):
         post['invoice_num'] = options.get('order_id', None)
@@ -81,7 +81,7 @@ class AuthorizeNetGateway:
         if not action == 'VOID':
             parameters['amount'] = money
         
-        parameters[:test_request] =  self.test_mode
+        parameters['test_request'] =  self.test_mode
         url = self.test_url if self.test_mode else self.live_url
         data = self.post_data(action, parameters)
         response = self.request(url, data)
@@ -113,18 +113,9 @@ class AuthorizeNetGateway:
             response = open_conn.read()
         except urllib2.URLError, ue:
             return (5, '1', 'Could not talk to payment gateway.')
-        fields = response[1::-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
-        return [int(fields[RESPONSE_CODE]),
+        fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
+        import ipdb
+        ipdb.set_trace()
+        return [fields[RESPONSE_CODE],
                 fields[RESPONSE_REASON_CODE],
                 fields[RESPONSE_REASON_TEXT]]
-
-"""
-    params = urllib.urlencode(raw_params)
-    headers = { 'content-type':'application/x-www-form-urlencoded',
-                'content-length':len(params) }
-    post_url = settings.AUTHNET_POST_URL
-    post_path = settings.AUTHNET_POST_PATH
-    cn = httplib.HTTPSConnection(post_url, httplib.HTTPS_PORT)
-    cn.request('POST', post_path, params, headers)
-    return cn.getresponse().read().split(delimiter)
-"""

@@ -2,4 +2,22 @@
 
 {% block content %}
 template: app/templates/app/index.html
+<br/>
+
+<p> pay ${{ amount }}</p>
+
+{% if response %}
+  <b>{{ response }} </b>
+{% endif %}
+
+<form method='post'>
+  {% csrf_token %}
+  <table>
+    {{ form }}
+    <tr>
+      <th>&nbsp;</th>
+      <td><input type='submit' value='Submit' /></td>
+    </tr>
+  </table>
+</form>
 {% endblock %}
