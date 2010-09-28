@@ -1,0 +1,3 @@
+[submodule "django-paypal"]
+	path = django-paypal
+	url = http://github.com/dcramer/django-paypal.git
