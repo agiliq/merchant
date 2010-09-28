@@ -93,4 +93,11 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
 
     'app',
+    'paypal.standard', 
+    'paypal.pro',
 )
+
+try:
+    from localsettings import *
+except ImportError, e:
+    print e.message

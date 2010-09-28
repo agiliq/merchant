@@ -100,10 +100,7 @@ class AuthorizeNetGateway:
         post['encap_char']     = ENCAP_CHAR
         
         post.update(parameters)
-        d = {}
-        for key, value in post.items():
-            d['x_%s' % (key)] = value
-        return urllib.urlencode(d)
+        return urllib.urlencode(dict(('x_%s' % (k), v) for k, v in post.iteritems()))
     
     # this shoud be moved to a requests lib file
     def request(self, url, data, headers={}):
@@ -114,8 +111,6 @@ class AuthorizeNetGateway:
         except urllib2.URLError, ue:
             return (5, '1', 'Could not talk to payment gateway.')
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
-        import ipdb
-        ipdb.set_trace()
         return [fields[RESPONSE_CODE],
                 fields[RESPONSE_REASON_CODE],
                 fields[RESPONSE_REASON_TEXT]]

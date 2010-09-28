@@ -28,3 +28,12 @@ https://checkout.google.com/seller/integrate.html
 http://developer.authorize.net/
 http://www.rbsworldpay.com/support/bg/index.php
 
+
+PAYPAL REQUIRED SETTINGS
+    
+    * For Website Payments Pro
+        INSTALLED_APPS = (... 'paypal.standard', 'paypal.pro', ...)
+        PAYPAL_TEST = True
+        PAYPAL_WPP_USER = "???"
+        PAYPAL_WPP_PASSWORD = "???"
+        PAYPAL_WPP_SIGNATURE = "???"
