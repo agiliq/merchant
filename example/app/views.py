@@ -20,10 +20,10 @@ def index(request, gateway=None):
         if form.is_valid():
             data = form.cleaned_data
             credit_card = CreditCard(**data)
-            # merchant = AuthorizeNetGateway()
-            # response = merchant.purchase(amount, credit_card)
-            merchant = PaypalCardProcess()
-            response = merchant.purchase(amount, credit_card, options={'request': request})
+            merchant = AuthorizeNetGateway()
+            response = merchant.purchase(amount, credit_card)
+            # merchant = PaypalCardProcess()
+            # response = merchant.purchase(amount, credit_card, options={'request': request})
     else:
         form = CreditCardForm(initial={'number':'4222222222222'})
     return render(request, 'app/index.html', {'form': form, 
@@ -32,11 +32,40 @@ def index(request, gateway=None):
 
 
 def authorize(request):
-    return HttpResponse('Authorize')
+    amount = 1
+    response = None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = AuthorizeNetGateway()
+            response = merchant.purchase(amount, credit_card)
+    else:
+        form = CreditCardForm(initial={'number':'4222222222222'})
+    return render(request, 'app/index.html', {'form': form, 
+                                              'amount': amount,
+                                              'response': response})
 
 
 def paypal(request):
-    return HttpResponse('Paypal')
+    amount = 1
+    response = None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = PaypalCardProcess()
+            response = merchant.purchase(amount, credit_card, options={'request': request})
+    else:
+        form = CreditCardForm(initial={'number':'4797503429879309', 
+                                       'verification_value': 037,
+                                       'month': 1,
+                                       'year': 2019})
+    return render(request, 'app/index.html', {'form': form, 
+                                              'amount': amount,
+                                              'response': response})
 
 
 def eway(request):
