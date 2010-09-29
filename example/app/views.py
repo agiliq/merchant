@@ -63,7 +63,8 @@ def paypal(request):
         form = CreditCardForm(initial={'number':'4797503429879309', 
                                        'verification_value': '037',
                                        'month': 1,
-                                       'year': 2019})
+                                       'year': 2019,
+                                       'card_type': 'visa'})
     return render(request, 'app/index.html', {'form': form, 
                                               'amount': amount,
                                               'response': response,

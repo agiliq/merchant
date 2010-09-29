@@ -21,16 +21,22 @@ class Eway:
         self.hosted_customer = self.client.client.factory.create("CreditCard")
     
     def purchase(self, money, credit_card, options={}):
+        """Using Eway payment gateway , charge the given
+        credit card for specified money"""
         self.add_creditcard(credit_card)
         self.add_address(options)
         
         customer_id = self.client.create_hosted_customer(self.hosted_customer)
         if self.test_mode:
             customer_id = '9876543211000'
-        payment_result = self.client.process_payment(customer_id, money * 100, "test", "test")
+        payment_result = self.client.process_payment(customer_id, 
+                                                     money * 100, 
+                                                     "test", 
+                                                     "test")
         return payment_result
     
     def add_creditcard(self, credit_card):
+        """add credit card details to the request parameters"""
         self.hosted_customer.CCNumber = credit_card.number
         self.hosted_customer.CCNameOnCard = "test"
         self.hosted_customer.CCExpiryMonth = '%02d' % (credit_card.month)
@@ -38,7 +44,8 @@ class Eway:
         self.hosted_customer.FirstName = credit_card.first_name
         self.hosted_customer.LastName = credit_card.last_name
     
-    def add_address(self, options):
+    def add_address(self, options={}):
+        """add address details to the request parameters"""
         self.hosted_customer.Title = "Mr."
         self.hosted_customer.Address = "test street"
         self.hosted_customer.Suburb = "Sydney"

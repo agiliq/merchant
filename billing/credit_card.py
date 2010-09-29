@@ -28,22 +28,29 @@ class CreditCard(object):
         self.verification_value = verification_value
     
     def get_card_type(self):
+        """Find the credit card type for the given card number"""
         for company, pattern in CARD_COMPANIES.items():
-            # Right now the Maestro regexp overlaps with the MasterCard regexp (IIRC).
+            # Maestro regexp overlaps with the MasterCard regexp (IIRC).
             if not company == 'maestro' and re.match(pattern, self.number):
                 return company
-        return 'maestro' if re.match(CARD_COMPANIES['maestro'], self.number) else None
+        
+        if re.match(CARD_COMPANIES['maestro'], self.number):
+            return 'maestro' 
+        else:
+            return None
     
     def is_luhn_valid(self):
-        # Checks the validity of a card number by use of the the Luhn Algorithm. 
-        # Please see http://en.wikipedia.org/wiki/Luhn_algorithm for details.
+        """Checks the validity of card number by using Luhn Algorithm. 
+        Please see http://en.wikipedia.org/wiki/Luhn_algorithm for details."""
         num = [int(x) for x in str(self.number)]
         return not sum(num[::-2] + [sum(divmod(d * 2, 10)) for d in num[-2::-2]]) % 10
     
     def is_expired(self):
+        """Check whehter the credit card is expired or not"""
         return datetime.date.today() > datetime.date(self.year, self.month, 1)
     
     def valid_essential_attributes(self):
+        """Validate that all the required attributes of card are given"""
         return self.first_name and \
                self.last_name and \
                self.month and \
@@ -52,15 +59,18 @@ class CreditCard(object):
                self.verification_value and True
     
     def is_valid(self):
+        """Check the validity of the card"""
         return self.is_luhn_valid() and \
                not self.is_expired() and \
                self.valid_essential_attributes()
     
     @property
     def expire_date(self):
+        """Returns the expiry date of the card in MM-YYYY format"""
         return '%02d-%04d' % (self.month, self.year)
     
     @property
     def name(self):
+        """Concat first name and last name of the card holder"""
         return '%s %s' % (self.first_name, self.last_name)
     

@@ -1,9 +1,13 @@
-
+"""
+Paypal DoDirectPayment API
+"""
 class PaypalCardProcess:
     def __init__(self):
         pass
     
     def purchase(self, money, credit_card, options={}):
+        """Using PAYPAL DoDirectPayment, charge the given
+        credit card for specified money"""
         from paypal.pro.helpers import PayPalWPP
         
         # item = {

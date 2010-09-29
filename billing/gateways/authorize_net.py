@@ -22,8 +22,9 @@ class AuthorizeNetGateway:
         # self.arb_test_url = 'https://apitest.authorize.net/xml/v1/request.api'
         # self.arb_live_url = 'https://api.authorize.net/xml/v1/request.api'
     
-    # def authorize(money, credit_card, options={}):
     def purchase(self, money, credit_card, options={}):
+        """Using Authorize.net payment gateway , charge the given
+        credit card for specified money"""
         post = {}
         
         self.add_invoice(post, options) 
@@ -35,10 +36,12 @@ class AuthorizeNetGateway:
         return self.commit('AUTH_CAPTURE', money, post)
     
     def add_invoice(self, post, options):
+        """add invoice details to the request parameters"""
         post['invoice_num'] = options.get('order_id', None)
         post['description'] = options.get('description', None)
     
     def add_creditcard(self, post, credit_card):
+        """add credit card details to the request parameters"""
         post['card_num']   = credit_card.number
         post['card_code']  = credit_card.verification_value
         post['exp_date']   = credit_card.expire_date
@@ -46,6 +49,7 @@ class AuthorizeNetGateway:
         post['last_name']  = credit_card.last_name
     
     def add_address(self, post, options):
+        """add billing/shipping address details to the request parameters"""
         if options.get('billing_address', None):
             address = options.get('billing_address')
             post['address']  = address.get('address', '')
@@ -69,9 +73,10 @@ class AuthorizeNetGateway:
             post['ship_to_state']      = address.get('state', '')
     
     def add_customer_data(self, post, options):
+        """add customer details to the request parameters"""
         if options.has_key('email'):
             post['email'] = options['email']
-            post['email_customer'] = false
+            post['email_customer'] = False
         
         if options.has_key('customer'):
             post['cust_id'] = options['customer']
@@ -90,6 +95,8 @@ class AuthorizeNetGateway:
         return response
 
     def post_data(self, action, parameters = {}):
+        """add API details, gateway response formating options 
+        to the request parameters"""
         post = {}
         
         post['version']        = API_VERSION
@@ -106,11 +113,13 @@ class AuthorizeNetGateway:
     
     # this shoud be moved to a requests lib file
     def request(self, url, data, headers={}):
+        """Make POST request to the payment gateway with the data and return 
+        gateway RESPONSE_CODE, RESPONSE_REASON_CODE, RESPONSE_REASON_TEXT"""
         conn = urllib2.Request(url=url, data=data, headers=headers)
         try:
             open_conn = urllib2.urlopen(conn)
             response = open_conn.read()
-        except urllib2.URLError, ue:
+        except urllib2.URLError:
             return (5, '1', 'Could not talk to payment gateway.')
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
         return [fields[RESPONSE_CODE],
