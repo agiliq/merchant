@@ -3,7 +3,7 @@ import datetime
 
 from django import forms
 
-from merchant.credit_card import CreditCard
+from billing.credit_card import CreditCard
 
 class CreditCardForm(forms.Form):
     CARD_TYPES = [

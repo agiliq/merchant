@@ -1,17 +1,18 @@
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.http import HttpResponse
 
 from app.forms import CreditCardForm
 
-from merchant.gateways.authorize_net import AuthorizeNetGateway
-from merchant.gateways.paypal_card import PaypalCardProcess
-from merchant.credit_card import CreditCard
+from billing.gateways.authorize_net import AuthorizeNetGateway
+from billing.gateways.paypal_card import PaypalCardProcess
+from billing.credit_card import CreditCard
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
 
-def index(request):
+def index(request, gateway=None):
     amount = 1
     response = None
     if request.method == 'POST':
@@ -19,7 +20,7 @@ def index(request):
         if form.is_valid():
             data = form.cleaned_data
             credit_card = CreditCard(**data)
-            # merchant = AuthorizeNetGateway(login='92KgL2uD', password='4nT73z4473vLJfXF')
+            # merchant = AuthorizeNetGateway()
             # response = merchant.purchase(amount, credit_card)
             merchant = PaypalCardProcess()
             response = merchant.purchase(amount, credit_card, options={'request': request})
@@ -28,3 +29,15 @@ def index(request):
     return render(request, 'app/index.html', {'form': form, 
                                               'amount': amount,
                                               'response': response})
+
+
+def authorize(request):
+    return HttpResponse('Authorize')
+
+
+def paypal(request):
+    return HttpResponse('Paypal')
+
+
+def eway(request):
+    return HttpResponse('Eway')

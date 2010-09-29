@@ -2,6 +2,8 @@
 import urllib
 import urllib2
 
+from django.conf import settings
+
 API_VERSION = '3.1'
 DELIM_CHAR = ','
 ENCAP_CHAR = '$'
@@ -10,10 +12,10 @@ RESPONSE_CODE, RESPONSE_REASON_CODE, RESPONSE_REASON_TEXT = 0, 2, 3
 
 
 class AuthorizeNetGateway:
-    def __init__(self, login, password, test_mode=True):
-        self.login = login
-        self.password = password
-        self.test_mode = test_mode
+    def __init__(self):
+        self.login = settings.AUTHORIZE_LOGIN_ID
+        self.password = settings.AUTHORIZE_TRANSACTION_KEY
+        self.test_mode = getattr(settings, 'MERCHANT_TEST_MODE', False)
         self.test_url = "https://test.authorize.net/gateway/transact.dll"
         self.live_url = "https://secure.authorize.net/gateway/transact.dll"
 

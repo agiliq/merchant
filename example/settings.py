@@ -93,6 +93,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
 
     'app',
+    'billing',
     'paypal.standard', 
     'paypal.pro',
 )
