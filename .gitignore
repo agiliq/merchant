@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 src
+tmp
 
 example/tmp
 example/localsettings.py

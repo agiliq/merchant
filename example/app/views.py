@@ -7,6 +7,7 @@ from app.forms import CreditCardForm
 
 from billing.gateways.authorize_net import AuthorizeNetGateway
 from billing.gateways.paypal_card import PaypalCardProcess
+from billing.gateways.eway import Eway
 from billing.credit_card import CreditCard
 
 def render(request, template, template_vars={}):
@@ -69,4 +70,21 @@ def paypal(request):
 
 
 def eway(request):
-    return HttpResponse('Eway')
+    amount = 1
+    response = None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = Eway()
+            response = merchant.purchase(amount, credit_card, options={'request': request})
+    else:
+        form = CreditCardForm(initial={'number':'4444333322221111', 
+                                       'verification_value': '000',
+                                       'month': 7,
+                                       'year': 2012})
+    return render(request, 'app/index.html', {'form': form, 
+                                              'amount': amount,
+                                              'response': response})
+
