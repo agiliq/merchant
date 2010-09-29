@@ -4,18 +4,15 @@ class PaypalCardProcess:
         pass
     
     def purchase(self, money, credit_card, options={}):
-        # django-paypal direct payment required params
-        # creditcardtype acct expdate cvv2 ipaddress firstname lastname street city state countrycode zip amt
         from paypal.pro.helpers import PayPalWPP
         
-        
-        item = {
-            'inv': 'inv',
-            'custom': 'custom',
-            'next': 'http://www.example.com/next/',
-            'returnurl': 'http://www.example.com/pay/',
-            'cancelurl': 'http://www.example.com/cancel/'
-        }
+        # item = {
+        #     'inv': 'inv',
+        #     'custom': 'custom',
+        #     'next': 'http://www.example.com/next/',
+        #     'returnurl': 'http://www.example.com/pay/',
+        #     'cancelurl': 'http://www.example.com/cancel/'
+        # }
         
         params = {}
         params['creditcardtype'] = credit_card.card_type
@@ -23,7 +20,7 @@ class PaypalCardProcess:
         params['expdate'] = '%02d%04d' % (credit_card.month, credit_card.year)
         params['cvv2'] = credit_card.verification_value
         params['ipaddress'] = options['request'].META.get("REMOTE_ADDR", "")
-        params['amt'] = str(money)
+        params['amt'] = money
         
         params['firstname'] = credit_card.first_name
         params['lastname'] = credit_card.last_name
@@ -33,7 +30,7 @@ class PaypalCardProcess:
         params['countrycode'] = 'US'
         params['zip'] = '95131'
         
-        params.update(item)
+        # params.update(item)
         
         wpp = PayPalWPP(options['request']) 
         response = wpp.doDirectPayment(params)

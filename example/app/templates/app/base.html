@@ -6,6 +6,11 @@
 
 <body>
   <h2>example project</h2>
+  <a href='{% url app_authorize %}'>Authorize</a>
+  <a href='{% url app_eway %}'>Eway</a>
+  <a href='{% url app_paypal %}'>Paypal</a>
+  
+  <h1>{{ title }} </h1>
   {% block content %}
 
   {% endblock %}

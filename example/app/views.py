@@ -23,13 +23,12 @@ def index(request, gateway=None):
             credit_card = CreditCard(**data)
             merchant = AuthorizeNetGateway()
             response = merchant.purchase(amount, credit_card)
-            # merchant = PaypalCardProcess()
-            # response = merchant.purchase(amount, credit_card, options={'request': request})
     else:
         form = CreditCardForm(initial={'number':'4222222222222'})
     return render(request, 'app/index.html', {'form': form, 
                                               'amount': amount,
-                                              'response': response})
+                                              'response': response,
+                                              'title': 'Authorize'})
 
 
 def authorize(request):
@@ -46,7 +45,8 @@ def authorize(request):
         form = CreditCardForm(initial={'number':'4222222222222'})
     return render(request, 'app/index.html', {'form': form, 
                                               'amount': amount,
-                                              'response': response})
+                                              'response': response,
+                                              'title': 'Authorize'})
 
 
 def paypal(request):
@@ -61,12 +61,13 @@ def paypal(request):
             response = merchant.purchase(amount, credit_card, options={'request': request})
     else:
         form = CreditCardForm(initial={'number':'4797503429879309', 
-                                       'verification_value': 037,
+                                       'verification_value': '037',
                                        'month': 1,
                                        'year': 2019})
     return render(request, 'app/index.html', {'form': form, 
                                               'amount': amount,
-                                              'response': response})
+                                              'response': response,
+                                              'title': 'Paypal'})
 
 
 def eway(request):
@@ -86,5 +87,6 @@ def eway(request):
                                        'year': 2012})
     return render(request, 'app/index.html', {'form': form, 
                                               'amount': amount,
-                                              'response': response})
+                                              'response': response,
+                                              'title': 'Eway'})
 
