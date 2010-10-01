@@ -1,4 +1,6 @@
-
+'''
+Template tags for paypal offsite payments
+'''
 from string import split
 
 from django.conf import settings
@@ -7,6 +9,7 @@ from paypal.standard.forms import PayPalPaymentsForm
 from required import require 
 
 def paypal_buy(context):
+    '''render paypal form to buy item'''
     require(context, *split('notify_url return_url cancel_return amount item_name invoice'))
     
     params = {

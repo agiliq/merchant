@@ -1,8 +1,10 @@
+'''
+Template tag for google checkout
+'''
 
 import hmac
 import hashlib
 import base64
-import urllib2
 
 from string import split
 from xml.dom import minidom
@@ -21,28 +23,19 @@ CURRENCY = getattr(settings, 'GOOGLE_CHECKOUT_CURRENCY', 'USD')
 SANDBOX_URL = 'https://sandbox.google.com/checkout/api/checkout/v2/merchantCheckout/Merchant/' + MERCHANT_ID
 URL = 'https://checkout.google.com/api/checkout/v2/merchantCheckout/Merchant/' + MERCHANT_ID
 
+# URLs for browser to server request
+F_SANDBOX_URL = 'https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/' + MERCHANT_ID
+F_URL = 'https://checkout.google.com/api/checkout/v2/checkout/Merchant/' + MERCHANT_ID
+    
+
 BUTTON_SANDBOX_URL = 'http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%s&w=180&h=46&style=white&variant=text&loc=en_US' % (MERCHANT_ID)
-
 BUTTON_URL = 'http://checkout.google.com/checkout/buttons/checkout.gif?merchant_id=%s&w=180&h=46&style=white&variant=text&loc=en_US' % (MERCHANT_ID)
-
-class CartItem:
-    @property
-    def name(self):
-        return 'tshirt'
-
-    @property
-    def price(self):
-        return 100
-
-    @property
-    def quantity(self):
-        return 3
 
 
 def get_checkout_url(context):
-    """ makes a request to Google Checkout with an XML cart and parses out the returned checkout URL
-    to which we send the customer when they are ready to check out.
-    
+    """ makes a request to Google Checkout with an XML cart and parses out 
+    the returned checkout URL to which we send the customer when they are 
+    ready to check out.
     """
     redirect_url = ''
     req = _create_google_checkout_request(context)
@@ -57,9 +50,8 @@ def get_checkout_url(context):
     return redirect_url
 
 def _create_google_checkout_request(context):
-    """ constructs a network request containing an XML version of a customer's shopping cart contents
-    to submit to Google Checkout 
-    
+    """constructs a network request containing an XML version of a customer's 
+    shopping cart contents to submit to Google Checkout 
     """
     if context['test_mode']:
         url = SANDBOX_URL
@@ -77,7 +69,8 @@ def _create_google_checkout_request(context):
     return req
 
 def _parse_google_checkout_response(response_xml):
-    """ get the XML response from an XML POST to Google Checkout of our shopping cart items """
+    """ get the XML response from an XML POST to Google Checkout of 
+    our shopping cart items """
     redirect_url = ''
     xml_doc = minidom.parseString(response_xml)
     root = xml_doc.documentElement
@@ -90,9 +83,8 @@ def _parse_google_checkout_response(response_xml):
     
     
 def _build_xml_shopping_cart(context):
-    """ constructs the XML representation of the current customer's shopping cart items to POST to 
-    the Google Checkout API
-    
+    """ constructs the XML representation of the current customer's
+    shopping cart items to POST to the Google Checkout API
     """
     doc = Document()
     root = doc.createElement('checkout-shopping-cart')
@@ -103,32 +95,30 @@ def _build_xml_shopping_cart(context):
     items = doc.createElement('items')
     shopping_cart.appendChild(items)
     
-    # cart_items = cart.get_cart_items(request)
-    cart_items = [CartItem()]
-    for cart_item in cart_items:
-        item = doc.createElement('item')
-        items.appendChild(item)
-        
-        item_name = doc.createElement('item-name')
-        item_name_text = doc.createTextNode(context['item_name'])
-        item_name.appendChild(item_name_text)
-        item.appendChild(item_name)
-        
-        item_description = doc.createElement('item-description')
-        item_description_text = doc.createTextNode(context['item_name'])
-        item_description.appendChild(item_description_text)
-        item.appendChild(item_description)
-        
-        unit_price = doc.createElement('unit-price')
-        unit_price.setAttribute('currency', CURRENCY)
-        unit_price_text = doc.createTextNode(str(context['amount']))
-        unit_price.appendChild(unit_price_text)
-        item.appendChild(unit_price)
-        
-        quantity = doc.createElement('quantity')
-        quantity_text = doc.createTextNode(str(context.get('quantity', 1)))
-        quantity.appendChild(quantity_text)
-        item.appendChild(quantity)
+    # for cart_item in cart_items:
+    item = doc.createElement('item')
+    items.appendChild(item)
+    
+    item_name = doc.createElement('item-name')
+    item_name_text = doc.createTextNode(context['item_name'])
+    item_name.appendChild(item_name_text)
+    item.appendChild(item_name)
+    
+    item_description = doc.createElement('item-description')
+    item_description_text = doc.createTextNode(context['item_name'])
+    item_description.appendChild(item_description_text)
+    item.appendChild(item_description)
+    
+    unit_price = doc.createElement('unit-price')
+    unit_price.setAttribute('currency', CURRENCY)
+    unit_price_text = doc.createTextNode(str(context['amount']))
+    unit_price.appendChild(unit_price_text)
+    item.appendChild(unit_price)
+    
+    quantity = doc.createElement('quantity')
+    quantity_text = doc.createTextNode(str(context.get('quantity', 1)))
+    quantity.appendChild(quantity_text)
+    item.appendChild(quantity)
         
     checkout_flow = doc.createElement('checkout-flow-support')
     root.appendChild(checkout_flow)
@@ -175,6 +165,8 @@ def get_hmac_signature(cart_xml):
 
 
 def google_checkout(context):
+    '''inclusion tag, fetches the redirect url from google checkout
+    to complete the checkout process'''
     require(context, *split('return_url'))
     test_mode = getattr(settings, 'MERCHANT_TEST_MODE', True)
     context['test_mode'] = test_mode
@@ -190,18 +182,16 @@ def google_checkout(context):
 
 
 def google_checkout_form(context):
-    # URLs for browser to server request
-    SANDBOX_URL = 'https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/' + MERCHANT_ID
-    URL = 'https://checkout.google.com/api/checkout/v2/checkout/Merchant/' + MERCHANT_ID
-    
+    '''inclusion tag to render a form that will be submitted to google
+    checkout API'''
     require(context, *split('return_url item_name amount'))
     test_mode = getattr(settings, 'MERCHANT_TEST_MODE', True)
     context['test_mode'] = test_mode
     if test_mode:
-        url = SANDBOX_URL
+        url = F_SANDBOX_URL
         image_url = BUTTON_SANDBOX_URL
     else:
-        url = URL
+        url = F_URL
         image_url = BUTTON_URL
     
     cart_xml = _build_xml_shopping_cart(context)
@@ -212,4 +202,5 @@ def google_checkout_form(context):
             'image_url': image_url, 
             'cart': cart,
             'signature': signature,
+            'form_submit': True,
             }

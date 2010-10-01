@@ -1,9 +1,11 @@
+{% if form_submit %}
+    <form action='{{ url }}' method='post'>
+        <input type='hidden' name='cart' value='{{ cart }}' />
+        <input type='hidden' name='signature' value='{{ signature }}' />
+        <input type="image" name="Google Checkout" alt="Fast checkout through Google" src="{{ image_url }}" height="46" width="180">
+    </form>
+{% else %}
+    <a href='{{ dest_url }}'><img src='{{ image_url }}'/></a>
+{% endif %}
 
-{# <a href='{{ dest_url }}'><img src='{{ image_url }}'/></a> #}
-
-<form action='{{ url }}' method='post'>
-    <input type='hidden' name='cart' value='{{ cart }}' />
-    <input type='hidden' name='signature' value='{{ signature }}' />
-    <input type="image" name="Google Checkout" alt="Fast checkout through Google" src="{{ image_url }}" height="46" width="180">
-</form>
 
