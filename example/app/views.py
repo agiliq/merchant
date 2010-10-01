@@ -1,14 +1,16 @@
 
+import datetime
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
-
-from app.forms import CreditCardForm
 
 from billing.gateways.authorize_net import AuthorizeNetGateway
 from billing.gateways.paypal_card import PaypalCardProcess
 from billing.gateways.eway import Eway
 from billing.credit_card import CreditCard
+
+from app.forms import CreditCardForm
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
@@ -91,3 +93,27 @@ def eway(request):
                                               'response': response,
                                               'title': 'Eway'})
 
+
+def offsite_paypal(request):
+    template_vars = {'title': 'Paypal Offsite'}
+    
+    # create a unique invoice id
+    invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    paypal_params = {'amount': 1,
+                     'item_name': "name of the item",
+                     'invoice': invoice_id,
+                     'notify_url': 'http://www.example.com/your-ipn-location/',
+                     'return_url': 'http://www.example.com/your-return-location/',
+                     'cancel_return': 'http://www.example.com/your-cancel-location/',
+                     }
+    template_vars.update(paypal_params)
+    return render(request, 'app/offsite_paypal.html', template_vars)
+
+def offsite_google_checkout(request):
+    template_vars = {'title': 'Google Checkout'}
+
+    checkout_params = {'amount': 1,
+                       'item_name': 'name of the item',
+                       'return_url': 'http://www.example.com/your-return-location/',}
+    template_vars.update(checkout_params)
+    return render(request, 'app/google_checkout.html', template_vars)

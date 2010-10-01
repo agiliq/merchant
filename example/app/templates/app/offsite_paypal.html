@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+{% load billing_tags %}
+
+{% block content %}
+    Required Parameters from the view
+    <ul>
+        <li> item_name </li>
+        <li> amount </li>
+        <li> invoice </li>
+        <li> notify_url </li>
+        <li> return_url </li>
+        <li> cancel_return </li>
+    </ul>
+    {% paypal_buy %}
+{% endblock %}

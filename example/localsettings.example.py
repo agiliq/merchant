@@ -20,6 +20,10 @@ EWAY_CUSTOMER_ID = ''
 EWAY_USERNAME = ''
 EWAY_PASSWORD = ''
 
+# GOOGLE CHECKOUT SETTINGS
+GOOGLE_CHECKOUT_MERCHANT_ID = '' 
+GOOGLE_CHECKOUT_MERCHANT_KEY = ''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
