@@ -3,6 +3,7 @@ import urllib
 import urllib2
 
 from django.conf import settings
+from billing.models import AuthorizeAIMResponse
 
 API_VERSION = '3.1'
 DELIM_CHAR = ','
@@ -10,6 +11,47 @@ ENCAP_CHAR = '$'
 APPROVED, DECLINED, ERROR, FRAUD_REVIEW = 1, 2, 3, 4
 RESPONSE_CODE, RESPONSE_REASON_CODE, RESPONSE_REASON_TEXT = 0, 2, 3
 
+
+def save_authorize_response(response):
+    data = {}
+    data['response_code']                 = int(response[0])
+    data['response_reason_code']          = response[2]
+    data['response_reason_text']          = response[3]
+    data['authorization_code']            = response[4]
+    data['address_verification_response'] = response[5]
+    data['transaction_id']                = response[6]
+    data['invoice_number']                = response[7]
+    data['description']                   = response[8]
+    data['amount']                        = response[9]
+    data['method']                        = response[10]
+    data['transaction_type']              = response[11]
+    data['customer_id']                   = response[12]
+
+    data['first_name'] = response[13]
+    data['last_name']  = response[14]
+    data['company']    = response[15]
+    data['address']    = response[16]
+    data['city']       = response[17]
+    data['state']      = response[18]
+    data['zip_code']   = response[19]
+    data['country']    = response[20]
+    data['phone']      = response[21]
+    data['fax']        = response[22]
+    data['email']      = response[23]
+
+
+    data['shipping_first_name'] = response[24]
+    data['shipping_last_name']  = response[25]
+    data['shipping_company']    = response[26]
+    data['shipping_address']    = response[27]
+    data['shipping_city']       = response[28]
+    data['shipping_state']      = response[29]
+    data['shipping_zip_code']   = response[30]
+    data['shipping_country']    = response[31]
+ 
+    data['card_code_response'] = response[38]
+    AuthorizeAIMResponse.objects.create(**data)
+    
 
 class AuthorizeNetGateway:
     def __init__(self):
@@ -122,6 +164,7 @@ class AuthorizeNetGateway:
         except urllib2.URLError:
             return (5, '1', 'Could not talk to payment gateway.')
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
+        save_authorize_response(fields)
         return [fields[RESPONSE_CODE],
                 fields[RESPONSE_REASON_CODE],
                 fields[RESPONSE_REASON_TEXT]]

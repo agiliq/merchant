@@ -15,7 +15,7 @@ class GCNewOrderNotification(models.Model):
     shipping_postal_code  = models.CharField(max_length=255, blank=True)
     shipping_region       = models.CharField(max_length=255, blank=True)
     shipping_country_code = models.CharField(max_length=255, blank=True)
-    shipping_email        = models.CharField(max_length=255, blank=True)
+    shipping_email        = models.EmailField()
     shipping_company_name = models.CharField(max_length=255, blank=True)
     shipping_fax          = models.CharField(max_length=255, blank=True)
     shipping_phone        = models.CharField(max_length=255, blank=True)
@@ -28,7 +28,7 @@ class GCNewOrderNotification(models.Model):
     billing_postal_code  = models.CharField(max_length=255, blank=True)
     billing_region       = models.CharField(max_length=255, blank=True)
     billing_country_code = models.CharField(max_length=255, blank=True)
-    billing_email        = models.CharField(max_length=255, blank=True)
+    billing_email        = models.EmailField()
     billing_company_name = models.CharField(max_length=255, blank=True)
     billing_fax          = models.CharField(max_length=255, blank=True)
     billing_phone        = models.CharField(max_length=255, blank=True)
@@ -40,12 +40,12 @@ class GCNewOrderNotification(models.Model):
     cart_items     = models.TextField()
     
     # Order Adjustment details
-    total_tax                 = models.DecimalField(max_digits=64, decimal_places=2, blank=True, null=True)
+    total_tax                 = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
     total_tax_currency        = models.CharField(max_length=255, blank=True)
-    adjustment_total          = models.DecimalField(max_digits=64, decimal_places=2, blank=True, null=True)
+    adjustment_total          = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
     adjustment_total_currency = models.CharField(max_length=255, blank=True)
     
-    order_total               = models.DecimalField(max_digits=64, decimal_places=2, blank=True, null=True)
+    order_total               = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
     order_total_currency      = models.CharField(max_length=255, blank=True)
     
     financial_order_state     = models.CharField(max_length=255, blank=True)

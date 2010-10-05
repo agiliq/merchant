@@ -1,6 +1,7 @@
 
 import datetime
 
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
@@ -99,21 +100,25 @@ def offsite_paypal(request):
     
     # create a unique invoice id
     invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    return_url = request.build_absolute_uri(reverse('app_offsite_paypal_done'))
+    cancel_return = request.build_absolute_uri(request.META['PATH_INFO'])
+    print cancel_return
     paypal_params = {'amount': 1,
                      'item_name': "name of the item",
                      'invoice': invoice_id,
                      'notify_url': 'http://www.example.com/your-ipn-location/',
-                     'return_url': 'http://www.example.com/your-return-location/',
-                     'cancel_return': 'http://www.example.com/your-cancel-location/',
+                     'return_url': return_url,
+                     'cancel_return': cancel_return,
                      }
     template_vars.update(paypal_params)
     return render(request, 'app/offsite_paypal.html', template_vars)
 
 def offsite_google_checkout(request):
     template_vars = {'title': 'Google Checkout'}
-
+    
+    return_url = request.build_absolute_uri(reverse('app_offsite_google_checkout_done'))
     checkout_params = {'amount': 1,
                        'item_name': 'name of the item',
-                       'return_url': 'http://www.example.com/your-return-location/',}
+                       'return_url': return_url,}
     template_vars.update(checkout_params)
     return render(request, 'app/google_checkout.html', template_vars)

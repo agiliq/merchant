@@ -57,14 +57,15 @@ def gc_new_order_notification(request):
     
     data['total_tax']                 = post_data.get('order-adjustment.total-tax', '')
     data['total_tax_currency']        = post_data.get('order-adjustment.total-tax.currency', '')
-    data['adjustment_total'] = post_data.get('order-adjustment.adjustment-total', '')
+    data['adjustment_total']          = post_data.get('order-adjustment.adjustment-total', '')
     data['adjustment_total_currency'] = post_data.get('order-adjustment.adjustment-total.currency', '')
     
     data['order_total'] = post_data.get('order-total', '')
     data['order_total_currency'] = post_data.get('order-total.currency', '')
     
-    data['financial_order_state'] = post_data.get('financial-order-state', '')
+    data['financial_order_state']   = post_data.get('financial-order-state', '')
     data['fulfillment_order_state'] = post_data.get('fulfillment-order-state', '')
+    
     data['timestamp'] = post_data.get('timestamp', '')
     
     GCNewOrderNotification.objects.create(**data)
