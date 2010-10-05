@@ -1,0 +1,13 @@
+This is an example app to test Django-Merchant.
+
+It is a test webstore which showcases the various Backends.
+
+Its has two things which you can buy.
+
+1. The Foo Story: Its a non-fiction book about Foo.
+2. Will the real Bar please stand up?: Its a fantasy fan-fiction about Bar. 
+
+Users choose what they will buy, and they are give option to pay via various Backends.
+
+After they make payments they are sent a mail describing the payments made, and the book is delivered.
+
