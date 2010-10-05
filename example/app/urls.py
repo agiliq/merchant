@@ -14,6 +14,11 @@ urlpatterns += patterns('app.views',
     url(r'offsite/google-checkout/$', 'offsite_google_checkout', name='app_offsite_google_checkout'),
 )
 
+# paypal payment notification handler
+urlpatterns += patterns('',
+    (r'^paypal-ipn-handler/', include('paypal.standard.ipn.urls')),
+)
+
 urlpatterns += patterns('django.views.generic.simple',
     url(r'offsite/paypal/done/$', 
         'direct_to_template', 

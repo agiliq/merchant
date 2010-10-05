@@ -102,11 +102,12 @@ def offsite_paypal(request):
     invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     return_url = request.build_absolute_uri(reverse('app_offsite_paypal_done'))
     cancel_return = request.build_absolute_uri(request.META['PATH_INFO'])
-    print cancel_return
+    notify_url = request.build_absolute_uri(reverse('paypal-ipn'))
+    
     paypal_params = {'amount': 1,
                      'item_name': "name of the item",
                      'invoice': invoice_id,
-                     'notify_url': 'http://www.example.com/your-ipn-location/',
+                     'notify_url': notify_url,
                      'return_url': return_url,
                      'cancel_return': cancel_return,
                      }
