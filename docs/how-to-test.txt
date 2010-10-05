@@ -1,0 +1,10 @@
+Authorize.net 
+
+Test with Test Visa credit card: 4222222222222
+
+Paypal:
+Google Checkout
+Eway
+RBS
+Paypal Website Standrad
+
