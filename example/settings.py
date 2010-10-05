@@ -96,6 +96,7 @@ INSTALLED_APPS = (
     'billing',
     'paypal.standard', 
     'paypal.pro',
+    'paypal.standard.ipn',
 )
 
 try:
