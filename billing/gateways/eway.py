@@ -9,7 +9,7 @@ LIVE_URL     = 'https://www.eway.com.au/gateway/xmlpayment.asp'
 TEST_CVN_URL = 'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp'
 LIVE_CVN_URL = 'https://www.eway.com.au/gateway_cvn/xmlpayment.asp'
 
-class Eway:
+class Eway(object):
     def __init__(self):
         self.test_mode = getattr(settings, 'MERCHANT_TEST_MODE', True)
         self.client = RebillEwayClient(test_mode=self.test_mode,
@@ -61,6 +61,3 @@ class Eway:
         self.hosted_customer.JobDesc = "test"
         self.hosted_customer.Comments = "Now!"
         self.hosted_customer.URL = "http://www.google.com.au"
-
-    
-    
