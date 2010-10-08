@@ -53,7 +53,7 @@ def save_authorize_response(response):
     AuthorizeAIMResponse.objects.create(**data)
     
 
-class AuthorizeNetGateway:
+class AuthorizeNetGateway(object):
     def __init__(self):
         self.login = settings.AUTHORIZE_LOGIN_ID
         self.password = settings.AUTHORIZE_TRANSACTION_KEY

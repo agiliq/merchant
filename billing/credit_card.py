@@ -36,8 +36,7 @@ class CreditCard(object):
         
         if re.match(CARD_COMPANIES['maestro'], self.number):
             return 'maestro' 
-        else:
-            return None
+        return None
     
     def is_luhn_valid(self):
         """Checks the validity of card number by using Luhn Algorithm. 

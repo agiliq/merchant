@@ -1,7 +1,7 @@
 """
 Paypal DoDirectPayment API
 """
-class PaypalCardProcess:
+class PaypalCardProcess(object):
     def __init__(self):
         pass
     
