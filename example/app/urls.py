@@ -12,6 +12,7 @@ urlpatterns = patterns('app.views',
 urlpatterns += patterns('app.views',
     url(r'offsite/paypal/$', 'offsite_paypal', name='app_offsite_paypal'),
     url(r'offsite/google-checkout/$', 'offsite_google_checkout', name='app_offsite_google_checkout'),
+    url(r'offsite/rbs/$', 'offsite_rbs', name='app_offsite_rbs'),
 )
 
 # paypal payment notification handler

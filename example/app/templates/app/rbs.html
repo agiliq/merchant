@@ -1,0 +1,36 @@
+{% extends 'app/base.html' %}
+{% load billing_tags %}
+
+{% block content %}
+    Expected Parameters from the view
+    <ul>
+        <li> cart_id, merchants reference to the transaction  </li>
+        <li> amount </li>
+        <li> currency, defaults to USD </li>
+        <li> description, description about the selling item, defaults to empty string </li>
+    </ul>
+    <h3>For recurring billing</h3>
+    <ul>
+        <li> is_recurring (Bool: True/False, defauts to False) </li>
+        <li> billing_interval_unit, 
+            Units for billing interval, day/week/month/year, defaults to month
+        </li>
+        <li> billing_interval_multiplier, 
+            The billing interval unit multiplier, default to 1
+            <br/>
+            The actual interval between payments is 
+                <b>billing_interval_unit multiplied by billing_interval_multiplier.</b>
+            <br/>
+            EX: For billing interval of 15 days,
+            <p> billing_interval_unit = day</p>
+            <p> billing_interval_multiplier = 15</p>
+            Note: Minumum interval time is 2 weeks (14 days)
+        </li>
+        <li> number_of_payments, 
+            Integer, number of times the customer has to be 
+            charged(including first month), default to 12
+        </li>
+    </ul>
+    
+    {% rbs_buy %}
+{% endblock %}

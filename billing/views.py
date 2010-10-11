@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from billing.models import GCNewOrderNotification
+from billing.models import GCNewOrderNotification, RBSResponse
 
 def gc_cart_items_blob(post_data):
     items = post_data.getlist('shopping-cart.items')
@@ -80,10 +80,55 @@ def gc_order_state_change_notification(request):
     
 @csrf_exempt
 @require_POST
-def notify_handler(request):
+def gc_notify_handler(request):
     if request.POST['_type'] == 'new-order-notification':
         gc_new_order_notification(request)
     elif request.POST['_type'] == 'order-state-change-notification':
         gc_order_state_change_notification(request)
     
     return HttpResponse(request.POST['serial-number'])
+
+    
+@csrf_exempt
+@require_POST
+def notify_handler(request):
+    post_data = request.POST
+    data = {}
+
+    data['installation_id'] = post_data.get('instId', '')
+    data['company_name']    = post_data.get('compName', '')
+    
+    data['cart_id']       = post_data.get('cartId', '')
+    data['description']   = post_data.get('desc', '')
+    data['amount']        = post_data.get('amount', '')
+    data['currency']      = post_data.get('currency', '')
+    data['amount_string'] = post_data.get('amountString', '')
+    
+    data['auth_mode'] = post_data.get('authMode', '')
+    data['test_mode'] = post_data.get('testMode', '')
+    
+    data['transaction_id']     = post_data.get('transId', '')
+    data['transaction_status'] = post_data.get('transStatus', '')
+    data['transaction_time']   = post_data.get('transTime', '')
+    data['auth_amount']        = post_data.get('authAmount', '')
+    data['auth_currency']      = post_data.get('authCurrency', '')
+    data['auth_amount_string'] = post_data.get('authAmountString', '')
+    data['raw_auth_message']   = post_data.get('rawAuthMessage', '')
+    data['raw_auth_code']      = post_data.get('rawAuthCode', '')
+    
+    data['name']         = post_data.get('name', '')
+    data['address']      = post_data.get('address', '')
+    data['post_code']    = post_data.get('postcode', '')
+    data['country_code'] = post_data.get('country', '')
+    data['country']      = post_data.get('countryString', '')
+    data['phone']        = post_data.get('tel', '')
+    data['fax']          = post_data.get('fax', '')
+    data['email']        = post_data.get('email', '')
+   
+    data['future_pay_id'] = post_data.get('futurePayId', '')
+
+    data['card_type']  = post_data.get('cardType', '')
+    data['ip_address'] = post_data.get('ipAddress', '')
+    
+    RBSResponse.objects.create(**data)
+    return HttpResponse("Payment successful")

@@ -123,3 +123,17 @@ def offsite_google_checkout(request):
                        'return_url': return_url,}
     template_vars.update(checkout_params)
     return render(request, 'app/google_checkout.html', template_vars)
+
+
+def offsite_rbs(request):
+    template_vars = {'title': 'RBS'}
+    checkout_params = {'amount': 1,
+                       'cart_id': 'TEST123',
+                       'is_recurring': True,
+                       # 'billing_interval_unit': 'DAY',
+                       # 'billing_interval_multiplier': 7
+                       }
+
+    template_vars.update(checkout_params)
+    return render(request, 'app/rbs.html', template_vars)
+    
