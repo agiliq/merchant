@@ -50,7 +50,7 @@ def save_authorize_response(response):
     data['shipping_country']    = response[31]
  
     data['card_code_response'] = response[38]
-    AuthorizeAIMResponse.objects.create(**data)
+    return AuthorizeAIMResponse.objects.create(**data)
     
 
 class AuthorizeNetGateway(object):
@@ -164,7 +164,4 @@ class AuthorizeNetGateway(object):
         except urllib2.URLError:
             return (5, '1', 'Could not talk to payment gateway.')
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
-        save_authorize_response(fields)
-        return [fields[RESPONSE_CODE],
-                fields[RESPONSE_REASON_CODE],
-                fields[RESPONSE_REASON_TEXT]]
+        return save_authorize_response(fields)

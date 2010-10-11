@@ -37,5 +37,4 @@ class PaypalCardProcess(object):
         # params.update(item)
         
         wpp = PayPalWPP(options['request']) 
-        response = wpp.doDirectPayment(params)
-        return (response.ack)
+        return wpp.doDirectPayment(params)
