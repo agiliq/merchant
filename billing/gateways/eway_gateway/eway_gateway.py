@@ -1,7 +1,7 @@
 
 from django.conf import settings
-
 from eway_api.client import RebillEwayClient, HOSTED_TEST_URL, HOSTED_LIVE_URL
+from billing import Gateway
 
 TEST_URL     = 'https://www.eway.com.au/gateway/xmltest/testpage.asp'
 LIVE_URL     = 'https://www.eway.com.au/gateway/xmlpayment.asp'
@@ -9,7 +9,7 @@ LIVE_URL     = 'https://www.eway.com.au/gateway/xmlpayment.asp'
 TEST_CVN_URL = 'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp'
 LIVE_CVN_URL = 'https://www.eway.com.au/gateway_cvn/xmlpayment.asp'
 
-class EwayGateway(object):
+class EwayGateway(Gateway):
     def __init__(self):
         self.test_mode = getattr(settings, 'MERCHANT_TEST_MODE', True)
         self.client = RebillEwayClient(test_mode=self.test_mode,
@@ -19,21 +19,6 @@ class EwayGateway(object):
                                       url=HOSTED_TEST_URL if self.test_mode else HOSTED_LIVE_URL,
                                       )
         self.hosted_customer = self.client.client.factory.create("CreditCard")
-    
-    def purchase(self, money, credit_card, options={}):
-        """Using Eway payment gateway , charge the given
-        credit card for specified money"""
-        self.add_creditcard(credit_card)
-        self.add_address(options)
-        
-        customer_id = self.client.create_hosted_customer(self.hosted_customer)
-        if self.test_mode:
-            customer_id = '9876543211000'
-        payment_result = self.client.process_payment(customer_id, 
-                                                     money * 100, 
-                                                     "test", 
-                                                     "test")
-        return payment_result
     
     def add_creditcard(self, credit_card):
         """add credit card details to the request parameters"""
@@ -61,3 +46,42 @@ class EwayGateway(object):
         self.hosted_customer.JobDesc = "test"
         self.hosted_customer.Comments = "Now!"
         self.hosted_customer.URL = "http://www.google.com.au"
+
+    def purchase(self, money, credit_card, options={}):
+        """Using Eway payment gateway , charge the given
+        credit card for specified money"""
+        self.add_creditcard(credit_card)
+        self.add_address(options)
+        
+        customer_id = self.client.create_hosted_customer(self.hosted_customer)
+        if self.test_mode:
+            customer_id = '9876543211000'
+        payment_result = self.client.process_payment(customer_id, 
+                                                     money * 100, 
+                                                     "test", 
+                                                     "test")
+        response = payment_result
+        # TODO: Fix the status and remove the hardcodings above
+        return {"status": , "response": response}
+    
+    def authorize(self, money, credit_card, options = {}):
+        raise NotImplementedError
+
+    def capture(self, money, authorization, options = {}):
+        raise NotImplementedError
+
+    def void(self, identification, options = {}):
+        raise NotImplementedError
+
+    def credit(self, money, identification, options = {}):
+        raise NotImplementedError
+
+    def recurring(self, money, creditcard, options = {}):
+        raise NotImplementedError
+
+    def store(self, creditcard, options = {}):
+        raise NotImplementedError
+
+    def unstore(self, identification, options = {}):
+        raise NotImplementedError
+
