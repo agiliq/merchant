@@ -1,13 +1,13 @@
 from django.test import TestCase
 from django.conf import settings
-from billing import Merchant
-from billing.signals import *
-from billing.models import AuthorizeAIMResponse
-from billing.credit_card import CreditCard
+from billing import get_gateway
+#from billing.signals import *
+from billing.models.authorize_models import AuthorizeAIMResponse
+from billing.utils.credit_card import CreditCard
 
 class AuthorizeNetAIMGatewayTestCase(TestCase):
     def setUp(self):
-        self.merchant = Merchant()
+        self.merchant = get_gateway("authorize_net")
         self.credit_card = CreditCard(first_name="Test", last_name="User", 
                                       month=10, year=2011, 
                                       number="4222222222222222", 
@@ -15,8 +15,8 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
                                       verification_value="100")
 
     def testPurchase(self):
-        resp = self.merchant.charge(1, self.credit_card)
-        self.assertEquals(resp.status, "OK")
+        resp = self.merchant.purchase(1, self.credit_card)
+        self.assertEquals(resp.status, "SUCCESS")
         # In test mode, the transaction ID from Authorize.net is 0
         self.assertEquals(resp.transaction_id, "0")
         self.assertTrue(isinstance(resp.actual, AuthorizeAIMResponse)) 
@@ -45,5 +45,5 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
 
     def testCreditCardExpired(self):
         resp = self.merchange.charge(8, self.credit_card)
-        self.assertNotEquals(resp.status, "OK")
+        self.assertNotEquals(resp.status, "SUCCESS")
 
