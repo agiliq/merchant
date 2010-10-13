@@ -4,6 +4,7 @@ import urllib2
 
 from django.conf import settings
 from billing.models import AuthorizeAIMResponse
+from billing import Gateway
 
 API_VERSION = '3.1'
 DELIM_CHAR = ','
@@ -53,7 +54,7 @@ def save_authorize_response(response):
     return AuthorizeAIMResponse.objects.create(**data)
     
 
-class AuthorizeNetGateway(object):
+class AuthorizeNetGateway(Gateway):
     def __init__(self):
         self.login = settings.AUTHORIZE_LOGIN_ID
         self.password = settings.AUTHORIZE_TRANSACTION_KEY
@@ -63,19 +64,6 @@ class AuthorizeNetGateway(object):
 
         # self.arb_test_url = 'https://apitest.authorize.net/xml/v1/request.api'
         # self.arb_live_url = 'https://api.authorize.net/xml/v1/request.api'
-    
-    def purchase(self, money, credit_card, options={}):
-        """Using Authorize.net payment gateway , charge the given
-        credit card for specified money"""
-        post = {}
-        
-        self.add_invoice(post, options) 
-        self.add_creditcard(post, credit_card) 
-        self.add_address(post, options)
-        self.add_customer_data(post, options)
-        # self.add_duplicate_window(post)
-
-        return self.commit('AUTH_CAPTURE', money, post)
     
     def add_invoice(self, post, options):
         """add invoice details to the request parameters"""
@@ -100,7 +88,7 @@ class AuthorizeNetGateway(object):
             post['zip']      = address.get('zip', '')
             post['city']     = address.get('city', '')
             post['country']  = address.get('country', '')
-            post[':state']   = address.get('state', '')
+            post['state']   = address.get('state', '')
           
         if options.get('shipping_address', None):
             address = options.get('shipping_address')
@@ -165,3 +153,88 @@ class AuthorizeNetGateway(object):
             return (5, '1', 'Could not talk to payment gateway.')
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
         return save_authorize_response(fields)
+
+    def purchase(self, money, credit_card, options={}):
+        """Using Authorize.net payment gateway, charge the given
+        credit card for specified money"""
+        post = {}
+        
+        self.add_invoice(post, options) 
+        self.add_creditcard(post, credit_card) 
+        self.add_address(post, options)
+        self.add_customer_data(post, options)
+
+        response = self.commit("AUTH_CAPTURE", money, post)
+        status = "SUCCESS"
+        if response.response_code != 1:
+            status = "FAILURE"
+        return {"status": status, "response": response}
+    
+    def authorize(self, money, credit_card, options = {}):
+        """Using Authorize.net payment gateway, authorize the
+        credit card for specified money"""
+        post = {}
+        
+        self.add_invoice(post, options) 
+        self.add_creditcard(post, credit_card) 
+        self.add_address(post, options)
+        self.add_customer_data(post, options)
+
+        response = self.commit("AUTH_ONLY", money, post)
+        status = "SUCCESS"
+        if response.response_code != 1:
+            status = "FAILURE"
+        return {"status": status, "response": response}
+    
+    def capture(self, money, authorization, options = {}):
+        """Using Authorize.net payment gateway, capture the
+        authorize credit card"""
+        post = {}
+        
+        post["trans_id"] = authorization
+        post.update(options)
+
+        response = self.commit("PRIOR_AUTH_CAPTURE", money, post)
+        status = "SUCCESS"
+        if response.response_code != 1:
+            status = "FAILURE"
+        return {"status": status, "response": response}
+    
+    def void(self, identification, options = {}):
+        """Using Authorize.net payment gateway, void the
+        specified transaction"""
+        post = {}
+        
+        post["trans_id"] = identification
+        post.update(options)
+
+        response = self.commit("VOID", money, post)
+        status = "SUCCESS"
+        if response.response_code != 1:
+            status = "FAILURE"
+        return {"status": status, "response": response}
+
+    def credit(self, money, identification, options = {}):
+        """Using Authorize.net payment gateway, void the
+        specified transaction"""
+        post = {}
+        
+        post["trans_id"] = identification
+        # Authorize.Net requuires the card or the last 4 digits be sent
+        post["card_num"] = options["credit_card"]
+        post.update(options)
+
+        response = self.commit("CREDIT", money, post)
+        status = "SUCCESS"
+        if response.response_code != 1:
+            status = "FAILURE"
+        return {"status": status, "response": response}
+
+    def recurring(self, money, creditcard, options = {}):
+        raise NotImplementedError
+
+    def store(self, creditcard, options = {}):
+        raise NotImplementedError
+
+    def unstore(self, identification, options = {}):
+        raise NotImplementedError
