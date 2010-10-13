@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.conf import settings
 from billing import get_gateway
 from billing.signals import *
-from billing.models.authorize_models import AuthorizeAIMResponse
+from billing.models import AuthorizeAIMResponse
 from billing.utils.credit_card import CreditCard
 
 class AuthorizeNetAIMGatewayTestCase(TestCase):
@@ -24,24 +24,24 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
     def testPaymentSuccessfulSignal(self):
         received_signals = []
 
-        def recieve(sender, **kwargs):
+        def receive(sender, **kwargs):
             received_signals.append(kwargs.get("signal"))
 
-        payment_was_succesful.connect(recieve)
+        payment_was_successful.connect(receive)
 
         resp = self.merchant.purchase(1000, self.credit_card)
-        self.assertEquals(recieved_signals, [payment_was_successful])
+        self.assertEquals(received_signals, [payment_was_successful])
 
     def testPaymentUnSuccessfulSignal(self):
         received_signals = []
 
-        def recieve(sender, **kwargs):
+        def receive(sender, **kwargs):
             received_signals.append(kwargs.get("signal"))
 
-        payment_was_unsuccesful.connect(recieve)
+        payment_was_unsuccessful.connect(receive)
 
         resp = self.merchant.purchase(6, self.credit_card)
-        self.assertEquals(recieved_signals, [payment_was_unsuccessful])
+        self.assertEquals(received_signals, [payment_was_unsuccessful])
 
     def testCreditCardExpired(self):
         resp = self.merchant.purchase(8, self.credit_card)
