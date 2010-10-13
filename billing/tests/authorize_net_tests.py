@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.conf import settings
 from billing import get_gateway
-#from billing.signals import *
+from billing.signals import *
 from billing.models.authorize_models import AuthorizeAIMResponse
 from billing.utils.credit_card import CreditCard
 
@@ -29,7 +29,7 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
 
         payment_was_succesful.connect(recieve)
 
-        resp = self.merchange.charge(1000, self.credit_card)
+        resp = self.merchant.purchase(1000, self.credit_card)
         self.assertEquals(recieved_signals, [payment_was_successful])
 
     def testPaymentUnSuccessfulSignal(self):
@@ -40,10 +40,10 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
 
         payment_was_unsuccesful.connect(recieve)
 
-        resp = self.merchange.charge(6, self.credit_card)
+        resp = self.merchant.purchase(6, self.credit_card)
         self.assertEquals(recieved_signals, [payment_was_unsuccessful])
 
     def testCreditCardExpired(self):
-        resp = self.merchange.charge(8, self.credit_card)
+        resp = self.merchant.purchase(8, self.credit_card)
         self.assertNotEquals(resp.status, "SUCCESS")
 

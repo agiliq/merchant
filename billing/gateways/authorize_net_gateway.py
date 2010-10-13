@@ -3,7 +3,7 @@ import urllib
 import urllib2
 
 from django.conf import settings
-from billing.models import AuthorizeAIMResponse
+from billing.models.authorize_models import AuthorizeAIMResponse
 
 API_VERSION = '3.1'
 DELIM_CHAR = ','
