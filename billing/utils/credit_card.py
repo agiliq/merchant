@@ -9,6 +9,9 @@ class CreditCard(object):
     # The regexp attribute should be overriden by the subclasses.
     # Attribute value should be a regexp instance
     regexp = None
+    # Has to be set by the user after calling `validate_card`
+    # method on the gateway
+    card_type = None
 
     def __init__(self, **kwargs):
         self.first_name = kwargs["first_name"]

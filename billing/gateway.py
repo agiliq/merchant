@@ -46,6 +46,7 @@ class Gateway(object):
         for card in self.supported_cardtypes:
             card_supported = card.regexp.match(credit_card.number)
             if card_supported:
+                credit_card.card_type = card
                 break
         if not card_supported:
             raise CardNotSupported("This credit card is not "

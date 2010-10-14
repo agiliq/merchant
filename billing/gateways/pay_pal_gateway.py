@@ -1,25 +1,20 @@
-"""
-Paypal DoDirectPayment API
-"""
-
 from billing import Gateway
-from paypal.pro.helpers import PayPalWPP        
+from paypal.pro.helpers import PayPalWPP
+from billing.utils.credit_card import Visa, MasterCard, AmericanExpress, Discover
 
-class PaypalGateway(Gateway):
+class PayPalGateway(Gateway):
+    default_currency = "USD"
+    supported_countries = ["US"]
+    supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
+    homepage_url = "https://merchant.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=merchant/wp_pro"
+    display_name = "PayPal Website Payments Pro"
+
     def __init__(self):
         pass
     
     def purchase(self, money, credit_card, options={}):
         """Using PAYPAL DoDirectPayment, charge the given
         credit card for specified money"""
-        # item = {
-        #     'inv': 'inv',
-        #     'custom': 'custom',
-        #     'next': 'http://www.example.com/next/',
-        #     'returnurl': 'http://www.example.com/pay/',
-        #     'cancelurl': 'http://www.example.com/cancel/'
-        # }
-        
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
 
@@ -30,16 +25,31 @@ class PaypalGateway(Gateway):
         params['cvv2'] = credit_card.verification_value
         params['ipaddress'] = options['request'].META.get("REMOTE_ADDR", "")
         params['amt'] = money
+
+        if options.get("email"):
+            params['email'] = options["email"]
         
+        address = options["billing_address"]
         params['firstname'] = credit_card.first_name
         params['lastname'] = credit_card.last_name
-        params['street'] = '1 Main St'
-        params['city'] = 'SAn Jose'
-        params['state'] = 'CA'
-        params['countrycode'] = 'US'
-        params['zip'] = '95131'
-        
-        # params.update(item)
+        params['street'] = address["address1"]
+        params['street2'] = address.get("address2", "")
+        params['city'] = address["city"]
+        params['state'] = address["state"]
+        params['countrycode'] = address["country"]
+        params['zip'] = address["zip"]
+        params['phone'] = address.get("phone", "")
+
+        shipping_address = option.get("shipping_address", None)
+        if shipping_address:
+            params['shiptoname'] = shipping_address["name"]
+            params['shiptostreet'] = shipping_address["address1"]
+            params['shiptostreet2'] = shipping_address.get("address2", "")
+            params['shiptocity'] = shipping_address["city"]
+            params['shiptostate'] = shipping_address["state"]
+            params['shiptocountry'] = shipping_address["country"]
+            params['shiptozip'] = shipping_address["zip"]
+            params['shiptophonenum'] = shipping_address.get("phone", "")
         
         wpp = PayPalWPP(options['request']) 
         response = wpp.doDirectPayment(params)
