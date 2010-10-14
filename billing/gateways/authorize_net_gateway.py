@@ -92,7 +92,8 @@ class AuthorizeNetGateway(Gateway):
         """add billing/shipping address details to the request parameters"""
         if options.get('billing_address', None):
             address = options.get('billing_address')
-            post['address']  = address.get('address', '')
+            post['address']  = address.get('address1', '') + \
+                               address.get('address2', '')
             post['company']  = address.get('company', '')
             post['phone']    = address.get('phone', '')
             post['zip']      = address.get('zip', '')
@@ -102,9 +103,10 @@ class AuthorizeNetGateway(Gateway):
           
         if options.get('shipping_address', None):
             address = options.get('shipping_address')
-            post['ship_to_first_name'] = address.get('first_name', '')
-            post['ship_to_last_name']  = address.get('last_name', '')
-            post['ship_to_address']    = address.get('address', '')
+            post['ship_to_first_name'] = address.get('name', '').split(" ")[0]
+            post['ship_to_last_name']  = " ".join(address.get('name', '').split(" ")[1:])
+            post['ship_to_address']    = address.get('address1', '') + \
+                                         address.get('address2', '')
             post['ship_to_company']    = address.get('company', '')
             post['ship_to_phone']      = address.get('phone', '')
             post['ship_to_zip']        = address.get('zip', '')
@@ -116,7 +118,7 @@ class AuthorizeNetGateway(Gateway):
         """add customer details to the request parameters"""
         if options.has_key('email'):
             post['email'] = options['email']
-            post['email_customer'] = False
+            post['email_customer'] = True
         
         if options.has_key('customer'):
             post['cust_id'] = options['customer']
