@@ -2,41 +2,18 @@
 import re
 import datetime
 
-CARD_COMPANIES = {
-    'visa'               : '^4\d{12}(\d{3})?$',
-    'master'             : '^(5[1-5]\d{4}|677189)\d{10}$',
-    'discover'           : '^(6011|65\d{2})\d{12}$',
-    'american_express'   : '^3[47]\d{13}$',
-    'diners_club'        : '^3(0[0-5]|[68]\d)\d{11}$',
-    'jcb'                : '^35(28|29|[3-8]\d)\d{12}$',
-    'switch'             : '^6759\d{12}(\d{2,3})?$',  
-    'solo'               : '^6767\d{12}(\d{2,3})?$',
-    'dankort'            : '^5019\d{12}$',
-    'maestro'            : '^(5[06-8]|6\d)\d{10,17}$',
-    'forbrugsforeningen' : '^600722\d{10}$',
-    'laser'              : '^(6304|6706|6771|6709)\d{8}(\d{4}|\d{6,7})?$'
-}
-
 class CreditCard(object):
-    def __init__(self, first_name=None, last_name=None, month=None, year=None, number=None, card_type=None, verification_value=None):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.month = int(month)
-        self.year = int(year)
-        self.number = number
-        self.card_type = card_type or self.get_card_type()
-        self.verification_value = verification_value
-    
-    def get_card_type(self):
-        """Find the credit card type for the given card number"""
-        for company, pattern in CARD_COMPANIES.items():
-            # Maestro regexp overlaps with the MasterCard regexp (IIRC).
-            if not company == 'maestro' and re.match(pattern, self.number):
-                return company
-        
-        if re.match(CARD_COMPANIES['maestro'], self.number):
-            return 'maestro' 
-        return None
+    # The regexp attribute should be overriden by the subclasses.
+    # Attribute value should be a regexp instance
+    regexp = None
+
+    def __init__(self, **kwargs):
+        self.first_name = kwargs["first_name"]
+        self.last_name = kwargs["last_name"]
+        self.month = int(kwargs["month"])
+        self.year = int(kwargs["year"])
+        self.number = kwargs["number"]
+        self.verification_value = kwargs["verification_value"]
     
     def is_luhn_valid(self):
         """Checks the validity of card number by using Luhn Algorithm. 
@@ -72,4 +49,54 @@ class CreditCard(object):
     def name(self):
         """Concat first name and last name of the card holder"""
         return '%s %s' % (self.first_name, self.last_name)
-    
+
+
+class Visa(CreditCard):
+    regexp = re.compile('^4\d{12}(\d{3})?$')
+
+class MasterCard(CreditCard):
+    regexp = re.compile('^(5[1-5]\d{4}|677189)\d{10}$')
+
+class Discover(CreditCard):
+    regexp = re.compile('^(6011|65\d{2})\d{12}$')
+
+class AmericanExpress(CreditCard):
+    regexp = re.compile('^3[47]\d{13}$')
+
+class DinersClub(CreditCard):
+    regexp = re.compile('^3(0[0-5]|[68]\d)\d{11}$')
+
+class JCB(CreditCard):
+    regexp = re.compile('^35(28|29|[3-8]\d)\d{12}$')
+
+class Switch(CreditCard):
+    # Debit Card
+    regexp = re.compile('^6759\d{12}(\d{2,3})?$')
+
+class Solo(CreditCard):
+    # Debit Card
+    regexp = re.compile('^6767\d{12}(\d{2,3})?$')
+
+class Dankort(CreditCard):
+    # Debit cum Credit Card
+    regexp = re.compile('^5019\d{12}$')
+
+class Maestro(CreditCard):
+    # Debit Card
+    regexp = re.compile('^(5[06-8]|6\d)\d{10,17}$')
+
+class Forbrugsforeningen(CreditCard):
+    regexp = re.compile('^600722\d{10}$')
+
+class Laser(CreditCard):
+    # Debit Card
+    regexp = re.compile('^(6304|6706|6771|6709)\d{8}(\d{4}|\d{6,7})?$')
+
+# A few helpful (probably) attributes
+all_credit_cards = [Visa, MasterCard, Discover, AmericanExpress,
+                    DinersClub, JCB]
+
+all_debit_cards  = [Switch, Solo, Dankort, Maestro,
+                    Forbrugsforeningen, Laser]
+
+all_cards = all_credit_cards + all_debit_cards
