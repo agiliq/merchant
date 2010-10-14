@@ -20,6 +20,9 @@ class PaypalGateway(Gateway):
         #     'cancelurl': 'http://www.example.com/cancel/'
         # }
         
+        if not self.validate_card(credit_card):
+            raise InvalidCard("Invalid Card")
+
         params = {}
         params['creditcardtype'] = credit_card.card_type
         params['acct'] = credit_card.number
@@ -44,6 +47,8 @@ class PaypalGateway(Gateway):
         return {"status": , "response": response}
 
     def authorize(self, money, credit_card, options = {}):
+        if not self.validate_card(credit_card):
+            raise InvalidCard("Invalid Card")
         raise NotImplementedError
 
     def capture(self, money, authorization, options = {}):

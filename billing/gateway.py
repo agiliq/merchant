@@ -7,6 +7,9 @@ class GatewayModuleNotFound(Exception):
 class GatewayNotConfigured(Exception):
     pass
 
+class CardNotSupported(Exception):
+    pass
+
 class Gateway(object):
     """Sub-classes to inherit from this and implement the below methods"""
 
@@ -15,7 +18,7 @@ class Gateway(object):
 
     # The below are optional attributes to be implemented and used by subclases.
     #
-    # Set to indicate the default currency for the gateway. Can be a sequence.
+    # Set to indicate the default currency for the gateway.
     default_currency = ""
     # Sequence of countries supported by the gateway in ISO 3166 alpha-2 format.
     # http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
@@ -29,6 +32,21 @@ class Gateway(object):
     display_name = ""
     # Application name or some unique identifier for the gateway.
     application_id = ""
+
+    def validate_card(self, credit_card):
+        """Checks if the credit card is supported by the gateway
+        and calls the `is_valid` method on it. Responsibility
+        of the gateway author to use this method before every
+        card transaction."""
+        card_supported = None
+        for card in self.supported_cardtypes:
+            card_supported = card.regexp.match(credit_card.number)
+            if card_supported:
+                break
+        if not card_supported:
+            raise CardNotSupported("This credit card is not "
+                                   "supported by the gateway.")
+        return credit_card.is_valid()
 
     def purchase(self, money, credit_card, options = {}):
         """One go authorize and capture transaction"""

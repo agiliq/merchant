@@ -50,6 +50,8 @@ class EwayGateway(Gateway):
     def purchase(self, money, credit_card, options={}):
         """Using Eway payment gateway , charge the given
         credit card for specified money"""
+        if not self.validate_card(credit_card):
+            raise InvalidCard("Invalid Card")
         self.add_creditcard(credit_card)
         self.add_address(options)
         

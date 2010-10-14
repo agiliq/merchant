@@ -2,6 +2,9 @@
 import re
 import datetime
 
+class InvalidCard(Exception):
+    pass
+
 class CreditCard(object):
     # The regexp attribute should be overriden by the subclasses.
     # Attribute value should be a regexp instance
