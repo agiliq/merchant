@@ -38,10 +38,6 @@ class Gateway(object):
         and calls the `is_valid` method on it. Responsibility
         of the gateway author to use this method before every
         card transaction."""
-        # Gateways might provide some random number which
-        # might not pass Luhn's test.
-        if self.test_mode:
-           return True 
         card_supported = None
         for card in self.supported_cardtypes:
             card_supported = card.regexp.match(credit_card.number)
@@ -51,6 +47,10 @@ class Gateway(object):
         if not card_supported:
             raise CardNotSupported("This credit card is not "
                                    "supported by the gateway.")
+        # Gateways might provide some random number which
+        # might not pass Luhn's test.
+        if self.test_mode:
+           return True 
         return credit_card.is_valid()
 
     def purchase(self, money, credit_card, options = {}):
