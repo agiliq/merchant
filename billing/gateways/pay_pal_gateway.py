@@ -53,8 +53,15 @@ class PayPalGateway(Gateway):
         
         wpp = PayPalWPP(options['request']) 
         response = wpp.doDirectPayment(params)
-        # TODO: Fix the status and remove the hardcoding above
-        return {"status": , "response": response}
+        if "Success" in response.ack:
+            transaction_was_successful(sender=self,
+                                       type="purchase",
+                                       response=response)
+        else:
+            transaction_was_unsuccessful(sender=self,
+                                         type="purchase",
+                                         response=response)
+        return {"status": response.ack, "response": response}
 
     def authorize(self, money, credit_card, options = {}):
         if not self.validate_card(credit_card):
