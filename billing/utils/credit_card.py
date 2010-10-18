@@ -31,7 +31,7 @@ class CreditCard(object):
         return not sum(num[::-2] + [sum(divmod(d * 2, 10)) for d in num[-2::-2]]) % 10
     
     def is_expired(self):
-        """Check whehter the credit card is expired or not"""
+        """Check whether the credit card is expired or not"""
         return datetime.date.today() > datetime.date(self.year, self.month, 1)
     
     def valid_essential_attributes(self):

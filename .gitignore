@@ -6,3 +6,5 @@ tmp
 
 example/tmp
 example/localsettings.py
+
+docs/_build/*
