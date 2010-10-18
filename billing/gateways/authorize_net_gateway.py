@@ -275,7 +275,7 @@ class AuthorizeNetGateway(Gateway):
         else:
             transaction_was_successful.send(sender=self,
                                             type="credit",
-                                            response)
+                                            response=response)
         return {"status": status, "response": response}
 
     def recurring(self, money, creditcard, options = {}):
