@@ -1,6 +1,8 @@
 from billing import Gateway
 from paypal.pro.helpers import PayPalWPP
+from paypal.pro.exceptions import PayPalFailure
 from billing.utils.credit_card import Visa, MasterCard, AmericanExpress, Discover
+from billing.signals import *
 
 class PayPalGateway(Gateway):
     default_currency = "USD"
@@ -19,7 +21,7 @@ class PayPalGateway(Gateway):
             raise InvalidCard("Invalid Card")
 
         params = {}
-        params['creditcardtype'] = credit_card.card_type
+        params['creditcardtype'] = credit_card.card_type.card_name
         params['acct'] = credit_card.number
         params['expdate'] = '%02d%04d' % (credit_card.month, credit_card.year)
         params['cvv2'] = credit_card.verification_value
@@ -30,8 +32,14 @@ class PayPalGateway(Gateway):
             params['email'] = options["email"]
         
         address = options["billing_address"]
-        params['firstname'] = credit_card.first_name
-        params['lastname'] = credit_card.last_name
+        first_name = None
+        last_name = None
+        try:
+            first_name, last_name = address.get("name", "").split(" ")
+        except ValueError:
+            pass
+        params['firstname'] = first_name or credit_card.first_name
+        params['lastname'] = last_name or credit_card.last_name
         params['street'] = address["address1"]
         params['street2'] = address.get("address2", "")
         params['city'] = address["city"]
@@ -40,7 +48,7 @@ class PayPalGateway(Gateway):
         params['zip'] = address["zip"]
         params['phone'] = address.get("phone", "")
 
-        shipping_address = option.get("shipping_address", None)
+        shipping_address = options.get("shipping_address", None)
         if shipping_address:
             params['shiptoname'] = shipping_address["name"]
             params['shiptostreet'] = shipping_address["address1"]
@@ -52,16 +60,19 @@ class PayPalGateway(Gateway):
             params['shiptophonenum'] = shipping_address.get("phone", "")
         
         wpp = PayPalWPP(options['request']) 
-        response = wpp.doDirectPayment(params)
-        if "Success" in response.ack:
-            transaction_was_successful(sender=self,
-                                       type="purchase",
-                                       response=response)
-        else:
-            transaction_was_unsuccessful(sender=self,
-                                         type="purchase",
-                                         response=response)
-        return {"status": response.ack, "response": response}
+        try:
+            response = wpp.doDirectPayment(params)
+            transaction_was_successful.send(sender=self,
+                                            type="purchase",
+                                            response=response)
+        except PayPalFailure, e:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="purchase",
+                                              response=e)
+            # Slight skewness because of the way django-paypal
+            # is implemented.
+            return {"status": "FAILURE", "response": e}
+        return {"status": response.ack.upper(), "response": response}
 
     def authorize(self, money, credit_card, options = {}):
         if not self.validate_card(credit_card):

@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.conf import settings
 from billing import get_gateway, CreditCard
 from billing.signals import *
 from billing.models import AuthorizeAIMResponse
