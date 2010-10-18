@@ -1,1 +1,1 @@
-from eway_gateway import Eway
+from eway_gateway import EwayGateway
