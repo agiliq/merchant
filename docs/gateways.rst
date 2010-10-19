@@ -77,5 +77,11 @@ the following keys:
 * **response**: The response object for the transaction. Please consult
   the respective gateway's documentation to learn more about it.
 
+Helper functions
+-----------------
+
+* **get_gateway(name, *args, **kwargs)**: A helper function that loads the
+  gateway class by the `name` and initializes it with the `args` and `kwargs`.
+
 .. _Merchant: http://github.com/agiliq/merchant
 .. _`ISO 3166-alpha 2 standard`: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
