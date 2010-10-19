@@ -31,7 +31,6 @@ Contents:
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
 * :doc:`Contributing to Merchant <contributing>`
-* Contributors
 
 
 Indices and tables
