@@ -29,8 +29,8 @@ Contents:
     * RBS WorldPay
 
 * :doc:`Signals <signals>`
-* Writing your own gateway
-* Contributing to Merchant
+* :doc:`Writing your own gateway <custom_gateway>`
+* :doc:`Contributing to Merchant <contributing>`
 * Contributors
 
 
