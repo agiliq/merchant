@@ -14,7 +14,7 @@ Contents:
 * :doc:`Overview <overview>`
 * :doc:`Install Merchant <install>`
 * :doc:`Credit Card <credit_card>`
-* Gateways
+* :doc:`Gateways <gateways>`
 
   * On-site Processing
 
