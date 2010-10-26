@@ -39,9 +39,9 @@ class EwayGateway(Gateway):
     
     def add_address(self, options={}):
         """add address details to the request parameters"""
-        address = options["billing_address"]
+        address = options.get("billing_address", {})
         self.hosted_customer.Title = address.get("salutation", "Mr./Ms.")
-        self.hosted_customer.Address = address["address1"] + address.get("address2", "")
+        self.hosted_customer.Address = address.get("address1", '') + address.get("address2", "")
         self.hosted_customer.Suburb = address.get("city")
         self.hosted_customer.State = address.get("state")
         self.hosted_customer.Company = address.get("company")
@@ -65,21 +65,23 @@ class EwayGateway(Gateway):
         self.add_address(options)
         
         customer_id = self.client.create_hosted_customer(self.hosted_customer)
+        if self.test_mode:
+            customer_id = getattr(settings, 'EWAY_TEST_CUSTOMER_ID', '9876543211000')
         pymt_response = self.client.process_payment(customer_id, 
                                                     money, 
-                                                    options.get("invoice"),
-                                                    options.get("description"))
-        is_response = getattr(pymt_response, "CCPaymentResponse", None)
-        if not is_response:
+                                                    options.get("invoice", 'test'),
+                                                    options.get("description", 'test'))
+        
+        if not pymt_response:
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
                                               response=pymt_response)
             return {"status": "FAILURE", "response": pymt_response}
-        response = getattr(pymt_response, "CCPaymentResponse")
+        
         transaction_was_successful.send(sender=self,
                                         type="purchase",
-                                        response=response)
-        return {"status": "SUCCESS", "response": response}
+                                        response=pymt_response)
+        return {"status": "SUCCESS", "response": pymt_response}
     
     def authorize(self, money, credit_card, options = {}):
         raise NotImplementedError
