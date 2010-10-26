@@ -6,9 +6,9 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
 
-from billing.gateways.authorize_net import AuthorizeNetGateway
-from billing.gateways.paypal_card import PaypalCardProcess
-from billing.gateways.eway import Eway
+from billing.gateways.authorize_net_gateway import AuthorizeNetGateway
+from billing.gateways.pay_pal_gateway import PayPalGateway
+from billing.gateways.eway_gateway import EwayGateway
 from billing.credit_card import CreditCard
 
 from app.forms import CreditCardForm
@@ -60,7 +60,7 @@ def paypal(request):
         if form.is_valid():
             data = form.cleaned_data
             credit_card = CreditCard(**data)
-            merchant = PaypalCardProcess()
+            merchant = PayPalGateway()
             response = merchant.purchase(amount, credit_card, options={'request': request})
     else:
         form = CreditCardForm(initial={'number':'4797503429879309', 
@@ -82,8 +82,25 @@ def eway(request):
         if form.is_valid():
             data = form.cleaned_data
             credit_card = CreditCard(**data)
-            merchant = Eway()
-            response = merchant.purchase(amount, credit_card, options={'request': request})
+            merchant = EwayGateway()
+            billing_address = {'salutation': 'Mr.',
+                               'address1': 'test', 
+                               'address2': ' street',
+                               'city': 'Sydney',
+                               'state': 'NSW',
+                               'company': 'Test Company',
+                               'zip': '2000',
+                               'country': 'au',
+                               'email': 'test@example.com',
+                               'fax': '0267720000',
+                               'phone': '0267720000',
+                               'mobile': '0404085992',
+                               'customer_ref': 'REF100',
+                               'job_desc': 'test',
+                               'comments': 'any',
+                               'url': 'http://www.google.com.au',
+                               }
+            response = merchant.purchase(amount, credit_card, options={'request': request, 'billing_address': billing_address})
     else:
         form = CreditCardForm(initial={'number':'4444333322221111', 
                                        'verification_value': '000',

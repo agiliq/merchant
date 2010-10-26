@@ -6,7 +6,7 @@ from string import split
 from django.conf import settings
 
 from paypal.standard.forms import PayPalPaymentsForm
-from required import require 
+from billing.helpers import require 
 
 def paypal_buy(context):
     '''render paypal form to buy item'''
