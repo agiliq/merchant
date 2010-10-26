@@ -31,7 +31,7 @@ class PayPalGateway(Gateway):
         if options.get("email"):
             params['email'] = options["email"]
         
-        address = options["billing_address"]
+        address = options.get("billing_address", {})
         first_name = None
         last_name = None
         try:
@@ -40,12 +40,12 @@ class PayPalGateway(Gateway):
             pass
         params['firstname'] = first_name or credit_card.first_name
         params['lastname'] = last_name or credit_card.last_name
-        params['street'] = address["address1"]
+        params['street'] = address.get("address1", '')
         params['street2'] = address.get("address2", "")
-        params['city'] = address["city"]
-        params['state'] = address["state"]
-        params['countrycode'] = address["country"]
-        params['zip'] = address["zip"]
+        params['city'] = address.get("city", '')
+        params['state'] = address.get("state", '')
+        params['countrycode'] = address.get("country", '')
+        params['zip'] = address.get("zip", '')
         params['phone'] = address.get("phone", "")
 
         shipping_address = options.get("shipping_address", None)
