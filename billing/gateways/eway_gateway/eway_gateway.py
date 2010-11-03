@@ -72,12 +72,18 @@ class EwayGateway(Gateway):
                                                     options.get("invoice", 'test'),
                                                     options.get("description", 'test'))
         
-        if not pymt_response:
+        if not hasattr(pymt_response, "ewayTrxnStatus"):
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
                                               response=pymt_response)
             return {"status": "FAILURE", "response": pymt_response}
-        
+
+        if pymt_response.ewayTrxnStatus == "False":
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="purchase",
+                                              response=pymt_response)
+            return {"status": "FAILURE", "response": pymt_response}
+
         transaction_was_successful.send(sender=self,
                                         type="purchase",
                                         response=pymt_response)

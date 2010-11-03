@@ -53,21 +53,27 @@ class EWayGatewayTestCase(TestCase):
     def testPurchase(self):
         resp = self.merchant.purchase(1, self.credit_card,
                                       options = fake_options)
-        self.assertEquals(resp["status"], "SUCCESS")
-        self.assertNotEquals(resp["response"].transaction_id, "0")
-        self.assertTrue(isinstance(resp["response"], EWayResponse)) 
+        # Eway test gateway sets the transaction status as failure
+        # in test mode
+        self.assertEquals(resp["status"], "FAILURE")
+        self.assertEquals(resp["response"].ewayTrxnError, 
+                          "1,Do Not Honour(Test Gateway)")
+        self.assertNotEquals(resp["response"].ewayTrxnNumber, "0")
+        self.assertTrue(resp["response"].ewayReturnAmount, "1") 
 
     def testPaymentSuccessfulSignal(self):
+        # Since in the test mode, all transactions are
+        # failures, we need to be checking for transaction_was_unsuccessful
         received_signals = []
 
         def receive(sender, **kwargs):
             received_signals.append(kwargs.get("signal"))
 
-        transaction_was_successful.connect(receive)
+        transaction_was_unsuccessful.connect(receive)
 
         resp = self.merchant.purchase(1, self.credit_card,
                                       options = fake_options)
-        self.assertEquals(received_signals, [transaction_was_successful])
+        self.assertEquals(received_signals, [transaction_was_unsuccessful])
 
     def testPaymentUnSuccessfulSignal(self):
         received_signals = []
