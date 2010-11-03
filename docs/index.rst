@@ -16,17 +16,17 @@ Contents:
 * :doc:`Credit Card <credit_card>`
 * :doc:`Gateways <gateways>`
 
-  * On-site Processing
+  * :doc:`On-site Processing <onsite_processing>`
 
-    * PayPal
-    * Authorize.Net
-    * eWay (Currently not working)
+    * :doc:`PayPal <gateways/paypal_gateway>`
+    * :doc:`Authorize.Net <gateways/authorize_net>`
+    * :doc:`eWay <gateways/eway_gateway>`
 
-  * Off-site Processing
+  * :doc:`Off-site Processing <offsite_processing>`
 
-    * PayPal
-    * Google Checkout
-    * RBS WorldPay
+    * :doc:`PayPal <offsite/paypal>`
+    * :doc:`Google Checkout <offsite/google_checkout>`
+    * :doc:`RBS WorldPay <offsite/rbs_worldpay>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
@@ -39,4 +39,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
