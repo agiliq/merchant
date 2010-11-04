@@ -37,6 +37,6 @@ The signals emitted by Merchant_ are:
   .. note:: 
 
     Some gateways are implemented to raise an error on failure. This exception
-    may be passed as the response object. Please consult the docs to be confirm.
+    may be passed as the response object. Please consult the docs to confirm.
 
 .. _Merchant: http://github.com/agiliq/merchant
