@@ -1,6 +1,10 @@
-from billing import Gateway
+
+import datetime
+
 from paypal.pro.helpers import PayPalWPP
 from paypal.pro.exceptions import PayPalFailure
+
+from billing import Gateway
 from billing.utils.credit_card import Visa, MasterCard, AmericanExpress, Discover
 from billing.signals import *
 
@@ -89,8 +93,37 @@ class PayPalGateway(Gateway):
         raise NotImplementedError
 
     def recurring(self, money, creditcard, options = {}):
-        raise NotImplementedError
+        # raise NotImplementedError
+        params = {}
+        params['profilestartdate'] = options.get('startdate') or datetime.datetime.now().strftime("%Y-%m-%dT00:00:00Z")
+        params['startdate'] = options.get('startdate') or datetime.datetime.now().strftime("%m%Y")
+        params['billingperiod'] = options.get('billingperiod') or 'Month'
+        params['billingfrequency'] = options.get('billingfrequency') or '1'
+        params['amt'] = money
+        params['desc'] = 'description of the billing'
+        
+        params['creditcardtype'] = creditcard.card_type.card_name
+        params['acct'] = creditcard.number
+        params['expdate'] = '%02d%04d' % (creditcard.month, creditcard.year)
+        params['firstname'] = creditcard.first_name
+        params['lastname'] = creditcard.last_name
 
+        wpp = PayPalWPP(options.get('request', {}))
+        try:
+            response = wpp.createRecurringPaymentsProfile(params, direct=True)
+            transaction_was_successful.send(sender=self,
+                                            type="purchase",
+                                            response=response)
+        except PayPalFailure, e:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="purchase",
+                                              response=e)
+            # Slight skewness because of the way django-paypal
+            # is implemented.
+            return {"status": "FAILURE", "response": e}
+        return {"status": response.ack.upper(), "response": response}
+       
+        
     def store(self, creditcard, options = {}):
         raise NotImplementedError
 

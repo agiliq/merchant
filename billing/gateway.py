@@ -50,7 +50,7 @@ class Gateway(object):
         # Gateways might provide some random number which
         # might not pass Luhn's test.
         if self.test_mode:
-           return True 
+            return True 
         return credit_card.is_valid()
 
     def purchase(self, money, credit_card, options = {}):

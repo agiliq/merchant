@@ -13,7 +13,7 @@ from urllib2 import Request, urlopen, HTTPError, URLError
 
 from django.conf import settings
 
-from billing.helpers import require
+from billing.utils.required import require 
 
 MERCHANT_ID = settings.GOOGLE_CHECKOUT_MERCHANT_ID
 MERCHANT_KEY = settings.GOOGLE_CHECKOUT_MERCHANT_KEY

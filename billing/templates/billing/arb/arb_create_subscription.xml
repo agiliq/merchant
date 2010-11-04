@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ARBCreateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+	<merchantAuthentication>
+		<name>{{ auth_login }}</name>
+		<transactionKey>{{ auth_key }}</transactionKey>
+	</merchantAuthentication>
+	<subscription>
+		<name>{{ sub_name }}</name>
+		<paymentSchedule>
+			<interval>
+				<length>{{ interval_length }}</length>
+				<unit>{{ interval_unit }}</unit>
+			</interval>
+			<startDate>{{ start_date }}</startDate>
+			<totalOccurrences>{{ total_occurrences }}</totalOccurrences>
+		</paymentSchedule>
+		<amount>{{ amount }}</amount>
+		<payment>
+			<creditCard>
+				<cardNumber>{{ card_number}}</cardNumber>
+				<expirationDate>{{ exp_date }}</expirationDate>
+			</creditCard>
+		</payment>
+		<billTo>
+			<firstName>{{ first_name }}</firstName>
+			<lastName>{{ last_name }}</lastName>
+		</billTo>
+	</subscription>
+</ARBCreateSubscriptionRequest>

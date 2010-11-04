@@ -4,7 +4,7 @@ import hashlib
 from django.conf import settings
 
 from billing.forms.rbs_forms import RBSHostedPaymentForm
-from billing.helpers import require 
+from billing.utils.required import require 
 
 def rbs_buy(context):
     require(context, *('cart_id amount').split())

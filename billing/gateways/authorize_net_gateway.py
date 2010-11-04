@@ -1,13 +1,17 @@
 
 import urllib
 import urllib2
+import datetime
 
 from django.conf import settings
+from django.template.loader import render_to_string
+
 from billing.models import AuthorizeAIMResponse
 from billing import Gateway
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, \
     MasterCard, Discover, AmericanExpress
+from billing.utils.xml_parser import parseString, nodeToDic
 
 API_VERSION = '3.1'
 DELIM_CHAR = ','
@@ -61,8 +65,8 @@ class AuthorizeNetGateway(Gateway):
     test_url = "https://test.authorize.net/gateway/transact.dll"
     live_url = "https://secure.authorize.net/gateway/transact.dll"
 
-    # arb_test_url = 'https://apitest.authorize.net/xml/v1/request.api'
-    # arb_live_url = 'https://api.authorize.net/xml/v1/request.api'
+    arb_test_url = 'https://apitest.authorize.net/xml/v1/request.api'
+    arb_live_url = 'https://api.authorize.net/xml/v1/request.api'
 
     supported_countries = ["US"]
     default_currency = "USD"
@@ -163,6 +167,8 @@ class AuthorizeNetGateway(Gateway):
             response = open_conn.read()
         except urllib2.URLError:
             return (5, '1', 'Could not talk to payment gateway.')
+        import ipdb
+        ipdb.set_trace()
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
         return save_authorize_response(fields)
 
@@ -278,10 +284,55 @@ class AuthorizeNetGateway(Gateway):
                                             response=response)
         return {"status": status, "response": response}
 
-    def recurring(self, money, creditcard, options = {}):
+    def recurring(self, money, credit_card, options = {}):
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
-        raise NotImplementedError
+        template_vars  = {}
+        template_vars['auth_login']  = self.login
+        template_vars['auth_key']    = self.password
+        template_vars['amount']      = money
+        template_vars['card_number'] = credit_card.number
+        template_vars['exp_date']    = credit_card.expire_date
+        
+        template_vars['start_date']        = options.get('start_date') or datetime.date.today().strftime("%Y-%m-%d")
+        template_vars['total_occurrences'] = options.get('total_occurences', 9999)
+        template_vars['interval_length']   = options.get('interval_length', 1)
+        template_vars['interval_unit']     = options.get('interval_unit', 'months')
+        template_vars['sub_name']          = options.get('sub_name', '')
+        template_vars['first_name']        = credit_card.first_name
+        template_vars['last_name']         = credit_card.last_name
+        
+        xml = render_to_string('billing/arb/arb_create_subscription.xml', template_vars)
+        
+        url = self.arb_test_url if self.test_mode else self.arb_live_url
+        headers = {'content-type':'text/xml'}
+        
+        conn = urllib2.Request(url=url, data=xml, headers=headers)
+        try:
+            open_conn = urllib2.urlopen(conn)
+            xml_response = open_conn.read()
+        except urllib2.URLError:
+            return (5, '1', 'Could not talk to payment gateway.')
+        
+        response = nodeToDic(parseString(xml_response))['ARBCreateSubscriptionResponse']
+        """ successful response
+        {u'ARBCreateSubscriptionResponse': {u'messages': {u'message': {u'code': u'I00001', 
+                                                                       u'text': u'Successful.'},
+                                                          u'resultCode': u'Ok'},
+                                            u'subscriptionId': u'933728'}}
+        """
+        
+        status = "SUCCESS"
+        if response['messages']['resultCode'].lower() != 'ok':
+            status = "FAILURE"
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="recurring",
+                                              response=response)
+        else:
+            transaction_was_successful.send(sender=self,
+                                            type="recurring",
+                                            response=response)
+        return {"status": status, "response": response}
 
     def store(self, creditcard, options = {}):
         raise NotImplementedError

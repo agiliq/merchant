@@ -25,7 +25,8 @@ def index(request, gateway=None):
             data = form.cleaned_data
             credit_card = CreditCard(**data)
             merchant = AuthorizeNetGateway()
-            response = merchant.purchase(amount, credit_card)
+            # response = merchant.purchase(amount, credit_card)
+            response = merchant.recurring(amount, credit_card)
     else:
         form = CreditCardForm(initial={'number':'4222222222222'})
     return render(request, 'app/index.html', {'form': form, 
@@ -43,7 +44,8 @@ def authorize(request):
             data = form.cleaned_data
             credit_card = CreditCard(**data)
             merchant = AuthorizeNetGateway()
-            response = merchant.purchase(amount, credit_card)
+            # response = merchant.purchase(amount, credit_card)
+            response = merchant.recurring(amount, credit_card)
     else:
         form = CreditCardForm(initial={'number':'4222222222222'})
     return render(request, 'app/index.html', {'form': form, 
@@ -61,7 +63,9 @@ def paypal(request):
             data = form.cleaned_data
             credit_card = CreditCard(**data)
             merchant = PayPalGateway()
-            response = merchant.purchase(amount, credit_card, options={'request': request})
+            merchant.validate_card(credit_card)
+            # response = merchant.purchase(amount, credit_card, options={'request': request})
+            response = merchant.recurring(amount, credit_card, options={'request': request})
     else:
         form = CreditCardForm(initial={'number':'4797503429879309', 
                                        'verification_value': '037',
