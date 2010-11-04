@@ -69,6 +69,42 @@ Method Reference
 * **unstore(identification, options = {})**: A method that reverses the
   `store` method's results. Subclasses must implement this method.
 
+The `options` dictionary passed to the above methods consists of the following
+keys:
+
+* **order_id**: A unique order identification code (usually set by the gateway).
+* **ip**: The IP address of the customer making the purchase. This is required
+  by certain gateways like PayPal.
+* **customer**: The name, customer number, or other information that identifies 
+  the customer. Optional.
+* **invoice**: The invoice code/number (set by the merchant).
+* **merchant**: The name or description of the merchant offering the product.
+* **description**: A description of the product or transaction.
+* **email**: The email address of the customer. Required by a few gateways.
+* **currency**: Required when using a currency with a gateway that supports
+  multiple currencies. If not specified, the value of the `default_currency` 
+  attribute of the gateway instance is used.
+* **billing_address**: A dictionary containing the billing address of the 
+  customer. Generally required by gateways for address verification (AVS) etc.
+* **shipping_address**: A dictionary containing the shipping address of the 
+  customer. Required if the merchant requires shipping of products and where
+  billing address is not the same as shipping address.
+
+The address dictionary for `billing_address` and `shipping_address` should have
+the following keys:
+
+* **name**: The full name of the customer.
+* **company**: The company name of the customer. Required by a few gateways.
+* **address1**: The primary street address of the customer. Required by many
+  gateways.
+* **address2**: Additional line for the address. Optional.
+* **city**: The city of the customer.
+* **state**: The state of the customer.
+* **country**: The `ISO 3166-alpha 2 standard`_ code for the country of the 
+  customer.
+* **zip**: The zip or postal code of the customer.
+* **phone**: The phone number of the customer. Optional.
+
 All the above methods return a standard `response` dictionary containing
 the following keys:
 
