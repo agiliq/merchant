@@ -167,8 +167,6 @@ class AuthorizeNetGateway(Gateway):
             response = open_conn.read()
         except urllib2.URLError:
             return (5, '1', 'Could not talk to payment gateway.')
-        import ipdb
-        ipdb.set_trace()
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
         return save_authorize_response(fields)
 
