@@ -30,7 +30,7 @@ Usage
     >>> g1 = get_gateway("pay_pal")
     >>>
     >>> cc = CreditCard(first_name= "Test",
-    ...                last_name = "User,
+    ...                last_name = "User",
     ...                month=10, year=2011,
     ...                number="4222222222222",
     ...                verification_value="100")
