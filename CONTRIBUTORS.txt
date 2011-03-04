@@ -4,7 +4,7 @@ Contributors to the project:
 Thanks go out to all the contributors listed in alphabetical order:
 
 * Ashok Raavi <ashok.raavi@gmail.com>
-* Isaac Kelly <http://www.issackelly.com/>
+* Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
 * Shabda Raaj <shabda@agiliq.com>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
