@@ -114,7 +114,8 @@ setup(
     version=get_version(),
     description="A Django app that provides helpers for multiple pluggable payment backends.",
     long_description=read("README"),
-    author="Agiliq",
+    author="Agiliq Solutions",
+    author_email="hello@agiliq.com",
     license="BSD",
     url="http://github.com/agiliq/merchant",
     packages=find_packages(),
@@ -129,6 +130,5 @@ setup(
         "Framework :: Django",
     ],
     zip_safe=False,
-    test_suite="staticfiles.tests.runtests.runtests",
     tests_require=["Django"],
 )
