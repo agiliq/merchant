@@ -14,10 +14,10 @@ def rbs_buy(context):
     form_data = {}
     if test_mode:
         rbs_hosted_url = getattr(settings, "RBS_HOSTED_URL_TEST", "https://select-test.wp3.rbsworldpay.com/wcc/purchase")
-        form_data['instId'] = settings.RBS_INSTALLTION_ID_TEST
+        form_data['instId'] = settings.RBS_INSTALLATION_ID_TEST
     else:
         rbs_hosted_url = getattr(settings, "RBS_HOSTED_URL_LIVE", "https://secure.wp3.rbsworldpay.com/wcc/purchase")
-        form_data['instId'] = settings.RBS_INSTALLTION_ID_LIVE
+        form_data['instId'] = settings.RBS_INSTALLATION_ID_LIVE
 
     form_data['cartId'] = context['cart_id']
     form_data['amount'] = context["amount"]
