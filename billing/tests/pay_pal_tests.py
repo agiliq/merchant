@@ -1,10 +1,13 @@
 from django.test import TestCase
-from billing import get_gateway, CreditCard
+from billing import get_gateway, get_integration, CreditCard
 from billing.signals import *
 from paypal.pro.models import PayPalNVP
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
 from paypal.pro.tests import RequestFactory
+from django.template import Template, Context
+from django.utils.html import strip_spaces_between_tags
+import datetime
 
 RF = RequestFactory()
 request = RF.get("/", REMOTE_ADDR="192.168.1.1")
@@ -87,3 +90,24 @@ class PayPalGatewayTestCase(TestCase):
         resp = self.merchant.purchase(105.02, self.credit_card,
                                       options = fake_options)
         self.assertNotEquals(resp["status"], "SUCCESS")
+
+
+class PayPalWebsiteStandardsTestCase(TestCase):
+    def setUp(self):
+        self.today = datetime.datetime.today().strftime("%Y-%m-%d")
+        self.pws = get_integration("pay_pal")
+        self.pws.test_mode = True
+        fields = {"cmd": "_xclick",
+        'notify_url': 'http://localhost/paypal-ipn-handler/',
+        'return_url': 'http://localhost/offsite/paypal/done/',
+        'cancel_return': 'http://localhost/offsite/paypal/',
+        'amount': 1,
+        'item_name': "Test Item",
+        'invoice': self.today,}
+        self.pws.add_fields(fields)
+
+    def testRenderForm(self):
+        tmpl = Template("{% load billing_tags %}{% paypal obj %}")
+        form = tmpl.render(Context({"obj": self.pws}))
+        pregen_form = """<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="business" value="probiz_1273571007_biz@uswaretech.com" id="id_business" /><input type="hidden" name="amount" value="1" id="id_amount" /><input type="hidden" name="item_name" value="Test Item" id="id_item_name" /><input type="hidden" name="notify_url" value="http://localhost/paypal-ipn-handler/" id="id_notify_url" /><input type="hidden" name="cancel_return" value="http://localhost/offsite/paypal/" id="id_cancel_return" /><input type="hidden" name="return" value="http://localhost/offsite/paypal/done/" id="id_return_url" /><input type="hidden" name="invoice" value="%(today)s" id="id_invoice" /><input type="hidden" name="cmd" value="_xclick" id="id_cmd" /><input type="hidden" name="charset" value="utf-8" id="id_charset" /><input type="hidden" name="currency_code" value="USD" id="id_currency_code" /><input type="hidden" name="no_shipping" value="1" id="id_no_shipping" /><input type="image" src="https://www.sandbox.paypal.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="Buy it Now" /></form>""" % ( {"today": self.today} )
+        self.assertEquals(pregen_form, strip_spaces_between_tags(form).strip())
