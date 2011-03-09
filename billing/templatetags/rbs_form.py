@@ -6,6 +6,8 @@ from django.conf import settings
 from billing.forms.rbs_forms import RBSHostedPaymentForm
 from billing.utils.required import require 
 
+# http://www.rbsworldpay.com/support/bg/index.php?page=development&sub=integration&c=WW
+
 def rbs_buy(context):
     require(context, *('cart_id amount').split())
     test_mode = getattr(settings, "MERCHANT_TEST_MODE", True)

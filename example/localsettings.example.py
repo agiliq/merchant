@@ -25,14 +25,14 @@ EWAY_TEST_CUSTOMER_ID = ''
 GOOGLE_CHECKOUT_MERCHANT_ID = '' 
 GOOGLE_CHECKOUT_MERCHANT_KEY = ''
 
-# RBS settings
-RBS_HOSTED_URL_TEST = "https://select-test.wp3.rbsworldpay.com/wcc/purchase"
-RBS_HOSTED_URL_LIVE = "https://secure.wp3.rbsworldpay.com/wcc/purchase"
+# WORLDPAY settings
+WORLDPAY_HOSTED_URL_TEST = "https://select-test.wp3.rbsworldpay.com/wcc/purchase"
+WORLDPAY_HOSTED_URL_LIVE = "https://secure.wp3.rbsworldpay.com/wcc/purchase"
 
-RBS_INSTALLTION_ID_TEST = ''
-RBS_INSTALLTION_ID_LIVE = ''
+WORLDPAY_INSTALLATION_ID_TEST = ''
+WORLDPAY_INSTALLATION_ID_LIVE = ''
 
-RBS_MD5_SECRET_KEY = ''
+WORLDPAY_MD5_SECRET_KEY = ''
 
 DATABASES = {
     'default': {

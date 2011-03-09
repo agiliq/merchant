@@ -1,9 +1,9 @@
 
 from django import forms
 
-class RBSHostedPaymentForm(forms.Form):
+class WPHostedPaymentForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        super(RBSHostedPaymentForm, self).__init__(*args, **kwargs)
+        super(WPHostedPaymentForm, self).__init__(*args, **kwargs)
     
     # recurring(future pay) parameters
     futurePayType  = forms.CharField(widget=forms.HiddenInput(), required=False)
