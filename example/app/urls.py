@@ -1,5 +1,6 @@
 
 from django.conf.urls.defaults import *
+from billing import get_integration
 
 urlpatterns = patterns('app.views',
     url(r'^$', 'index', name='app_index'),
@@ -15,9 +16,10 @@ urlpatterns += patterns('app.views',
     url(r'offsite/rbs/$', 'offsite_rbs', name='app_offsite_rbs'),
 )
 
+paypal = get_integration("pay_pal")
 # paypal payment notification handler
 urlpatterns += patterns('',
-    (r'^paypal-ipn-handler/', include('paypal.standard.ipn.urls')),
+    (r'^paypal-ipn-handler/', include(paypal.urls)),
 )
 
 urlpatterns += patterns('django.views.generic.simple',

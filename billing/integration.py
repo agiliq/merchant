@@ -1,5 +1,6 @@
 from django.utils.importlib import import_module
 from django.conf import settings
+from django.conf.urls.defaults import patterns
 
 class IntegrationModuleNotFound(Exception):
     pass
@@ -26,6 +27,15 @@ class Integration(object):
     def add_fields(self, params):
         for (key, val) in params.iteritems():
             self.add_field(key, val)
+
+    def get_urls(self):
+        # Method must be subclassed
+        urlpatterns = patterns('')
+        return urlpatterns
+
+    @property
+    def urls(self):
+        return self.get_urls()
 
 def get_integration(integration, *args, **kwargs):
     """Return a integration instance specified by `integration` name"""
