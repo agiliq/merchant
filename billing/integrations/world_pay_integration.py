@@ -1,7 +1,11 @@
 from billing.integration import Integration
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.conf.urls.default import patterns
+from django.conf.urls.defaults import patterns
+from billing.signals import transaction_was_successful, transaction_was_unsuccessful
+from django.http import HttpResponse
+from billing.models.world_pay_models import WorldPayResponse
+
 
 RBS_HOSTED_URL_TEST = "https://select-test.wp3.rbsworldpay.com/wcc/purchase"
 RBS_HOSTED_URL_LIVE = "https://secure.wp3.rbsworldpay.com/wcc/purchase"
@@ -67,5 +71,13 @@ class WorldPayIntegration(Integration):
         for (key, val) in resp_fields.iteritems():
             data[val] = post_data.get(key, '')
 
-        resp = WorldPayResponse.objects.create(**data)
-        return {"status": "SUCCESS", "response": resp}
+        try:
+            resp = WorldPayResponse.objects.create(**data)
+            # TODO: Make the type more generic
+            transaction_was_successful.send(sender=self.__class__, type="purchase", response=resp)
+            status = "SUCCESS"
+        except:
+            transaction_was_unsuccessful.send(sender=self.__class__, type="purchase", response=post_data)
+            status = "FAILURE"
+        
+        return HttpResponse(status)
