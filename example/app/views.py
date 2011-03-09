@@ -9,6 +9,8 @@ from billing import CreditCard, get_gateway, get_integration
 from billing.gateway import CardNotSupported
 
 from app.forms import CreditCardForm
+from django.conf import settings
+from hashlib import md5
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
@@ -138,14 +140,17 @@ def offsite_google_checkout(request):
     return render(request, 'app/google_checkout.html', template_vars)
 
 
-def offsite_rbs(request):
-    template_vars = {'title': 'RBS'}
-    checkout_params = {'amount': 1,
-                       'cart_id': 'TEST123',
-                       'is_recurring': True,
-                       # 'billing_interval_unit': 'DAY',
-                       # 'billing_interval_multiplier': 7
-                       }
-
-    template_vars.update(checkout_params)
-    return render(request, 'app/rbs.html', template_vars)
+def offsite_world_pay(request):
+    wp = get_integration("world_pay")
+    fields = {"instId": settings.WORLDPAY_INSTALLATION_ID_TEST,
+              "cartId": "TEST123",
+              "currency": "USD",
+              "amount": 1,
+              "desc": "Test Item",
+              "signatureFields": "instId:amount:cartId",}
+    wp.add_fields(fields)
+    signature = md5("%s:%s:%s:%s" %(settings.WORLDPAY_MD5_SECRET_KEY, wp.fields["instId"],
+                                    wp.fields["amount"], wp.fields["cartId"])).hexdigest()
+    wp.add_field("signature", signature)
+    template_vars = {'title': 'WorldPay', "wp_obj": wp}
+    return render(request, 'app/world_pay.html', template_vars)
