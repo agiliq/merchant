@@ -1,7 +1,7 @@
 
 from django.db import models
 
-class RBSResponse(models.Model):
+class WorldPayResponse(models.Model):
     # merchant details
     installation_id = models.CharField(max_length=64)
     company_name    = models.CharField(max_length=255, blank=True, null=True)
