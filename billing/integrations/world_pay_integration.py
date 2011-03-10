@@ -15,10 +15,14 @@ RBS_HOSTED_URL_LIVE = "https://secure.wp3.rbsworldpay.com/wcc/purchase"
 class WorldPayIntegration(Integration):
     # Template for required fields
     fields = {"instId": "",
-              "cart_id": "",
+              "cartId": "",
               "amount": "",
-              "currency": "",
-              "testMode": 100}
+              "currency": "",}
+
+    def __init__(self, options={}):
+        super(WorldPayIntegration, self).__init__(options=options)
+        if self.test_mode:
+            self.fields.update({"testMode": 100})
 
     def get_urls(self):
         urlpatterns = patterns('',
