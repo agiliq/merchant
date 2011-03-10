@@ -146,11 +146,7 @@ def offsite_world_pay(request):
               "cartId": "TEST123",
               "currency": "USD",
               "amount": 1,
-              "desc": "Test Item",
-              "signatureFields": "instId:amount:cartId",}
+              "desc": "Test Item",}
     wp.add_fields(fields)
-    signature = md5("%s:%s:%s:%s" %(settings.WORLDPAY_MD5_SECRET_KEY, wp.fields["instId"],
-                                    wp.fields["amount"], wp.fields["cartId"])).hexdigest()
-    wp.add_field("signature", signature)
     template_vars = {'title': 'WorldPay', "wp_obj": wp}
     return render(request, 'app/world_pay.html', template_vars)
