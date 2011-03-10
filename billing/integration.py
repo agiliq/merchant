@@ -8,6 +8,8 @@ class IntegrationModuleNotFound(Exception):
 class IntegrationNotConfigured(Exception):
     pass
 
+integration_cache = {}
+
 class Integration(object):
     """Base Integration class that needs to be subclassed by
     implementations"""
@@ -39,17 +41,22 @@ class Integration(object):
 
 def get_integration(integration, *args, **kwargs):
     """Return a integration instance specified by `integration` name"""
-    integration_filename = "%s_integration" %integration
-    integration_module = None
-    for app in settings.INSTALLED_APPS:
+
+    klass = integration_cache.get(integration, None)
+
+    if not klass:
+        integration_filename = "%s_integration" %integration
+        integration_module = None
+        for app in settings.INSTALLED_APPS:
+            try:
+                integration_module = import_module(".integrations.%s" %integration_filename, package=app)
+            except ImportError:
+                pass
+        if not integration_module:
+            raise IntegrationModuleNotFound("Missing integration")
+        integration_class_name = "".join(integration_filename.title().split("_"))
         try:
-            integration_module = import_module(".integrations.%s" %integration_filename, package=app)
-        except ImportError:
-            pass
-    if not integration_module:
-        raise IntegrationModuleNotFound("Missing integration")
-    integration_class_name = "".join(integration_filename.title().split("_"))
-    try:
-        return getattr(integration_module, integration_class_name)(*args, **kwargs)
-    except AttributeError:
-        raise IntegrationNotConfigured("Missing %s class in the integration module." %integration_class_name)
+            klass = getattr(integration_module, integration_class_name)
+        except AttributeError:
+            raise IntegrationNotConfigured("Missing %s class in the integration module." %integration_class_name)
+    return klass(*args, **kwargs)
