@@ -21,6 +21,10 @@ paypal = get_integration("pay_pal")
 urlpatterns += patterns('',
     (r'^paypal-ipn-handler/', include(paypal.urls)),
 )
+google_checkout = get_integration("google_checkout")
+urlpatterns += patterns('',
+    (r'^', include(google_checkout.urls)),
+)
 
 urlpatterns += patterns('django.views.generic.simple',
     url(r'offsite/paypal/done/$', 
