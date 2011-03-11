@@ -130,15 +130,20 @@ def offsite_paypal(request):
     return render(request, 'app/offsite_paypal.html', template_vars)
 
 def offsite_google_checkout(request):
-    template_vars = {'title': 'Google Checkout'}
-    
+    gc = get_integration("google_checkout")
     return_url = request.build_absolute_uri(reverse('app_offsite_google_checkout_done'))
-    checkout_params = {'amount': 1,
-                       'item_name': 'name of the item',
-                       'return_url': return_url,}
-    template_vars.update(checkout_params)
+    fields = {'items': [{'amount': 1,
+                         'name': 'name of the item',
+                         'description': 'Item description',
+                         'id': '999AXZ',
+                         'currency': 'USD',
+                         'quantity': 1,
+                        }],
+              'return_url': return_url,}
+    gc.add_fields(fields)
+    template_vars = {'title': 'Google Checkout', "gc_obj": gc}
+    
     return render(request, 'app/google_checkout.html', template_vars)
-
 
 def offsite_world_pay(request):
     wp = get_integration("world_pay")
