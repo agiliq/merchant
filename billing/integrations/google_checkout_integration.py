@@ -1,7 +1,13 @@
 from billing import Integration
+from billing.models import GCNewOrderNotification
 from django.conf import settings
 from xml.dom.minidom import Document
 import hmac, hashlib, base64
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.http import HttpResponse
+from billing.signals import transaction_was_successful, transaction_was_unsuccessful
+from django.conf.urls.defaults import patterns
 
 SANDBOX_URL = 'https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%s' 
 PROD_URL = 'https://checkout.google.com/api/checkout/v2/checkout/Merchant/%s'
@@ -94,3 +100,104 @@ class GoogleCheckoutIntegration(Integration):
         if not self._signature:
             self.generate_cart_xml()
         return self._signature
+
+    @csrf_exempt
+    @require_POST
+    def gc_notify_handler(self, request):
+        if request.POST['_type'] == 'new-order-notification':
+            self.gc_new_order_notification(request)
+        elif request.POST['_type'] == 'order-state-change-notification':
+            self.gc_order_state_change_notification(request)
+        return HttpResponse(request.POST['serial-number'])
+
+    def gc_cart_items_blob(self, post_data):
+        items = post_data.getlist('shopping-cart.items')
+        cart_blob = ''
+        for item in items:
+            item_id = post_data.get('%s.merchant-item-id' % (item), '')
+            item_name = post_data.get('%s.item-name' % (item), '')
+            item_desc = post_data.get('%s.item-description' % (item), '')
+            item_price = post_data.get('%s.unit-price' % (item), '')
+            item_price_currency = post_data.get('%s.unit-price.currency' % (item), '')
+            item_quantity = post_data.get('%s.quantity' % (item), '')
+            cart_blob += '%(item_id)s\t%(item_name)s\t%(item_desc)s\t%(item_price)s\t%(item_price_currency)s\t%(item_quantity)s\n\n' % ({"item_id": item_id,
+                                                                                                                                         "item_name": item_name,
+                                                                                                                                         "item_desc": item_desc,
+                                                                                                                                         "item_price": item_price,
+                                                                                                                                         "item_price_currency": item_price_currency,
+                                                                                                                                         "item_quantity": item_quantity,})
+        return cart_blob
+
+    def gc_new_order_notification(self, request):
+        post_data = request.POST.copy()
+        data = {}
+
+        resp_fields = {
+            "_type": "notify_type",
+            "serial-number" : "serial_number",      
+            "google-order-number" : "google_order_number",
+            "buyer-id" : "buyer_id",           
+            "buyer-shipping-address.contact-name" : "shipping_contact_name",
+            "buyer-shipping-address.address1" : "shipping_address1",    
+            "buyer-shipping-address.address2" : "shipping_address2",    
+            "buyer-shipping-address.city" : "shipping_city",        
+            "buyer-shipping-address.postal-code" : "shipping_postal_code", 
+            "buyer-shipping-address.region" : "shipping_region",      
+            "buyer-shipping-address.country-code" : "shipping_country_code",
+            "buyer-shipping-address.email" : "shipping_email",       
+            "buyer-shipping-address.company-name" : "shipping_company_name",
+            "buyer-shipping-address.fax" : "shipping_fax",         
+            "buyer-shipping-address.phone" : "shipping_phone",       
+            "buyer-billing-address.contact-name" : "billing_contact_name",
+            "buyer-billing-address.address1" : "billing_address1",    
+            "buyer-billing-address.address2" : "billing_address2",    
+            "buyer-billing-address.city" : "billing_city",        
+            "buyer-billing-address.postal-code" : "billing_postal_code", 
+            "buyer-billing-address.region" : "billing_region",      
+            "buyer-billing-address.country-code" : "billing_country_code",
+            "buyer-billing-address.email" : "billing_email",       
+            "buyer-billing-address.company-name" : "billing_company_name",
+            "buyer-billing-address.fax" : "billing_fax",         
+            "buyer-billing-address.phone" : "billing_phone",       
+            "buyer-marketing-preferences.email-allowed" : "marketing_email_allowed",
+            "order-adjustment.total-tax" : "total_tax",                
+            "order-adjustment.total-tax.currency" : "total_tax_currency",       
+            "order-adjustment.adjustment-total" : "adjustment_total",         
+            "order-adjustment.adjustment-total.currency" : "adjustment_total_currency",
+            "order-total" : "order_total",
+            "order-total.currency" : "order_total_currency",
+            "financial-order-state" : "financial_order_state",  
+            "fulfillment-order-state" : "fulfillment_order_state",
+            "timestamp" : "timestamp",
+            }
+        
+        for (key, val) in resp_fields.iteritems():
+            data[val] = post_data.get(key, '')
+
+        data['num_cart_items'] = len(post_data.getlist('shopping-cart.items'))
+        data['cart_items']     = self.gc_cart_items_blob(post_data)
+    
+        try:
+            resp = GCNewOrderNotification.objects.create(**data)
+            # TODO: Make the type more generic
+            transaction_was_successful.send(sender=self.__class__, type="purchase", response=resp)
+            status = "SUCCESS"
+        except:
+            transaction_was_unsuccessful.send(sender=self.__class__, type="purchase", response=post_data)
+            status = "FAILURE"
+        
+        return HttpResponse(status)
+    
+
+    def gc_order_state_change_notification(self, request):
+        post_data = request.POST.copy()
+        order = GCNewOrderNotification.objects.get(google_order_number=post_data['google-order-number'])
+        order.financial_order_state = post_data['new-financial-order-state']
+        order.fulfillment_order_state = post_data['new-fulfillment-order-state']
+        order.save()
+
+    def get_urls(self):
+        urlpatterns = patterns('',
+           (r'^gc-notify-handler/$', self.gc_notify_handler),
+                               )
+        return urlpatterns
