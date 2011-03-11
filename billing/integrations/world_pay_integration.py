@@ -5,12 +5,15 @@ from django.conf.urls.defaults import patterns
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from django.http import HttpResponse
 from billing.models.world_pay_models import WorldPayResponse
-
+from django.utils.decorators import method_decorator
 
 RBS_HOSTED_URL_TEST = "https://select-test.wp3.rbsworldpay.com/wcc/purchase"
 RBS_HOSTED_URL_LIVE = "https://secure.wp3.rbsworldpay.com/wcc/purchase"
 
 # http://www.rbsworldpay.com/support/bg/index.php?page=development&sub=integration&c=WW
+
+csrf_exempt_m = method_decorator(csrf_exempt)
+require_POST_m = method_decorator(require_POST)
 
 class WorldPayIntegration(Integration):
     # Template for required fields
@@ -36,8 +39,8 @@ class WorldPayIntegration(Integration):
             return RBS_HOSTED_URL_TEST
         return RBS_HOSTED_URL_LIVE
 
-    @csrf_exempt
-    @require_POST
+    @csrf_exempt_m
+    @require_POST_m
     def notify_handler(self, request):
         post_data = request.POST.copy()
         data = {}

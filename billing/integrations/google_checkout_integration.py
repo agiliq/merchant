@@ -8,12 +8,16 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from django.conf.urls.defaults import patterns
+from django.utils.decorators import method_decorator
 
 SANDBOX_URL = 'https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%s' 
 PROD_URL = 'https://checkout.google.com/api/checkout/v2/checkout/Merchant/%s'
 
 BUTTON_SANDBOX_URL = 'http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%(merchant_id)s&w=%(width)s&h=%(height)s&style=white&variant=text&loc=en_US'
 BUTTON_URL = 'http://checkout.google.com/checkout/buttons/checkout.gif?merchant_id=%(merchant_id)s&w=%(width)s&h=%(height)s&style=white&variant=text&loc=en_US'
+
+csrf_exempt_m = method_decorator(csrf_exempt)
+require_POST_m = method_decorator(require_POST)
 
 class NotConfiguredError(Exception):
     pass
@@ -101,8 +105,8 @@ class GoogleCheckoutIntegration(Integration):
             self.generate_cart_xml()
         return self._signature
 
-    @csrf_exempt
-    @require_POST
+    @csrf_exempt_m
+    @require_POST_m
     def gc_notify_handler(self, request):
         if request.POST['_type'] == 'new-order-notification':
             self.gc_new_order_notification(request)
