@@ -30,6 +30,11 @@ class Integration(object):
         for (key, val) in params.iteritems():
             self.add_field(key, val)
 
+    @property
+    def service_url(self):
+        # Modified by subclasses
+        raise NotImplementedError
+
     def get_urls(self):
         # Method must be subclassed
         urlpatterns = patterns('')

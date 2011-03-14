@@ -45,8 +45,10 @@ Methods
 * **add_field(key, value)**: A method to modify the fields attribute.
 * **add_fields(fields)**: A method to update the fields attribute with
   the fields dictionary specified.
+* **service_url**: The URL on the form where the fields data is posted.
+  Overridden by implementations.
 * **get_urls**: A method that returns the urlpatterns for the notifier/
-  callback. This method is subclassed by implementations.
+  callback. This method is modified by implementations.
 * **urls**: A property that returns the above method.
 
 Helper Function
