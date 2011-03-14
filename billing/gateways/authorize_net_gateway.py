@@ -130,12 +130,18 @@ class AuthorizeNetGateway(Gateway):
         if options.has_key('ip'):
             post['customer_ip'] = options['ip']
 
+    @property
+    def service_url(self):
+        if self.test_mode:
+            return self.test_url
+        return self.live_url
+
     def commit(self, action, money, parameters):
         if not action == 'VOID':
             parameters['amount'] = money
         
         parameters['test_request'] =  self.test_mode
-        url = self.test_url if self.test_mode else self.live_url
+        url = self.service_url
         data = self.post_data(action, parameters)
         response = self.request(url, data)
         return response
@@ -302,7 +308,10 @@ class AuthorizeNetGateway(Gateway):
         
         xml = render_to_string('billing/arb/arb_create_subscription.xml', template_vars)
         
-        url = self.arb_test_url if self.test_mode else self.arb_live_url
+        if self.test_mode:
+            url = self.arb_test_url
+        else:
+            url = self.arb_live_url
         headers = {'content-type':'text/xml'}
         
         conn = urllib2.Request(url=url, data=xml, headers=headers)
