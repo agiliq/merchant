@@ -10,6 +10,11 @@ After a transaction, WorldPay pings the notification URL and all the
 data sent is stored in the `RBSResponse` model instance that can be 
 viewed from the django admin.
 
+The settings attribute required for this integration are:
+
+* **WORLDPAY_MD5_SECRET_KEY**: The MD5 secret key chosen by the user
+  while signing up for the WorldPay Hosted Payments Service.
+
 Example
 --------
 
