@@ -10,6 +10,13 @@ the `Merchant Center`_ dashboard and pings the merchant at the Notification
 URL. The HTTP POST data is stored in the `GCResponse` model instance that
 can be viewed from the django admin.
 
+The setting attributes required for this integration are:
+
+* **GOOGLE_CHECKOUT_MERCHANT_ID**: The merchant id assigned by Google after
+  signing up for the service.
+* **GOOGLE_CHECKOUT_MERCHANT_KEY**: A secret key assigned by Google after 
+  signing up for the service.
+
 Example
 -------
 
@@ -34,7 +41,8 @@ In views.py::
   ...    "id": "item_id",
   ...    "quantity": 1},
   ...    ....
-  ... ]}
+  ... ],
+  ... "return_url": "http://example.com/return/", }
   >>> return render_to_response("some_template.html",
   ...                           {"obj": gc},
   ...                           context_instance=RequestContext(request))
