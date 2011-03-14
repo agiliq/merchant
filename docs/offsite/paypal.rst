@@ -10,6 +10,10 @@ payment processor.
 For a list of the fields expected, please refer to the PWS and django-paypal
 documentation.
 
+After a transaction, PayPal pings the notification URL and all the 
+data sent is stored in the `PayPalIPN` model instance that can be 
+viewed from the django admin.
+
 Example
 -------
 
@@ -33,8 +37,8 @@ In views.py::
   ...   "cancel_return": "http://example.com/paypal/unsuccessful/",
   ...   "amount": 100})
   >>> return render_to_response("some_template.html", 
-                                {"obj": pay_pal},
-                                context_instance=RequestContext(request))
+  ...                           {"obj": pay_pal},
+  ...                           context_instance=RequestContext(request))
 
 In some_template.html::
 
