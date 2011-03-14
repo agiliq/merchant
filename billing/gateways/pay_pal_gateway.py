@@ -17,6 +17,11 @@ class PayPalGateway(Gateway):
 
     def __init__(self):
         pass
+
+    @property
+    def service_url(self):
+        # Implemented in django-paypal
+        raise NotImplementedError
     
     def purchase(self, money, credit_card, options={}):
         """Using PAYPAL DoDirectPayment, charge the given

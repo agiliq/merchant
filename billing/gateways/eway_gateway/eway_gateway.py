@@ -5,12 +5,6 @@ from billing import Gateway
 from billing.signals import *
 from billing.utils.credit_card import Visa, MasterCard, DinersClub, JCB, AmericanExpress
 
-TEST_URL     = 'https://www.eway.com.au/gateway/xmltest/testpage.asp'
-LIVE_URL     = 'https://www.eway.com.au/gateway/xmlpayment.asp'
-
-TEST_CVN_URL = 'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp'
-LIVE_CVN_URL = 'https://www.eway.com.au/gateway_cvn/xmlpayment.asp'
-
 class EwayGateway(Gateway):
     default_currency = "AUD"
     supported_countries = ["AU"]
@@ -24,7 +18,7 @@ class EwayGateway(Gateway):
                                       customer_id=settings.EWAY_CUSTOMER_ID,
                                       username=settings.EWAY_USERNAME,
                                       password=settings.EWAY_PASSWORD,
-                                      url=HOSTED_TEST_URL if self.test_mode else HOSTED_LIVE_URL,
+                                      url=self.service_url,
                                       )
         self.hosted_customer = self.client.client.factory.create("CreditCard")
     
@@ -55,6 +49,12 @@ class EwayGateway(Gateway):
         self.hosted_customer.JobDesc = address.get("job_desc")
         self.hosted_customer.Comments = address.get("comments")
         self.hosted_customer.URL = address.get("url")
+
+    @property
+    def service_url(self):
+        if self.test_mode:
+            return HOSTED_TEST_URL
+        return HOSTED_LIVE_URL
 
     def purchase(self, money, credit_card, options={}):
         """Using Eway payment gateway , charge the given
