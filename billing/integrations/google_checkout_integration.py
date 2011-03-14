@@ -184,6 +184,8 @@ class GoogleCheckoutIntegration(Integration):
         try:
             resp = GCNewOrderNotification.objects.create(**data)
             # TODO: Make the type more generic
+            # TODO: The person might have got charged and yet transaction
+            # might have failed here. Need a better way to communicate it
             transaction_was_successful.send(sender=self.__class__, type="purchase", response=resp)
             status = "SUCCESS"
         except:
