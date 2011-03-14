@@ -7,8 +7,8 @@ method of payment is implemented in merchant as a wrapper on top of
 `django-paypal`_. You need to install the package to be able to use this
 payment processor.
 
-For a list of the fields expected, please refer to the PWS and django-paypal
-documentation.
+For a list of the fields and settings attribute expected, please refer to the 
+PWS and django-paypal documentation.
 
 After a transaction, PayPal pings the notification URL and all the 
 data sent is stored in the `PayPalIPN` model instance that can be 
