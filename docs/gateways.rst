@@ -45,6 +45,8 @@ Method Reference
   attribute) and calls the `is_valid` method of the card and returns a boolean.
   if the card is not supported by the gateway, a `CardNotSupported` exception
   is raised.
+* **service_url**: A property that returns the url to which the credit card
+  and other transaction related details are submitted.
 * **purchase(money, credit_card, options = {})**: A method that charges the
   given card (one-time) for the given amount `money` using the `options`
   provided. Subclasses have to implement this method.
