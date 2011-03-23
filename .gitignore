@@ -8,3 +8,5 @@ example/tmp
 example/localsettings.py
 
 docs/_build/*
+
+*_flymake.py*
