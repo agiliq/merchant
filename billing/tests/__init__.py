@@ -5,6 +5,7 @@ from pay_pal_tests import *
 from eway_tests import *
 from world_pay_tests import *
 from google_checkout_tests import *
+from amazon_fps_tests import *
 
 if __name__ == "__main__":
     unittest.main()

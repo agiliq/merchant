@@ -1,0 +1,22 @@
+from django.test import TestCase
+from billing import get_integration
+from django.template import Template, Context
+from django.conf import settings
+
+class AmazonFPSTestCase(TestCase):
+    def setUp(self):
+        self.fps = get_integration("amazon_fps")
+        fields = {
+            "callerReference": "100",
+            "paymentReason": "Digital Download",
+            "pipelineName": "SingleUse",
+            "transactionAmount": 30,
+            "returnURL": "http://localhost/",
+            }
+        self.fps.add_fields(fields)
+
+    def testLinkGen(self):
+        tmpl = Template("{% load billing_tags %}{% amazon_fps obj %}")
+        link = tmpl.render(Context({"obj": self.fps}))
+        pregen_link = """https://authorize.payments-sandbox.amazon.com/cobranded-ui/actions/start?callerKey=%(aws_access_key)s&callerReference=100&paymentReason=Digital%%20Download&pipelineName=SingleUse&returnURL=http%%3A%%2F%%2Flocalhost%%2F&signature=tSOFkVhl61UwGqGS7rjBiuYGDVBuabhCsD9JG3XvUgc%%3D&signatureMethod=HmacSHA256&signatureVersion=2&transactionAmount=30""" %({"aws_access_key": settings.AWS_ACCESS_KEY})
+        self.assertEquals(pregen_link, link)
