@@ -1,6 +1,6 @@
 from billing.integration import Integration
 from django.conf import settings
-from boto.connection import FPSConnection
+from boto.fps.connection import FPSConnection
 
 FPS_PROD_API_ENDPOINT = "fps.amazonaws.com"
 FPS_SANDBOX_API_ENDPOINT = "fps.sandbox.amazonaws.com"
