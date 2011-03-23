@@ -26,8 +26,9 @@ class AmazonFpsIntegration(Integration):
 
     @property
     def link_url(self):
-        return self.fps_connection.make_url(self.fields["returnURL"],
-                                            self.fields["paymentReason"],
-                                            self.fields["pipelineName"],
-                                            self.fields["transactionAmount"],
-                                            **self.fields)
+        tmp_fields = self.fields.copy()
+        return self.fps_connection.make_url(tmp_fields.pop("returnURL"),
+                                            tmp_fields.pop("paymentReason"),
+                                            tmp_fields.pop("pipelineName"),
+                                            str(tmp_fields.pop("transactionAmount")),
+                                            **tmp_fields)
