@@ -5,9 +5,11 @@ from django import template
 from billing.templatetags.paypal_tags import paypal
 from billing.templatetags.world_pay_tags import world_pay
 from billing.templatetags.google_checkout_tags import google_checkout
+from billing.templatetags.amazon_fps_tags import amazon_fps
 
 register = template.Library()
 
 register.tag(google_checkout)
 register.tag(paypal)
 register.tag(world_pay)
+register.tag(amazon_fps)
