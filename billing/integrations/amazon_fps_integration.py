@@ -27,8 +27,45 @@ class AmazonFpsIntegration(Integration):
     @property
     def link_url(self):
         tmp_fields = self.fields.copy()
+        tmp_fields.pop("aws_access_key", None)
+        tmp_fields.pop("aws_secret_access_key", None)
         return self.fps_connection.make_url(tmp_fields.pop("returnURL"),
                                             tmp_fields.pop("paymentReason"),
                                             tmp_fields.pop("pipelineName"),
                                             str(tmp_fields.pop("transactionAmount")),
                                             **tmp_fields)
+
+    def purchase(self, amount, options={}):
+        tmp_options = options.copy()
+        permissible_options = ["senderTokenId", "recipientTokenId", "callerTokenId",
+            "chargeFeeTo", "callerReference", "senderReference", "recipientReference",
+            "senderDescription", "recipientDescription", "callerDescription",
+            "metadata", "transactionDate", "reserve"]
+        tmp_options["senderTokenId"] = options["tokenID"]
+        for key in options:
+            if key not in permissible_options:
+                tmp_options.pop(key)
+        return self.fps_connection.pay(amount, tmp_options.pop("senderTokenId"), 
+                                       callerReference=tmp_options.pop("callerReference"),
+                                       **tmp_options)
+
+    def authorize(self, amount, options={}):
+        options["reserve"] = True
+        return self.purchase(amount, options)
+
+    def capture(self, amount, options={}):
+        assert "ReserveTransactionId" in options, "Expecting 'ReserveTransactionId' in options"
+        return self.fps_connection.settle(options["ReserveTransactionId"], amount)
+
+    def credit(self, amount, options={}):
+        assert "CallerReference" in options, "Expecting 'CallerReference' in options"
+        assert "TransactionId" in options, "Expecting 'TransactionId' in options"
+        return self.fps_connection.refund(options["CallerReference"],
+                                          options["TransactionId"], 
+                                          refundAmount=amount,
+                                          callerDescription=options.get("description", None))
+
+    def void(self, identification, options={}):
+        # Requires the TransactionID to be passed as 'identification'
+        return self.fps_connection.cancel(identification, 
+                                          options.get("description", None))
