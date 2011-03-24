@@ -52,9 +52,10 @@ class AmazonFpsIntegration(Integration):
         for key in options:
             if key not in permissible_options:
                 tmp_options.pop(key)
-        return self.fps_connection.pay(amount, tmp_options.pop("senderTokenId"), 
+        resp = self.fps_connection.pay(amount, tmp_options.pop("senderTokenId"), 
                                        callerReference=tmp_options.pop("callerReference"),
                                        **tmp_options)
+        return {"status": resp[0].TransactionStatus, "response": resp[0]}
 
     def authorize(self, amount, options={}):
         options["reserve"] = True
@@ -62,20 +63,23 @@ class AmazonFpsIntegration(Integration):
 
     def capture(self, amount, options={}):
         assert "ReserveTransactionId" in options, "Expecting 'ReserveTransactionId' in options"
-        return self.fps_connection.settle(options["ReserveTransactionId"], amount)
+        resp = self.fps_connection.settle(options["ReserveTransactionId"], amount)
+        return {"status": resp[0].TransactionStatus, "response": resp[0]}
 
     def credit(self, amount, options={}):
         assert "CallerReference" in options, "Expecting 'CallerReference' in options"
         assert "TransactionId" in options, "Expecting 'TransactionId' in options"
-        return self.fps_connection.refund(options["CallerReference"],
+        resp = self.fps_connection.refund(options["CallerReference"],
                                           options["TransactionId"], 
                                           refundAmount=amount,
                                           callerDescription=options.get("description", None))
+        return {"status": resp[0].TransactionStatus, "response": resp[0]}
 
     def void(self, identification, options={}):
         # Requires the TransactionID to be passed as 'identification'
-        return self.fps_connection.cancel(identification, 
+        resp = self.fps_connection.cancel(identification, 
                                           options.get("description", None))
+        return {"status": resp[0].TransactionStatus, "response": resp[0]}
 
     def get_urls(self):
         urlpatterns = patterns('',
