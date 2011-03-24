@@ -1,9 +1,16 @@
 from billing.integration import Integration
 from django.conf import settings
 from boto.fps.connection import FPSConnection
+from django.conf.urls.defaults import patterns
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 FPS_PROD_API_ENDPOINT = "fps.amazonaws.com"
 FPS_SANDBOX_API_ENDPOINT = "fps.sandbox.amazonaws.com"
+
+csrf_exempt_m = method_decorator(csrf_exempt)
+require_POST_m = method_decorator(require_POST)
 
 class AmazonFpsIntegration(Integration):
     # TODO: Document the fields for each flow
@@ -69,3 +76,18 @@ class AmazonFpsIntegration(Integration):
         # Requires the TransactionID to be passed as 'identification'
         return self.fps_connection.cancel(identification, 
                                           options.get("description", None))
+
+    def get_urls(self):
+        urlpatterns = patterns('',
+           (r'^fps-notify-handler/$', self.fps_ipn_handler),
+           (r'^fps-return-url/$', self.fps_return_url),
+                               )
+        return urlpatterns
+
+    @csrf_exempt_m
+    @require_POST_m
+    def fps_ipn_handler(self, request):
+        pass
+
+    def fps_return_url(self, request):
+        pass
