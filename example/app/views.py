@@ -178,7 +178,7 @@ def offsite_amazon_fps(request):
               "returnURLPrefix": "http://merchant.agiliq.com",
               "recurringPeriod": "1 Hour",
               }
-    fps.add_fields(fields)
+    fps_recur.add_fields(fields)
     template_vars = {'title': 'Amazon Flexible Payment Service', 
                      "fps_recur_obj": fps_recur, "fps_obj": fps}
     return render(request, 'app/amazon_fps.html', template_vars)
