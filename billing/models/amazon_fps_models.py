@@ -11,7 +11,8 @@ class AmazonFPSResponse(models.Model):
     recipientName = models.CharField(max_length=75)
     statusCode = models.CharField(max_length=50)
     statusMessage = models.TextField()
-    transactionAmount = models.FloatField()
+    # Because currency is sent along
+    transactionAmount = models.CharField(max_length=20)
     transactionDate = models.DateTimeField()
     transactionId = models.CharField(max_length=50, db_index=True)
     transactionStatus = models.CharField(max_length=50)

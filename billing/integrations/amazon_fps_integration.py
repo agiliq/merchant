@@ -13,7 +13,7 @@ from billing.signals import (amazon_fps_payment_signal,
                              transaction_was_unsuccessful)
 from django.core.urlresolvers import reverse
 from billing.models import AmazonFPSResponse
-import urlparse, urllib
+import urlparse, urllib, time, datetime
 
 FPS_PROD_API_ENDPOINT = "fps.amazonaws.com"
 FPS_SANDBOX_API_ENDPOINT = "fps.sandbox.amazonaws.com"
@@ -135,6 +135,8 @@ class AmazonFpsIntegration(Integration):
         for (key, val) in data.iteritems():
             model_inst_attr = getattr(resp, key, None)
             if model_inst_attr and not callable(model_inst_attr):
+                if key == "transactionDate":
+                    val = datetime.datetime(*time.localtime(val)[:6])
                 setattr(resp, key, val)
         resp.save()
         if resp.statusCode == "Success":
