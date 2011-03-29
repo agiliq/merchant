@@ -10,7 +10,11 @@ from billing.gateway import CardNotSupported
 
 from app.forms import CreditCardForm
 from django.conf import settings
-from hashlib import md5
+
+google_checkout_obj = get_integration("google_checkout")
+pay_pal_obj = get_integration("pay_pal")
+amazon_fps_obj = get_integration("amazon_fps")
+world_pay_obj = get_integration("world_pay")
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
@@ -111,8 +115,6 @@ def eway(request):
 
 
 def offsite_paypal(request):
-    paypal_obj = get_integration("pay_pal")
-
     invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     return_url = request.build_absolute_uri(reverse('app_offsite_paypal_done'))
     cancel_return = request.build_absolute_uri(request.META['PATH_INFO'])
@@ -125,12 +127,11 @@ def offsite_paypal(request):
                      'return_url': return_url,
                      'cancel_return': cancel_return,
                      }
-    paypal_obj.add_fields(paypal_params)
-    template_vars = {"obj": paypal_obj, 'title': 'PayPal Offsite'}
+    pay_pal_obj.add_fields(paypal_params)
+    template_vars = {"obj": pay_pal_obj, 'title': 'PayPal Offsite'}
     return render(request, 'app/offsite_paypal.html', template_vars)
 
 def offsite_google_checkout(request):
-    gc = get_integration("google_checkout")
     return_url = request.build_absolute_uri(reverse('app_offsite_google_checkout_done'))
     fields = {'items': [{'amount': 1,
                          'name': 'name of the item',
@@ -140,24 +141,22 @@ def offsite_google_checkout(request):
                          'quantity': 1,
                         }],
               'return_url': return_url,}
-    gc.add_fields(fields)
-    template_vars = {'title': 'Google Checkout', "gc_obj": gc}
+    google_checkout_obj.add_fields(fields)
+    template_vars = {'title': 'Google Checkout', "gc_obj": google_checkout_obj}
     
     return render(request, 'app/google_checkout.html', template_vars)
 
 def offsite_world_pay(request):
-    wp = get_integration("world_pay")
     fields = {"instId": settings.WORLDPAY_INSTALLATION_ID_TEST,
               "cartId": "TEST123",
               "currency": "USD",
               "amount": 1,
               "desc": "Test Item",}
-    wp.add_fields(fields)
-    template_vars = {'title': 'WorldPay', "wp_obj": wp}
+    world_pay_obj.add_fields(fields)
+    template_vars = {'title': 'WorldPay', "wp_obj": world_pay_obj}
     return render(request, 'app/world_pay.html', template_vars)
 
 def offsite_amazon_fps(request):
-    fps = get_integration("amazon_fps")
     fields = {"transactionAmount": "100",
               "pipelineName": "SingleUse",
               "paymentReason": "Merchant Test",
@@ -169,7 +168,7 @@ def offsite_amazon_fps(request):
     # the callerReference so that the amount to be charged is known
     # Or save the callerReference in the session and send the user
     # to FPS and then use the session value when the user is back.
-    fps.add_fields(fields)
+    amazon_fps_obj.add_fields(fields)
     fps_recur = get_integration("amazon_fps")
     fields.update({"transactionAmount": "10",
                    "pipelineName": "Recurring",
@@ -177,5 +176,5 @@ def offsite_amazon_fps(request):
                    })
     fps_recur.add_fields(fields)
     template_vars = {'title': 'Amazon Flexible Payment Service', 
-                     "fps_recur_obj": fps_recur, "fps_obj": fps}
+                     "fps_recur_obj": fps_recur, "fps_obj": amazon_fps_obj}
     return render(request, 'app/amazon_fps.html', template_vars)

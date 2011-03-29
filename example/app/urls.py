@@ -1,6 +1,7 @@
 
 from django.conf.urls.defaults import *
 from billing import get_integration
+from app.views import google_checkout_obj, pay_pal_obj, amazon_fps_obj
 
 urlpatterns = patterns('app.views',
     url(r'^$', 'index', name='app_index'),
@@ -17,19 +18,16 @@ urlpatterns += patterns('app.views',
     url(r'offsite/amazon_fps/$', 'offsite_amazon_fps', name='app_offsite_amazon_fps'),
 )
 
-paypal = get_integration("pay_pal")
 # paypal payment notification handler
 urlpatterns += patterns('',
-    (r'^paypal-ipn-handler/', include(paypal.urls)),
+    (r'^paypal-ipn-handler/', include(pay_pal_obj.urls)),
 )
-google_checkout = get_integration("google_checkout")
 urlpatterns += patterns('',
-    (r'^', include(google_checkout.urls)),
+    (r'^', include(google_checkout_obj.urls)),
 )
 
-amazon_fps = get_integration("amazon_fps")
 urlpatterns += patterns('',
-    (r'^fps/', include(amazon_fps.urls)),
+    (r'^fps/', include(amazon_fps_obj.urls)),
 )
 
 urlpatterns += patterns('django.views.generic.simple',
