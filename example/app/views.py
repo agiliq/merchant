@@ -170,7 +170,7 @@ def offsite_amazon_fps(request):
     # to FPS and then use the session value when the user is back.
     amazon_fps_obj.add_fields(fields)
     fps_recur = get_integration("amazon_fps")
-    fields.update({"transactionAmount": "10",
+    fields.update({"transactionAmount": "100",
                    "pipelineName": "Recurring",
                    "recurringPeriod": "1 Hour",
                    })
