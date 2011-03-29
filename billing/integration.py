@@ -13,8 +13,6 @@ integration_cache = {}
 class Integration(object):
     """Base Integration class that needs to be subclassed by
     implementations"""
-    # The form fields that will be rendered in the template
-    fields = {}
     # The mode of the gateway. Looks into the settings else
     # defaults to True
     test_mode = getattr(settings, "MERCHANT_TEST_MODE", True)
@@ -22,6 +20,8 @@ class Integration(object):
     def __init__(self, options=None):
         if not options:
             options = {}
+        # The form fields that will be rendered in the template
+        self.fields = {}
         self.fields.update(options)
     
     def add_field(self, key, value):

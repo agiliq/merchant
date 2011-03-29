@@ -23,8 +23,6 @@ class NotConfiguredError(Exception):
     pass
 
 class GoogleCheckoutIntegration(Integration):
-    fields = {}
-
     def __init__(self, options=None):
         if not options:
             options = {}

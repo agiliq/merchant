@@ -22,18 +22,13 @@ csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
 
 class AmazonFpsIntegration(Integration):
-    fields = {"transactionAmount": "",
-              "pipelineName": "",
-              "paymentReason": "",
-              # Page on the merchant site from
-              # where the user got redirected to FPS
-              # Used to get him back after the transaction
-              # is completed
-              "paymentPage": "",
-              # Slight modification of FPS attr
-              "returnURLPrefix": "",
-              }
-
+    """
+    Fields required:
+    transactionAmount: Amount to be charged/authorized
+    paymentReason: Description of the transaction
+    paymentPage: Page to direct the user on completion/failure of transaction
+    returnURLPrefix: The domain and path that is prefixed to the fps return url defined below
+    """
     def __init__(self, options=None):
         if not options:
             options = {}

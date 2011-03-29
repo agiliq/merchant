@@ -4,15 +4,16 @@ from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
 from django.conf.urls.defaults import patterns, include
 
 class PayPalIntegration(Integration):
-    # Required Fields. Just a template for the user
-    fields = {"business": settings.PAYPAL_RECEIVER_EMAIL,
-              "item_name": "",
-              "invoice": "",
-              "notify_url": "",
-              "return_url": "",
-              "cancel_return": "",
-              "amount": 0,
-              }
+    def __init__(self):
+        # Required Fields. Just a template for the user
+        self.fields = {"business": settings.PAYPAL_RECEIVER_EMAIL,
+                       "item_name": "",
+                       "invoice": "",
+                       "notify_url": "",
+                       "return_url": "",
+                       "cancel_return": "",
+                       "amount": 0,
+                       }
 
     @property
     def service_url(self):

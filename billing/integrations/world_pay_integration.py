@@ -16,12 +16,13 @@ csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
 
 class WorldPayIntegration(Integration):
-    # Template for required fields
-    fields = {"instId": "",
-              "cartId": "",
-              "amount": "",
-              "currency": "",}
-
+    """
+    Fields required:
+    instId: Installation ID provided by WorldPay
+    cartId: Merchant specified unique id to identify user
+    amount: Amount to be charged
+    currency: ISO 3-character currency
+    """
     def __init__(self, options=None):
         if not options:
             options = {}
