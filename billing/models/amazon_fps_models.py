@@ -13,7 +13,7 @@ class AmazonFPSResponse(models.Model):
     statusMessage = models.TextField()
     transactionAmount = models.FloatField()
     transactionDate = models.DateTimeField()
-    transactionId = models.CharField(max_length=50)
+    transactionId = models.CharField(max_length=50, index=True)
     transactionStatus = models.CharField(max_length=50)
 
     def __unicode__(self):
