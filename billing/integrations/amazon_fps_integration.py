@@ -5,9 +5,14 @@ from django.conf.urls.defaults import patterns, url
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.http import HttpResponseForbidden, HttpResponseRedirect
-from billing.signals import amazon_fps_payment_signal
+from django.http import (HttpResponseForbidden, 
+                         HttpResponseRedirect, 
+                         HttpResponse)
+from billing.signals import (amazon_fps_payment_signal, 
+                             transaction_was_successful,
+                             transaction_was_unsuccessful)
 from django.core.urlresolvers import reverse
+from billing.models import AmazonFPSResponse
 import urlparse
 
 FPS_PROD_API_ENDPOINT = "fps.amazonaws.com"
@@ -112,6 +117,28 @@ class AmazonFpsIntegration(Integration):
                                                     parsed_url.query)
         if not resp[0].VerificationStatus == "Success":
             return HttpResponseForbidden()
+
+        data = request.POST.copy()
+        if AmazonFPSResponse.objects.filter(transactionId=data["transactionId"]).count():
+            resp = AmazonFPSResponse.objects.get(transactionId=data["transactionId"])
+        else:
+            resp = AmazonFPSResponse()
+        for (key, val) in data.iteritems():
+            model_inst_attr = getattr(resp, key, None)
+            if model_inst_attr and not callable(model_inst_attr):
+                setattr(resp, key, val)
+        resp.save()
+        if resp.statusCode == "Success":
+            transaction_was_successful.send(sender=self.__class__, 
+                                            type=data["operation"], 
+                                            response=resp)
+        else:
+            if not "Pending" in resp.statusCode:
+                transaction_was_unsuccessful.send(sender=self.__class__, 
+                                                  type=data["operation"], 
+                                                  response=resp)
+        # Return a HttpResponse to prevent django from complaining
+        return HttpResponse(resp.statusCode)
 
     def fps_return_url(self, request):
         uri = request.build_absolute_uri()
