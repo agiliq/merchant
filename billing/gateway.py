@@ -119,6 +119,7 @@ def get_gateway(gateway, *args, **kwargs):
             clazz = getattr(gateway_module, gateway_class_name)
         except AttributeError:
             raise GatewayNotConfigured("Missing %s class in the gateway module." %gateway_class_name)
+        gateway_cache[gateway] = clazz
     # We either hit the cache or load our class object, let's return an instance
     # of it.
     return clazz(*args, **kwargs)

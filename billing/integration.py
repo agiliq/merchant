@@ -64,4 +64,5 @@ def get_integration(integration, *args, **kwargs):
             klass = getattr(integration_module, integration_class_name)
         except AttributeError:
             raise IntegrationNotConfigured("Missing %s class in the integration module." %integration_class_name)
+        integration_cache[integration] = klass
     return klass(*args, **kwargs)
