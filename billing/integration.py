@@ -19,9 +19,10 @@ class Integration(object):
     # defaults to True
     test_mode = getattr(settings, "MERCHANT_TEST_MODE", True)
 
-    def __init__(self, options={}):
-        if options:
-            self.fields.update(options)
+    def __init__(self, options=None):
+        if not options:
+            options = {}
+        self.fields.update(options)
     
     def add_field(self, key, value):
         self.fields[key] = value

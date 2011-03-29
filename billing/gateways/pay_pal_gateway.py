@@ -1,4 +1,3 @@
-
 import datetime
 
 from paypal.pro.helpers import PayPalWPP
@@ -23,9 +22,11 @@ class PayPalGateway(Gateway):
         # Implemented in django-paypal
         raise NotImplementedError
     
-    def purchase(self, money, credit_card, options={}):
+    def purchase(self, money, credit_card, options=None):
         """Using PAYPAL DoDirectPayment, charge the given
         credit card for specified money"""
+        if not options:
+            options = {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
 
@@ -83,22 +84,25 @@ class PayPalGateway(Gateway):
             return {"status": "FAILURE", "response": e}
         return {"status": response.ack.upper(), "response": response}
 
-    def authorize(self, money, credit_card, options = {}):
+    def authorize(self, money, credit_card, options = None):
+        if not options:
+            options = {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
         raise NotImplementedError
 
-    def capture(self, money, authorization, options = {}):
+    def capture(self, money, authorization, options = None):
         raise NotImplementedError
 
-    def void(self, identification, options = {}):
+    def void(self, identification, options = None):
         raise NotImplementedError
 
-    def credit(self, money, identification, options = {}):
+    def credit(self, money, identification, options = None):
         raise NotImplementedError
 
-    def recurring(self, money, creditcard, options = {}):
-        # raise NotImplementedError
+    def recurring(self, money, creditcard, options = None):
+        if not options:
+            options = {}
         params = {}
         params['profilestartdate'] = options.get('startdate') or datetime.datetime.now().strftime("%Y-%m-%dT00:00:00Z")
         params['startdate'] = options.get('startdate') or datetime.datetime.now().strftime("%m%Y")
@@ -129,8 +133,8 @@ class PayPalGateway(Gateway):
         return {"status": response.ack.upper(), "response": response}
        
         
-    def store(self, creditcard, options = {}):
+    def store(self, creditcard, options = None):
         raise NotImplementedError
 
-    def unstore(self, identification, options = {}):
+    def unstore(self, identification, options = None):
         raise NotImplementedError

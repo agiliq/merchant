@@ -146,9 +146,11 @@ class AuthorizeNetGateway(Gateway):
         response = self.request(url, data)
         return response
 
-    def post_data(self, action, parameters = {}):
+    def post_data(self, action, parameters = None):
         """add API details, gateway response formating options 
         to the request parameters"""
+        if not parameters:
+            parameters = {}
         post = {}
         
         post['version']        = API_VERSION
@@ -164,9 +166,11 @@ class AuthorizeNetGateway(Gateway):
         return urllib.urlencode(dict(('x_%s' % (k), v) for k, v in post.iteritems()))
     
     # this shoud be moved to a requests lib file
-    def request(self, url, data, headers={}):
+    def request(self, url, data, headers = None):
         """Make POST request to the payment gateway with the data and return 
         gateway RESPONSE_CODE, RESPONSE_REASON_CODE, RESPONSE_REASON_TEXT"""
+        if not headers:
+            headers = {}
         conn = urllib2.Request(url=url, data=data, headers=headers)
         try:
             open_conn = urllib2.urlopen(conn)
@@ -176,9 +180,11 @@ class AuthorizeNetGateway(Gateway):
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
         return save_authorize_response(fields)
 
-    def purchase(self, money, credit_card, options={}):
+    def purchase(self, money, credit_card, options = None):
         """Using Authorize.net payment gateway, charge the given
         credit card for specified money"""
+        if not options:
+            options = {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
 
@@ -201,9 +207,11 @@ class AuthorizeNetGateway(Gateway):
                                             response=response)
         return {"status": status, "response": response}
     
-    def authorize(self, money, credit_card, options = {}):
+    def authorize(self, money, credit_card, options = None):
         """Using Authorize.net payment gateway, authorize the
         credit card for specified money"""
+        if not options:
+            options = {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
 
@@ -226,9 +234,11 @@ class AuthorizeNetGateway(Gateway):
                                             response=response)
         return {"status": status, "response": response}
     
-    def capture(self, money, authorization, options = {}):
+    def capture(self, money, authorization, options = None):
         """Using Authorize.net payment gateway, capture the
         authorize credit card"""
+        if not options:
+            options = {}
         post = {}        
         post["trans_id"] = authorization
         post.update(options)
@@ -246,9 +256,11 @@ class AuthorizeNetGateway(Gateway):
                                             response=response)
         return {"status": status, "response": response}
     
-    def void(self, identification, options = {}):
+    def void(self, identification, options = None):
         """Using Authorize.net payment gateway, void the
         specified transaction"""
+        if not options:
+            options = {}
         post = {}        
         post["trans_id"] = identification
         post.update(options)
@@ -266,9 +278,11 @@ class AuthorizeNetGateway(Gateway):
                                             response=response)
         return {"status": status, "response": response}
 
-    def credit(self, money, identification, options = {}):
+    def credit(self, money, identification, options = None):
         """Using Authorize.net payment gateway, void the
         specified transaction"""
+        if not options:
+            options = {}
         post = {}
         post["trans_id"] = identification
         # Authorize.Net requuires the card or the last 4 digits be sent
@@ -288,7 +302,9 @@ class AuthorizeNetGateway(Gateway):
                                             response=response)
         return {"status": status, "response": response}
 
-    def recurring(self, money, credit_card, options = {}):
+    def recurring(self, money, credit_card, options):
+        if not options:
+            options = {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
         template_vars  = {}
@@ -322,12 +338,11 @@ class AuthorizeNetGateway(Gateway):
             return (5, '1', 'Could not talk to payment gateway.')
         
         response = nodeToDic(parseString(xml_response))['ARBCreateSubscriptionResponse']
-        """ successful response
-        {u'ARBCreateSubscriptionResponse': {u'messages': {u'message': {u'code': u'I00001', 
-                                                                       u'text': u'Successful.'},
-                                                          u'resultCode': u'Ok'},
-                                            u'subscriptionId': u'933728'}}
-        """
+        # successful response
+        # {u'ARBCreateSubscriptionResponse': {u'messages': {u'message': {u'code': u'I00001', 
+        #                                                               u'text': u'Successful.'},
+        #                                                  u'resultCode': u'Ok'},
+        #                                    u'subscriptionId': u'933728'}}
         
         status = "SUCCESS"
         if response['messages']['resultCode'].lower() != 'ok':
@@ -341,8 +356,8 @@ class AuthorizeNetGateway(Gateway):
                                             response=response)
         return {"status": status, "response": response}
 
-    def store(self, creditcard, options = {}):
+    def store(self, creditcard, options = None):
         raise NotImplementedError
 
-    def unstore(self, identification, options = {}):
+    def unstore(self, identification, options = None):
         raise NotImplementedError

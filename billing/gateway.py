@@ -55,36 +55,36 @@ class Gateway(object):
             return True 
         return credit_card.is_valid()
 
-    def purchase(self, money, credit_card, options = {}):
+    def purchase(self, money, credit_card, options = None):
         """One go authorize and capture transaction"""
         raise NotImplementedError
 
-    def authorize(self, money, credit_card, options = {}):
+    def authorize(self, money, credit_card, options = None):
         """Authorization for a future capture transaction"""
         raise NotImplementedError
 
-    def capture(self, money, authorization, options = {}):
+    def capture(self, money, authorization, options = None):
         """Capture funds from a previously authorized transaction"""
         raise NotImplementedError
 
-    def void(self, identification, options = {}):
+    def void(self, identification, options = None):
         """Null/Blank/Delete a previous transaction"""
         raise NotImplementedError
 
-    def credit(self, money, identification, options = {}):
+    def credit(self, money, identification, options = None):
         """Refund a previously 'settled' transaction"""
         raise NotImplementedError
 
-    def recurring(self, money, creditcard, options = {}):
+    def recurring(self, money, creditcard, options = None):
         """Setup a recurring transaction"""
         raise NotImplementedError
 
-    def store(self, creditcard, options = {}):
+    def store(self, creditcard, options = None):
         """Store the credit card and user profile information
         on the gateway for future use"""
         raise NotImplementedError
 
-    def unstore(self, identification, options = {}):
+    def unstore(self, identification, options = None):
         """Delete the previously stored credit card and user
         profile information on the gateway"""
         raise NotImplementedError
