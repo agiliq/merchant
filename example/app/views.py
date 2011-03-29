@@ -155,3 +155,30 @@ def offsite_world_pay(request):
     wp.add_fields(fields)
     template_vars = {'title': 'WorldPay', "wp_obj": wp}
     return render(request, 'app/world_pay.html', template_vars)
+
+def offsite_amazon_fps(request):
+    fps = get_integration("amazon_fps")
+    fields = {"transactionAmount": "100",
+              "pipelineName": "SingleUse",
+              "paymentReason": "Merchant Test",
+              "paymentPage": request.build_absolute_uri(),
+              "returnURLPrefix": "http://merchant.agiliq.com",
+              }
+    fps.add_fields(fields)
+    # Save the fps.fields["callerReference"] in the db along with
+    # the amount to be charged or use the user's unique id as
+    # the callerReference so that the amount to be charged is known
+    # Or save the callerReference in the session and send the user
+    # to FPS and then use the session value when the user is back.
+    fps_recur = get_integration("amazon_fps")
+    fields = {"transactionAmount": "10",
+              "pipelineName": "Recurring",
+              "paymentReason": "Merchant",
+              "paymentPage": request.build_absolute_uri(),
+              "returnURLPrefix": "http://merchant.agiliq.com",
+              "recurringPeriod": "1 Hour",
+              }
+    fps.add_fields(fields)
+    template_vars = {'title': 'Amazon Flexible Payment Service', 
+                     "fps_recur_obj": fps_recur, "fps_obj": fps}
+    return render(request, 'app/amazon_fps.html', template_vars)
