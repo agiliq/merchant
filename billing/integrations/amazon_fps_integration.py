@@ -1,10 +1,14 @@
 from billing.integration import Integration
 from django.conf import settings
 from boto.fps.connection import FPSConnection
-from django.conf.urls.defaults import patterns
+from django.conf.urls.defaults import patterns, url
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.http import HttpResponseForbidden, HttpResponseRedirect
+from billing.signals import amazon_fps_payment_signal
+from django.core.urlresolvers import reverse
+import urlparse
 
 FPS_PROD_API_ENDPOINT = "fps.amazonaws.com"
 FPS_SANDBOX_API_ENDPOINT = "fps.sandbox.amazonaws.com"
@@ -13,11 +17,17 @@ csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
 
 class AmazonFpsIntegration(Integration):
-    # TODO: Document the fields for each flow
     fields = {"transactionAmount": "",
               "pipelineName": "",
               "paymentReason": "",
-              "returnURL": "",}
+              # Page on the merchant site from
+              # where the user got redirected to FPS
+              # Used to get him back after the transaction
+              # is completed
+              "paymentPage": "",
+              # Slight modification of FPS attr
+              "returnURLPrefix": "",
+              }
 
     def __init__(self, options={}):
         self.aws_access_key = options.get("aws_access_key", None) or settings.AWS_ACCESS_KEY
@@ -36,7 +46,10 @@ class AmazonFpsIntegration(Integration):
         tmp_fields = self.fields.copy()
         tmp_fields.pop("aws_access_key", None)
         tmp_fields.pop("aws_secret_access_key", None)
-        return self.fps_connection.make_url(tmp_fields.pop("returnURL"),
+        tmp_fields.pop("returnURL", None)
+        tmp_fields.pop("paymentPage", None)
+        return self.fps_connection.make_url("%s%s" %(tmp_fields.pop("returnURLPrefix"), 
+                                                     reverse("fps_return_url")),
                                             tmp_fields.pop("paymentReason"),
                                             tmp_fields.pop("pipelineName"),
                                             str(tmp_fields.pop("transactionAmount")),
@@ -44,7 +57,7 @@ class AmazonFpsIntegration(Integration):
 
     def purchase(self, amount, options={}):
         tmp_options = options.copy()
-        permissible_options = ["senderTokenId", "recipientTokenId", "callerTokenId",
+        permissible_options = ["senderTokenId", "recipientTokenId", 
             "chargeFeeTo", "callerReference", "senderReference", "recipientReference",
             "senderDescription", "recipientDescription", "callerDescription",
             "metadata", "transactionDate", "reserve"]
@@ -83,15 +96,37 @@ class AmazonFpsIntegration(Integration):
 
     def get_urls(self):
         urlpatterns = patterns('',
-           (r'^fps-notify-handler/$', self.fps_ipn_handler),
-           (r'^fps-return-url/$', self.fps_return_url),
+           url(r'^fps-notify-handler/$', self.fps_ipn_handler, name="fps_ipn_handler"),
+           url(r'^fps-return-url/$', self.fps_return_url, name="fps_return_url"),
                                )
         return urlpatterns
 
     @csrf_exempt_m
     @require_POST_m
     def fps_ipn_handler(self, request):
-        pass
+        uri = request.build_absolute_uri()
+        parsed_url = urlparse.urlparse(uri)
+        resp = self.fps_connection.verify_signature("%s%s%s" %(parsed_url.scheme, 
+                                                               parsed_url.netloc, 
+                                                               parsed_url.path),
+                                                    parsed_url.query)
+        if not resp[0].VerificationStatus == "Success":
+            return HttpResponseForbidden()
 
     def fps_return_url(self, request):
-        pass
+        uri = request.build_absolute_uri()
+        parsed_url = urlparse.urlparse(uri)
+        resp = self.fps_connection.verify_signature("%s%s%s" %(parsed_url.scheme, 
+                                                               parsed_url.netloc, 
+                                                               parsed_url.path),
+                                                    parsed_url.query)
+        if not resp[0].VerificationStatus == "Success":
+            return HttpResponseForbidden()
+        
+        if not request.session["CallerReference"] == request.GET["callerReference"]:
+            return HttpResponseForbidden()
+
+        amazon_fps_payment_signal.send(sender=self.__class__, 
+                                       request=request, 
+                                       integration=self)
+        return HttpResponseRedirect(self.fields["paymentPage"])
