@@ -13,7 +13,7 @@ from billing.signals import (amazon_fps_payment_signal,
                              transaction_was_unsuccessful)
 from django.core.urlresolvers import reverse
 from billing.models import AmazonFPSResponse
-import urlparse
+import urlparse, urllib
 
 FPS_PROD_API_ENDPOINT = "fps.amazonaws.com"
 FPS_SANDBOX_API_ENDPOINT = "fps.sandbox.amazonaws.com"
@@ -121,11 +121,13 @@ class AmazonFpsIntegration(Integration):
         resp = self.fps_connection.verify_signature("%s://%s%s" %(parsed_url.scheme, 
                                                                   parsed_url.netloc, 
                                                                   parsed_url.path),
-                                                    parsed_url.query)
+                                                    request.raw_post_data)
         if not resp[0].VerificationStatus == "Success":
             return HttpResponseForbidden()
 
-        data = request.POST.copy()
+        data = dict(map(lambda x: x.split("="), request.raw_post_data.split("&")))
+        for (key, val) in data.iteritems():
+            data[key] = urllib.unquote_plus(val)
         if AmazonFPSResponse.objects.filter(transactionId=data["transactionId"]).count():
             resp = AmazonFPSResponse.objects.get(transactionId=data["transactionId"])
         else:
