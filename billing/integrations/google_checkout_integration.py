@@ -25,7 +25,9 @@ class NotConfiguredError(Exception):
 class GoogleCheckoutIntegration(Integration):
     fields = {}
 
-    def __init__(self, options={}):
+    def __init__(self, options=None):
+        if not options:
+            options = {}
         super(GoogleCheckoutIntegration, self).__init__(options=options)
         if not getattr(settings, "GOOGLE_CHECKOUT_MERCHANT_ID", None):
             raise NotConfiguredError("Could not locate the 'GOOGLE_CHECKOUT_MERCHANT_ID' setting")

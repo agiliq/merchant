@@ -22,7 +22,9 @@ class WorldPayIntegration(Integration):
               "amount": "",
               "currency": "",}
 
-    def __init__(self, options={}):
+    def __init__(self, options=None):
+        if not options:
+            options = {}
         super(WorldPayIntegration, self).__init__(options=options)
         if self.test_mode:
             self.fields.update({"testMode": 100})

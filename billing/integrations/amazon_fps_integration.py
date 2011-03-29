@@ -34,7 +34,9 @@ class AmazonFpsIntegration(Integration):
               "returnURLPrefix": "",
               }
 
-    def __init__(self, options={}):
+    def __init__(self, options=None):
+        if not options:
+            options = {}
         self.aws_access_key = options.get("aws_access_key", None) or settings.AWS_ACCESS_KEY
         self.aws_secret_access_key = options.get("aws_secret_access_key", None) or settings.AWS_SECRET_ACCESS_KEY
         super(AmazonFpsIntegration, self).__init__(options=options)
@@ -60,7 +62,9 @@ class AmazonFpsIntegration(Integration):
                                             str(tmp_fields.pop("transactionAmount")),
                                             **tmp_fields)
 
-    def purchase(self, amount, options={}):
+    def purchase(self, amount, options=None):
+        if not options:
+            options = {}
         tmp_options = options.copy()
         permissible_options = ["senderTokenId", "recipientTokenId", 
             "chargeFeeTo", "callerReference", "senderReference", "recipientReference",
@@ -75,16 +79,22 @@ class AmazonFpsIntegration(Integration):
                                        **tmp_options)
         return {"status": resp[0].TransactionStatus, "response": resp[0]}
 
-    def authorize(self, amount, options={}):
+    def authorize(self, amount, options=None):
+        if not options:
+            options = {}
         options["reserve"] = True
         return self.purchase(amount, options)
 
-    def capture(self, amount, options={}):
+    def capture(self, amount, options=None):
+        if not options:
+            options = {}
         assert "ReserveTransactionId" in options, "Expecting 'ReserveTransactionId' in options"
         resp = self.fps_connection.settle(options["ReserveTransactionId"], amount)
         return {"status": resp[0].TransactionStatus, "response": resp[0]}
 
-    def credit(self, amount, options={}):
+    def credit(self, amount, options=None):
+        if not options:
+            options = {}
         assert "CallerReference" in options, "Expecting 'CallerReference' in options"
         assert "TransactionId" in options, "Expecting 'TransactionId' in options"
         resp = self.fps_connection.refund(options["CallerReference"],
@@ -93,7 +103,9 @@ class AmazonFpsIntegration(Integration):
                                           callerDescription=options.get("description", None))
         return {"status": resp[0].TransactionStatus, "response": resp[0]}
 
-    def void(self, identification, options={}):
+    def void(self, identification, options=None):
+        if not options:
+            options = {}
         # Requires the TransactionID to be passed as 'identification'
         resp = self.fps_connection.cancel(identification, 
                                           options.get("description", None))
