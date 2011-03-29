@@ -29,7 +29,7 @@ urlpatterns += patterns('',
 
 amazon_fps = get_integration("amazon_fps")
 urlpatterns += patterns('',
-    (r'^', include(amazon_fps.urls)),
+    (r'^fps/', include(amazon_fps.urls)),
 )
 
 urlpatterns += patterns('django.views.generic.simple',
