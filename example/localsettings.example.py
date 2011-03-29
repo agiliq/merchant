@@ -34,6 +34,10 @@ WORLDPAY_INSTALLATION_ID_LIVE = ''
 
 WORLDPAY_MD5_SECRET_KEY = ''
 
+# Amazon FPS settings
+AWS_ACCESS_KEY = ''
+AWS_SECRET_ACCESS_KEY = ''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
