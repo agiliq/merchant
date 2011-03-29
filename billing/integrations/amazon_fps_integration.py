@@ -106,9 +106,9 @@ class AmazonFpsIntegration(Integration):
     def fps_ipn_handler(self, request):
         uri = request.build_absolute_uri()
         parsed_url = urlparse.urlparse(uri)
-        resp = self.fps_connection.verify_signature("%s%s%s" %(parsed_url.scheme, 
-                                                               parsed_url.netloc, 
-                                                               parsed_url.path),
+        resp = self.fps_connection.verify_signature("%s://%s%s" %(parsed_url.scheme, 
+                                                                  parsed_url.netloc, 
+                                                                  parsed_url.path),
                                                     parsed_url.query)
         if not resp[0].VerificationStatus == "Success":
             return HttpResponseForbidden()
@@ -116,16 +116,13 @@ class AmazonFpsIntegration(Integration):
     def fps_return_url(self, request):
         uri = request.build_absolute_uri()
         parsed_url = urlparse.urlparse(uri)
-        resp = self.fps_connection.verify_signature("%s%s%s" %(parsed_url.scheme, 
-                                                               parsed_url.netloc, 
-                                                               parsed_url.path),
+        resp = self.fps_connection.verify_signature("%s://%s%s" %(parsed_url.scheme, 
+                                                                  parsed_url.netloc, 
+                                                                  parsed_url.path),
                                                     parsed_url.query)
         if not resp[0].VerificationStatus == "Success":
             return HttpResponseForbidden()
         
-        if not request.session["CallerReference"] == request.GET["callerReference"]:
-            return HttpResponseForbidden()
-
         amazon_fps_payment_signal.send(sender=self.__class__, 
                                        request=request, 
                                        integration=self)
