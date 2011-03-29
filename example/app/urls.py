@@ -14,6 +14,7 @@ urlpatterns += patterns('app.views',
     url(r'offsite/paypal/$', 'offsite_paypal', name='app_offsite_paypal'),
     url(r'offsite/google-checkout/$', 'offsite_google_checkout', name='app_offsite_google_checkout'),
     url(r'offsite/world_pay/$', 'offsite_world_pay', name='app_offsite_world_pay'),
+    url(r'offsite/amazon_fps/$', 'offsite_amazon_fps', name='app_offsite_amazon_fps'),
 )
 
 paypal = get_integration("pay_pal")
@@ -24,6 +25,11 @@ urlpatterns += patterns('',
 google_checkout = get_integration("google_checkout")
 urlpatterns += patterns('',
     (r'^', include(google_checkout.urls)),
+)
+
+amazon_fps = get_integration("amazon_fps")
+urlpatterns += patterns('',
+    (r'^', include(amazon_fps.urls)),
 )
 
 urlpatterns += patterns('django.views.generic.simple',
