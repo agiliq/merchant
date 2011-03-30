@@ -1,7 +1,12 @@
 
 from django.conf.urls.defaults import *
 from billing import get_integration
-from app.views import google_checkout_obj, pay_pal_obj, amazon_fps_obj
+
+google_checkout_obj = get_integration("google_checkout")
+pay_pal_obj = get_integration("pay_pal")
+amazon_fps_obj = get_integration("amazon_fps")
+fps_recur_obj = get_integration("amazon_fps")
+world_pay_obj = get_integration("world_pay")
 
 urlpatterns = patterns('app.views',
     url(r'^$', 'index', name='app_index'),

@@ -5,16 +5,14 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
 
-from billing import CreditCard, get_gateway, get_integration
+from billing import CreditCard, get_gateway
 from billing.gateway import CardNotSupported
 
 from app.forms import CreditCardForm
+from app.urls import (google_checkout_obj, world_pay_obj,
+                      pay_pal_obj, amazon_fps_obj,
+                      fps_recur_obj)
 from django.conf import settings
-
-google_checkout_obj = get_integration("google_checkout")
-pay_pal_obj = get_integration("pay_pal")
-amazon_fps_obj = get_integration("amazon_fps")
-world_pay_obj = get_integration("world_pay")
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
@@ -169,12 +167,12 @@ def offsite_amazon_fps(request):
     # Or save the callerReference in the session and send the user
     # to FPS and then use the session value when the user is back.
     amazon_fps_obj.add_fields(fields)
-    fps_recur = get_integration("amazon_fps")
     fields.update({"transactionAmount": "100",
                    "pipelineName": "Recurring",
                    "recurringPeriod": "1 Hour",
                    })
-    fps_recur.add_fields(fields)
+    fps_recur_obj.add_fields(fields)
     template_vars = {'title': 'Amazon Flexible Payment Service', 
-                     "fps_recur_obj": fps_recur, "fps_obj": amazon_fps_obj}
+                     "fps_recur_obj": fps_recur_obj, 
+                     "fps_obj": amazon_fps_obj}
     return render(request, 'app/amazon_fps.html', template_vars)
