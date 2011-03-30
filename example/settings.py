@@ -1,4 +1,5 @@
 # Django settings for example project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -98,6 +99,9 @@ INSTALLED_APPS = (
     'paypal.pro',
     'paypal.standard.ipn',
 )
+
+STATIC_URL = "http://merchant.agiliq.com/"
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), "static")
 
 try:
     from localsettings import *
