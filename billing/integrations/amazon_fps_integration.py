@@ -133,10 +133,10 @@ class AmazonFpsIntegration(Integration):
         else:
             resp = AmazonFPSResponse()
         for (key, val) in data.iteritems():
-            model_inst_attr = getattr(resp, key, None)
-            if model_inst_attr and not callable(model_inst_attr):
+            attr_exists = hasattr(resp, key)
+            if attr_exists and not callable(getattr(resp, key, None)):
                 if key == "transactionDate":
-                    val = datetime.datetime(*time.localtime(val)[:6])
+                    val = datetime.datetime(*time.localtime(float(val))[:6])
                 setattr(resp, key, val)
         resp.save()
         if resp.statusCode == "Success":
