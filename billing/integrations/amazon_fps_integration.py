@@ -164,4 +164,5 @@ class AmazonFpsIntegration(Integration):
         amazon_fps_payment_signal.send(sender=self.__class__, 
                                        request=request, 
                                        integration=self)
+        # TODO: Need a more portable way of being able to redirect
         return HttpResponseRedirect(self.fields["paymentPage"])
