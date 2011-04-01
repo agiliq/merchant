@@ -4,8 +4,8 @@ from billing import get_integration
 
 google_checkout_obj = get_integration("google_checkout")
 pay_pal_obj = get_integration("pay_pal")
-amazon_fps_obj = get_integration("amazon_fps")
-fps_recur_obj = get_integration("amazon_fps")
+amazon_fps_obj = get_integration("fps")
+fps_recur_obj = get_integration("fps")
 world_pay_obj = get_integration("world_pay")
 
 urlpatterns = patterns('app.views',

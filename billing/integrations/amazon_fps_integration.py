@@ -8,8 +8,7 @@ from django.views.decorators.http import require_POST
 from django.http import (HttpResponseForbidden, 
                          HttpResponseRedirect, 
                          HttpResponse)
-from billing.signals import (amazon_fps_payment_signal, 
-                             transaction_was_successful,
+from billing.signals import (transaction_was_successful,
                              transaction_was_unsuccessful)
 from django.core.urlresolvers import reverse
 from billing.models import AmazonFPSResponse
@@ -160,9 +159,9 @@ class AmazonFpsIntegration(Integration):
                                                     parsed_url.query)
         if not resp[0].VerificationStatus == "Success":
             return HttpResponseForbidden()
-        
-        amazon_fps_payment_signal.send(sender=self.__class__, 
-                                       request=request, 
-                                       integration=self)
-        # TODO: Need a more portable way of being able to redirect
-        return HttpResponseRedirect(self.fields["paymentPage"])
+
+        return self.transaction(request)
+
+    def transaction(self, request):
+        """Has to be overridden by the subclasses"""
+        raise NotImplementedError
