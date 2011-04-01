@@ -27,6 +27,7 @@ Contents:
     * :doc:`PayPal <offsite/paypal>`
     * :doc:`Google Checkout <offsite/google_checkout>`
     * :doc:`RBS WorldPay <offsite/rbs_worldpay>`
+    * :doc:`Amazon FPS <offsite/amazon_fps>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
