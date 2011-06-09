@@ -4,6 +4,8 @@ Template tags for paypal offsite payments
 from paypal.standard.forms import PayPalPaymentsForm
 from django import template
 from django.template.loader import render_to_string
+register = template.Library()
+
 
 class PayPalNode(template.Node):
     def __init__(self, integration):
@@ -16,6 +18,7 @@ class PayPalNode(template.Node):
                                      "integration": int_obj}, context)
         return form_str
 
+@register.tag
 def paypal(parser, token):
     try:
         tag, int_obj = token.split_contents()
