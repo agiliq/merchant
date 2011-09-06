@@ -1,7 +1,6 @@
 from django.test import TestCase
 from billing import get_gateway, CreditCard
 from billing.signals import *
-from billing.models import BraintreePaymentResponse
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
 
@@ -31,7 +30,6 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
     def testPurchase(self):
         resp = self.merchant.purchase(1, self.credit_card)
         self.assertEquals(resp["status"], "SUCCESS")
-        self.assertTrue(isinstance(resp["response"], BraintreePaymentResponse)) 
 
     def testFailedPurchase(self):
         resp = self.merchant.purchase(2001, self.credit_card)
