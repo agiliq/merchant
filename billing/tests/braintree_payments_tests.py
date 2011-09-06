@@ -4,7 +4,7 @@ from billing.signals import *
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
 
-class AuthorizeNetAIMGatewayTestCase(TestCase):
+class BraintreePaymentGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("braintree_payment")
         self.merchant.test_mode = True
