@@ -20,7 +20,7 @@ class BraintreePaymentGatewayTestCase(TestCase):
 
     def testCardValidated(self):
         self.merchant.test_mode = False
-        self.credit_card.number = "4005519200000004"
+        self.credit_card.number = "4000111111111115"
         self.assertFalse(self.merchant.validate_card(self.credit_card))
 
     def testCardType(self):
@@ -66,5 +66,5 @@ class BraintreePaymentGatewayTestCase(TestCase):
                                  month=10, year=2011, 
                                  number="4000111111111115", 
                                  verification_value="100")
-        resp = self.merchant.purchase(100, credit_card)
+        resp = self.merchant.purchase(2004, credit_card)
         self.assertNotEquals(resp["status"], "SUCCESS")
