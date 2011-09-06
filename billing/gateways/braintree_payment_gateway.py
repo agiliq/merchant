@@ -1,14 +1,35 @@
 from billing import Gateway
 from billing.signals import *
-from billing.utils.credit_card import InvalidCard
+from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
+    AmericanExpress, Discover
 from django.conf import settings
 import braintree
 
 class BraintreePaymentGateway(Gateway):
+    supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
+    supported_countries = ["US"]
+    default_currency = "USD"
+
+    supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
+    homepage_url = "http://www.braintreepayments.com/"
+    display_name = "Braintree Payments"
+
+    def __init__(self):
+        test_mode = getattr(settings, "MERCHANT_TEST_MODE", True)
+        if test_mode:
+            env = braintree.Environment.Sandbox
+        else:
+            env = braintree.Environment.Production
+        braintree.Configuration.configure(
+            env,
+            settings.BRAINTREE_MERCHANT_ACCOUNT_ID,
+            settings.BRAINTREE_PUBLIC_KEY,
+            settings.BRAINTREE_PRIVATE_KEY
+            )
+
     def _build_request_hash(self, options):
         request_hash = {
                 "order_id": options.get("order_id", ""),
-                "merchant_account_id": settings.BRAINTREE_MERCHANT_ACCOUNT_ID,
                 }
         if options.get("customer"):
             name = options["customer"].get("name", "")
