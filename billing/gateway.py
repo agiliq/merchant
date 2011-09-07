@@ -12,6 +12,9 @@ class GatewayNotConfigured(Exception):
 class CardNotSupported(Exception):
     pass
 
+class InvalidData(Exception):
+    pass
+
 class Gateway(object):
     """Sub-classes to inherit from this and implement the below methods"""
 

@@ -1,4 +1,5 @@
 from billing import Gateway
+from billing.gateway import InvalidData
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
     AmericanExpress, Discover
@@ -201,11 +202,116 @@ class BraintreePaymentGateway(Gateway):
                                               response=response)
         return {"status": status, "response": response}
 
-    def recurring(self, money, creditcard, options = None):
-        pass
+    def recurring(self, money, credit_card, options = None):
+        resp = self.store(credit_card, options = options)
+        if resp["status"] == "FAILURE":
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="recurring",
+                                              response=response)
+            return resp
+        payment_token = resp["response"].credit_card.token
+        request_hash = options["recurring"]
+        request_hash.update({
+            "payment_method_token": payment_token,
+            })
+        response = braintree.Subscription.create(request_hash)
+        if response.is_success:
+            status = "SUCCESS"
+            transaction_was_successful.send(sender=self,
+                                            type="recurring",
+                                            response=response)
+        else:
+            status = "FAILURE"
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="recurring",
+                                              response=response)
+        return {"status": status, "response": response}
 
-    def store(self, creditcard, options = None):
-        pass
-
+    def store(self, credit_card, options = None):
+        if not options:
+            options = {}
+        customer = options.get("customer", None)
+        if not customer:
+            raise InvalidData("Customer information needs to be passed.")
+        first_name, last_name = customer["name"].split(" ", 1)
+        search_resp = braintree.Customer.search(
+            braintree.CustomerSearch.cardholder_name == credit_card.name,
+            braintree.CustomerSearch.credit_card_number.ends_with(credit_card.number[-4:]),
+            braintree.CustomerSearch.credit_card_expiration_date == "%s/%s" %(credit_card.month,
+                                                                              credit_card.year)
+            )
+        customer_list = []
+        for customer in search_resp.items:
+            customer_list.append(customer)
+        if len(customer_list) > 1:
+            raise InvalidData("Found more than one customer for provided details.")
+        elif len(customer_list) == 1:
+            customer = customer_list[0]
+        else:
+            result = braintree.Customer.create({
+                "first_name": first_name,
+                "last_name": last_name,
+                "company": customer.get("company", ""),
+                "email": customer.get("email", options.get("email", "")),
+                "phone": customer.get("phone", "")
+                })
+            if not result.is_success:
+                transaction_was_unsuccessful.send(sender=self,
+                                                  type="store",
+                                                  response=result)
+                return {"status": "FAILURE", "response": result}
+            customer = result.customer
+        request_hash = {
+            "customer_id": customer.id,
+            "number": credit_card.number,
+            "expiration_date": "%s/%s" %(credit_card.month,
+                                         credit_card.year),
+            "cardholder_name": "%s %s" %(credit_card.first_name,
+                                         credit_card.last_name)
+            }
+        if options.get("billing_address"):
+            name = options["billing_address"].get("name", "")
+            try:
+                first_name, last_name = name.split(" ", 1)
+            except ValueError:
+                first_name = name
+                last_name = ""
+            request_hash["billing_address"] = {
+                "first_name": first_name,
+                "last_name": last_name,
+                "company": options.get("company", ""),
+                "street_address": options.get("address1", ""),
+                "extended_address": options.get("address2", ""),
+                "locality": options.get("city", ""),
+                "region": options.get("state", ""),
+                "postal_code": options.get("zip", ""),
+                "country_name": options.get("country", "")
+                }
+        if options.get("options"):
+            request_hash["options"] = options["options"]
+        response = braintree.CreditCard.create(request_hash)
+        if response.is_success:
+            status = "SUCCESS"
+            transaction_was_successful.send(sender=self,
+                                            type="store",
+                                            response=response)
+        else:
+            status = "FAILURE"
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="store",
+                                              response=response)
+        return {"status": status, "response": response}
+            
     def unstore(self, identification, options = None):
-        pass
+        response = braintree.CreditCard.delete(identification)
+        if response.is_success:
+            status = "SUCCESS"
+            transaction_was_successful.send(sender=self,
+                                            type="unstore",
+                                            response=response)
+        else:
+            status = "FAILURE"
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="unstore",
+                                              response=response)
+        return {"status": status, "response": response}

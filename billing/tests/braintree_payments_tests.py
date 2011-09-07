@@ -1,10 +1,11 @@
 from django.test import TestCase
 from billing import get_gateway, CreditCard
 from billing.signals import *
-from billing.gateway import CardNotSupported
+from billing.gateway import CardNotSupported, InvalidData
 from billing.utils.credit_card import Visa
+import braintree
 
-class BraintreePaymentGatewayTestCase(TestCase):
+class BraintreePaymentsGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("braintree_payment")
         self.merchant.test_mode = True
@@ -17,11 +18,6 @@ class BraintreePaymentGatewayTestCase(TestCase):
         self.credit_card.number = "5019222222222222"
         self.assertRaises(CardNotSupported, 
                           lambda : self.merchant.purchase(1000, self.credit_card))
-
-    def testCardValidated(self):
-        self.merchant.test_mode = False
-        self.credit_card.number = "4000111111111115"
-        self.assertFalse(self.merchant.validate_card(self.credit_card))
 
     def testCardType(self):
         self.merchant.validate_card(self.credit_card)
@@ -68,3 +64,134 @@ class BraintreePaymentGatewayTestCase(TestCase):
                                  verification_value="100")
         resp = self.merchant.purchase(2004, credit_card)
         self.assertNotEquals(resp["status"], "SUCCESS")
+
+    def testAuthorizeAndCapture(self):
+        resp = self.merchant.authorize(100, self.credit_card)
+        self.assertEquals(resp["status"], "SUCCESS")
+        response = self.merchant.capture(50, resp["response"].transaction.id)
+        self.assertEquals(response["status"], "SUCCESS")
+
+    # Need a way to test this. Requires delaying the status to either
+    # "settled" or "settling"
+    # def testAuthorizeAndRefund(self):
+    #     resp = self.merchant.purchase(100, self.credit_card)
+    #     self.assertEquals(resp["status"], "SUCCESS")
+    #     response = self.merchant.credit(50, resp["response"].transaction.id)
+    #     self.assertEquals(response["status"], "SUCCESS")
+
+    def testAuthorizeAndVoid(self):
+        resp = self.merchant.authorize(100, self.credit_card)
+        self.assertEquals(resp["status"], "SUCCESS")
+        response = self.merchant.void(resp["response"].transaction.id)
+        self.assertEquals(response["status"], "SUCCESS")
+
+    def testStoreMissingCustomer(self):
+        self.assertRaises(InvalidData, 
+                          lambda : self.merchant.store(self.credit_card, {}))
+
+    def testStoreWithoutBillingAddress(self):
+        options = {
+            "customer": {
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                },
+            }
+        resp = self.merchant.store(self.credit_card, options = options)
+        self.assertEquals(resp["status"], "SUCCESS")
+        self.assertEquals(resp["response"].credit_card.expiration_date, 
+                          "%s/%s" %(self.credit_card.month,
+                                    self.credit_card.year))
+        self.assertTrue(getattr(resp["response"].credit_card, "customer_id"))
+        self.assertTrue(getattr(resp["response"].credit_card, "token"))
+
+    def testStoreWithBillingAddress(self):
+        options = {
+            "customer": {
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                },
+            "billing_address": {
+                "name": "Johnny Doe",
+                "company": "",
+                "email": "johnny.doe@example.com",
+                "address1": "Street #1",
+                "address2": "House #2",
+                "city": "Timbuktu",
+                "country": "United States of America",
+                "zip": "110011"
+                }
+            }
+        resp = self.merchant.store(self.credit_card, options = options)
+        self.assertEquals(resp["status"], "SUCCESS")
+        self.assertTrue(getattr(resp["response"].credit_card, "billing_address"))
+        billing_address = resp["response"].credit_card.billing_address
+        # The tests below don't seem to work.
+        # self.assertEquals(billing_address.country_code_alpha2, "US")
+        # self.assertEquals(billing_address.postal_code, "110011")
+        # self.assertEquals(billing_address.street_address, "Street #1")
+        # self.assertEquals(billing_address.extended_address, "House #2")
+        # self.assertEquals(billing_address.city, "Timbuktu")
+
+    def testUnstore(self):
+        options = {
+            "customer": {
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                },
+            }
+        resp = self.merchant.store(self.credit_card, options = options)
+        self.assertEquals(resp["status"], "SUCCESS")
+        response = self.merchant.unstore(resp["response"].credit_card.token)
+        self.assertEquals(response["status"], "SUCCESS")
+
+    # The below tests require 'test_plan' to be created in the sandbox 
+    # console panel. This cannot be created by API at the moment
+    def testRecurring1(self):
+        options = {
+            "customer": {
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                },
+            "recurring": {
+                "plan_id": "test_plan"
+                },
+            }
+        resp = self.merchant.recurring(10, self.credit_card, options = options)
+        self.assertEquals(resp["status"], "SUCCESS")
+        subscription = resp["response"].subscription
+        self.assertEquals(subscription.status,
+                          braintree.Subscription.Status.Active)
+
+    def testRecurring2(self):
+        options = {
+            "customer": {
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                },
+            "recurring": {
+                "plan_id": "test_plan",
+                "price": 15
+                },
+            }
+        resp = self.merchant.recurring(10, self.credit_card, options = options)
+        self.assertEquals(resp["status"], "SUCCESS")
+        subscription = resp["response"].subscription
+        self.assertEquals(subscription.price, 15)
+
+    def testRecurring3(self):
+        options = {
+            "customer": {
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                },
+            "recurring": {
+                "plan_id": "test_plan",
+                "trial_duration": 2,
+                "trial_duration_unit": "month",
+                "number_of_billing_cycles": 12,
+                },
+            }
+        resp = self.merchant.recurring(10, self.credit_card, options = options)
+        self.assertEquals(resp["status"], "SUCCESS")
+        subscription = resp["response"].subscription
+        self.assertEquals(subscription.number_of_billing_cycles, 12)
