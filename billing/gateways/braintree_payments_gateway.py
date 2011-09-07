@@ -6,7 +6,7 @@ from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
 from django.conf import settings
 import braintree
 
-class BraintreePaymentGateway(Gateway):
+class BraintreePaymentsGateway(Gateway):
     supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
     supported_countries = ["US"]
     default_currency = "USD"

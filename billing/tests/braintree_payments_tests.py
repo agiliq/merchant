@@ -7,7 +7,7 @@ import braintree
 
 class BraintreePaymentsGatewayTestCase(TestCase):
     def setUp(self):
-        self.merchant = get_gateway("braintree_payment")
+        self.merchant = get_gateway("braintree_payments")
         self.merchant.test_mode = True
         self.credit_card = CreditCard(first_name="Test", last_name="User",
                                       month=10, year=2011, 
