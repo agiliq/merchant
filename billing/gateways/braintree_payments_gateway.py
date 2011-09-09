@@ -233,7 +233,11 @@ class BraintreePaymentsGateway(Gateway):
         customer = options.get("customer", None)
         if not customer:
             raise InvalidData("Customer information needs to be passed.")
-        first_name, last_name = customer["name"].split(" ", 1)
+        try:
+            first_name, last_name = customer["name"].split(" ", 1)
+        except ValueError:
+            first_name = customer["name"]
+            last_name = ""
         search_resp = braintree.Customer.search(
             braintree.CustomerSearch.cardholder_name == credit_card.name,
             braintree.CustomerSearch.credit_card_number.ends_with(credit_card.number[-4:]),
