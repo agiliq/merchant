@@ -28,6 +28,12 @@ class BraintreePaymentsGateway(Gateway):
             settings.BRAINTREE_PRIVATE_KEY
             )
 
+    def _cc_expiration_date(self, credit_card):
+        return "%s/%s" %(credit_card.month, credit_card.year)
+
+    def _cc_cardholder_name(self, credit_card):
+        return "%s %s" %(credit_card.first_name, credit_card.last_name)
+
     def _build_request_hash(self, options):
         request_hash = {
                 "order_id": options.get("order_id", ""),
@@ -102,10 +108,8 @@ class BraintreePaymentsGateway(Gateway):
         request_hash["amount"] = money
         request_hash["credit_card"] = {
             "number": credit_card.number,
-            "expiration_date": "%s/%s" %(credit_card.month,
-                                         credit_card.year),
-            "cardholder_name": "%s %s" %(credit_card.first_name,
-                                         credit_card.last_name),
+            "expiration_date": self._cc_expiration_date(credit_card),
+            "cardholder_name": self._cc_cardholder_name(credit_card),
             "cvv": credit_card.verification_value,
             }
         braintree_options = options.get("options", {})
@@ -136,10 +140,8 @@ class BraintreePaymentsGateway(Gateway):
         request_hash["amount"] = money
         request_hash["credit_card"] = {
             "number": credit_card.number,
-            "expiration_date": "%s/%s" %(credit_card.month,
-                                         credit_card.year),
-            "cardholder_name": "%s %s" %(credit_card.first_name,
-                                         credit_card.last_name),
+            "expiration_date": self._cc_expiration_date(credit_card),
+            "cardholder_name": self._cc_cardholder_name(credit_card),
             "cvv": credit_card.verification_value,
             }
         braintree_options = options.get("options", {})
@@ -207,9 +209,9 @@ class BraintreePaymentsGateway(Gateway):
         if resp["status"] == "FAILURE":
             transaction_was_unsuccessful.send(sender=self,
                                               type="recurring",
-                                              response=response)
+                                              response=resp)
             return resp
-        payment_token = resp["response"].credit_card.token
+        payment_token = resp["response"].customer.credit_cards[0].token
         request_hash = options["recurring"]
         request_hash.update({
             "payment_method_token": payment_token,
@@ -230,49 +232,59 @@ class BraintreePaymentsGateway(Gateway):
     def store(self, credit_card, options = None):
         if not options:
             options = {}
+
         customer = options.get("customer", None)
         if not customer:
             raise InvalidData("Customer information needs to be passed.")
+
         try:
             first_name, last_name = customer["name"].split(" ", 1)
         except ValueError:
             first_name = customer["name"]
             last_name = ""
+
         search_resp = braintree.Customer.search(
             braintree.CustomerSearch.cardholder_name == credit_card.name,
+            braintree.CustomerSearch.credit_card_number.starts_with(credit_card.number[:6]),
             braintree.CustomerSearch.credit_card_number.ends_with(credit_card.number[-4:]),
-            braintree.CustomerSearch.credit_card_expiration_date == "%s/%s" %(credit_card.month,
-                                                                              credit_card.year)
+            braintree.CustomerSearch.credit_card_expiration_date == self._cc_expiration_date(credit_card)
             )
+
         customer_list = []
         for customer in search_resp.items:
             customer_list.append(customer)
-        if len(customer_list) > 1:
-            raise InvalidData("Found more than one customer for provided details.")
-        elif len(customer_list) == 1:
+
+        if len(customer_list) >= 1:
+            # Take the first customer
             customer = customer_list[0]
         else:
-            result = braintree.Customer.create({
+            card_hash = {
+                "number": credit_card.number,
+                "expiration_date": self._cc_expiration_date(credit_card),
+                "cardholder_name": self._cc_cardholder_name(credit_card),
+                }
+
+            if options.get("options"):
+                card_hash["options"] = options["options"]
+
+            request_hash = {
                 "first_name": first_name,
                 "last_name": last_name,
                 "company": customer.get("company", ""),
                 "email": customer.get("email", options.get("email", "")),
-                "phone": customer.get("phone", "")
-                })
-            if not result.is_success:
+                "phone": customer.get("phone", ""),
+                }
+            if not options.get("billing_address"):
+                request_hash["credit_card"] = card_hash
+            result = braintree.Customer.create(request_hash)
+            if not result.is_success: 
                 transaction_was_unsuccessful.send(sender=self,
                                                   type="store",
                                                   response=result)
                 return {"status": "FAILURE", "response": result}
             customer = result.customer
-        request_hash = {
-            "customer_id": customer.id,
-            "number": credit_card.number,
-            "expiration_date": "%s/%s" %(credit_card.month,
-                                         credit_card.year),
-            "cardholder_name": "%s %s" %(credit_card.first_name,
-                                         credit_card.last_name)
-            }
+
+        request_hash = {}
         if options.get("billing_address"):
             name = options["billing_address"].get("name", "")
             try:
@@ -280,7 +292,8 @@ class BraintreePaymentsGateway(Gateway):
             except ValueError:
                 first_name = name
                 last_name = ""
-            request_hash["billing_address"] = {
+
+            request_hash.update({
                 "first_name": first_name,
                 "last_name": last_name,
                 "company": options.get("company", ""),
@@ -290,16 +303,28 @@ class BraintreePaymentsGateway(Gateway):
                 "region": options.get("state", ""),
                 "postal_code": options.get("zip", ""),
                 "country_name": options.get("country", "")
-                }
+                })
+
+        card_hash = {
+                    "number": credit_card.number,
+                    "expiration_date": self._cc_expiration_date(credit_card),
+                    "cardholder_name": self._cc_cardholder_name(credit_card),
+            }
         if options.get("options"):
-            request_hash["options"] = options["options"]
-        response = braintree.CreditCard.create(request_hash)
+            card_hash["options"] = options["options"]
+        if request_hash:
+            card_hash.update({"billing_address": request_hash})
+        response = braintree.Customer.update(customer.id, {
+                "credit_card": card_hash,
+                })
         if response.is_success:
             status = "SUCCESS"
             transaction_was_successful.send(sender=self,
                                             type="store",
                                             response=response)
         else:
+            for ii in response.errors.deep_errors:
+                print ii.message
             status = "FAILURE"
             transaction_was_unsuccessful.send(sender=self,
                                               type="store",

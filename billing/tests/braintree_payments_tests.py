@@ -98,11 +98,11 @@ class BraintreePaymentsGatewayTestCase(TestCase):
             }
         resp = self.merchant.store(self.credit_card, options = options)
         self.assertEquals(resp["status"], "SUCCESS")
-        self.assertEquals(resp["response"].credit_card.expiration_date, 
+        self.assertEquals(resp["response"].customer.credit_cards[0].expiration_date, 
                           "%s/%s" %(self.credit_card.month,
                                     self.credit_card.year))
-        self.assertTrue(getattr(resp["response"].credit_card, "customer_id"))
-        self.assertTrue(getattr(resp["response"].credit_card, "token"))
+        self.assertTrue(getattr(resp["response"].customer.credit_cards[0], "customer_id"))
+        self.assertTrue(getattr(resp["response"].customer.credit_cards[0], "token"))
 
     def testStoreWithBillingAddress(self):
         options = {
@@ -123,9 +123,9 @@ class BraintreePaymentsGatewayTestCase(TestCase):
             }
         resp = self.merchant.store(self.credit_card, options = options)
         self.assertEquals(resp["status"], "SUCCESS")
-        self.assertTrue(getattr(resp["response"].credit_card, "billing_address"))
-        billing_address = resp["response"].credit_card.billing_address
+        self.assertTrue(getattr(resp["response"].customer.credit_cards[0], "billing_address"))
         # The tests below don't seem to work.
+        # billing_address = resp["response"].customer.credit_cards[0].billing_address
         # self.assertEquals(billing_address.country_code_alpha2, "US")
         # self.assertEquals(billing_address.postal_code, "110011")
         # self.assertEquals(billing_address.street_address, "Street #1")
@@ -141,7 +141,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
             }
         resp = self.merchant.store(self.credit_card, options = options)
         self.assertEquals(resp["status"], "SUCCESS")
-        response = self.merchant.unstore(resp["response"].credit_card.token)
+        response = self.merchant.unstore(resp["response"].customer.credit_cards[0].token)
         self.assertEquals(response["status"], "SUCCESS")
 
     # The below tests require 'test_plan' to be created in the sandbox 
