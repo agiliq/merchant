@@ -273,9 +273,8 @@ class BraintreePaymentsGateway(Gateway):
                 "company": customer.get("company", ""),
                 "email": customer.get("email", options.get("email", "")),
                 "phone": customer.get("phone", ""),
+                "credit_card": card_hash, 
                 }
-            if not options.get("billing_address"):
-                request_hash["credit_card"] = card_hash
             result = braintree.Customer.create(request_hash)
             if not result.is_success: 
                 transaction_was_unsuccessful.send(sender=self,
@@ -306,12 +305,15 @@ class BraintreePaymentsGateway(Gateway):
                 })
 
         card_hash = {
-                    "number": credit_card.number,
-                    "expiration_date": self._cc_expiration_date(credit_card),
-                    "cardholder_name": self._cc_cardholder_name(credit_card),
+            "number": credit_card.number,
+            "expiration_date": self._cc_expiration_date(credit_card),
+            "cardholder_name": self._cc_cardholder_name(credit_card),
+            "options": {
+                "update_existing_token": customer.credit_cards[0].token,
+                }
             }
         if options.get("options"):
-            card_hash["options"] = options["options"]
+            card_hash["options"].update(options["options"])
         if request_hash:
             card_hash.update({"billing_address": request_hash})
         response = braintree.Customer.update(customer.id, {
