@@ -22,4 +22,5 @@ Following gateways are supported:
 
 ## Documentation
 Documentation is automatically built and published online at:
+
  * http://readthedocs.org/docs/django-merchant/en/latest/
