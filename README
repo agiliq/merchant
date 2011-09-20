@@ -37,3 +37,8 @@ PAYPAL REQUIRED SETTINGS
         PAYPAL_WPP_USER = "???"
         PAYPAL_WPP_PASSWORD = "???"
         PAYPAL_WPP_SIGNATURE = "???"
+
+
+Documentation is available at:
+
+http://readthedocs.org/docs/django-merchant/en/latest/
