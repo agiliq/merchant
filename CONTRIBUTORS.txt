@@ -7,5 +7,6 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Chris Glass <https://github.com/chrisglass>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
+* Markus Gattol <markus.gattol@sunoano.org>
 * Shabda Raaj <shabda@agiliq.com>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
