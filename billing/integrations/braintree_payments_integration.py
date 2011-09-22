@@ -39,7 +39,7 @@ class BraintreePaymentsIntegration(Integration):
         transaction_was_unsuccessful.send(sender=self,
                                           type="sale",
                                           response=result)
-        return {"status": "FAILURE": "response": result}
+        return {"status": "FAILURE", "response": result}
 
     def get_urls(self):
         urlpatterns = patterns('',
