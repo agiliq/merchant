@@ -14,7 +14,7 @@ urlpatterns = patterns('app.views',
     url(r'^authorize/$', 'authorize', name='app_authorize'),
     url(r'^paypal/$', 'paypal', name='app_paypal'),
     url(r'^eway/$', 'eway', name='app_eway'),
-    url(r'^braintree/$', 'eway', name='app_braintree'),
+    url(r'^braintree/$', 'braintree', name='app_braintree'),
 )
 
 # offsite payments

@@ -112,6 +112,28 @@ def eway(request):
                                               'response': response,
                                               'title': 'Eway'})
 
+def braintree(request):
+    amount = 1
+    response = None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("braintree_payments")
+            try:
+                merchant.validate_card(credit_card)
+            except CardNotSupported:
+                response = "Credit Card Not Supported"
+            response = merchant.purchase(amount, credit_card)
+    else:
+        form = CreditCardForm(initial={'number':'4111111111111111'})
+    return render(request, 'app/index.html', {'form': form, 
+                                              'amount': amount,
+                                              'response': response,
+                                              'title': 'Braintree Payments (S2S)'})
+
+
 
 def offsite_paypal(request):
     invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
