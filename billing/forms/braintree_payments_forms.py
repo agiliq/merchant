@@ -3,20 +3,6 @@ from django.conf import settings
 import braintree
 
 class BraintreePaymentsForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(BraintreePaymentsForm, self).__init__(*args, **kwargs)
-        test_mode = getattr(settings, "MERCHANT_TEST_MODE", True)
-        if test_mode:
-            env = braintree.Environment.Sandbox
-        else:
-            env = braintree.Environment.Production
-        braintree.Configuration.configure(
-            env,
-            settings.BRAINTREE_MERCHANT_ACCOUNT_ID,
-            settings.BRAINTREE_PUBLIC_KEY,
-            settings.BRAINTREE_PRIVATE_KEY
-            )
-
     transaction__customer__first_name = forms.CharField(max_length=50, required=False)
     transaction__customer__last_name  = forms.CharField(max_length=50, required=False)
     transaction__customer__company    = forms.CharField(max_length=100, required=False)

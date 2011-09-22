@@ -72,7 +72,8 @@ class BraintreePaymentsIntegration(Integration):
             tr_data_dict["transaction"]["credit_card"] = {"token": self.fields["transaction__credit_card__token"]}
         if self.fields.get("transaction__amount"):
             tr_data_dict["transaction"]["amount"] = self.fields["transaction__amount"]
-        tr_data = braintree.Transaction.tr_data_for_sale(tr_data_dict, reverse("braintree_notify_handler"))
+        notification_url = "%s%s" %(self.fields["site"], reverse("braintree_notify_handler"))
+        tr_data = braintree.Transaction.tr_data_for_sale(tr_data_dict, notification_url)
         return tr_data
 
     def generate_form(self):
