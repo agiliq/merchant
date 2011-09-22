@@ -30,8 +30,16 @@ class BraintreePaymentsIntegration(Integration):
         return braintree.TransparentRedirect.url()
 
     def braintree_notify_handler(self, request):
-        result = braintree.TransparentRedirect(urllib.urlencode(request.GET))
-        return result
+        result = braintree.TransparentRedirect.confirm(urllib.urlencode(request.GET))
+        if result.is_success:
+            transaction_was_successful.send(sender=self,
+                                            type="sale",
+                                            response=result)
+            return {"status": "SUCCESS", "response": result}
+        transaction_was_unsuccessful.send(sender=self,
+                                          type="sale",
+                                          response=result)
+        return {"status": "FAILURE": "response": result}
 
     def get_urls(self):
         urlpatterns = patterns('',
