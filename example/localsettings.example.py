@@ -38,6 +38,11 @@ WORLDPAY_MD5_SECRET_KEY = ''
 AWS_ACCESS_KEY = ''
 AWS_SECRET_ACCESS_KEY = ''
 
+# Braintree Payment settings
+BRAINTREE_MERCHANT_ACCOUNT_ID = ""
+BRAINTREE_PUBLIC_KEY = ""
+BRAINTREE_PRIVATE_KEY = ""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.

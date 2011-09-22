@@ -6,6 +6,8 @@ from django.conf.urls.defaults import patterns, url
 import braintree, urllib
 from django.core.urlresolvers import reverse
 from billing.forms.braintree_payments_forms import BraintreePaymentsForm
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 class BraintreePaymentsIntegration(Integration):
     def __init__(self, options=None):
@@ -30,16 +32,28 @@ class BraintreePaymentsIntegration(Integration):
         return braintree.TransparentRedirect.url()
 
     def braintree_notify_handler(self, request):
-        result = braintree.TransparentRedirect.confirm(urllib.urlencode(request.GET))
+        fpath = request.get_full_path()
+        query_string = fpath.split("?", 1)[1]
+        result = braintree.TransparentRedirect.confirm(query_string)
         if result.is_success:
             transaction_was_successful.send(sender=self,
                                             type="sale",
                                             response=result)
-            return {"status": "SUCCESS", "response": result}
+            return self.braintree_success_handler(request, result)
         transaction_was_unsuccessful.send(sender=self,
                                           type="sale",
                                           response=result)
-        return {"status": "FAILURE", "response": result}
+        return self.braintree_failure_handler(request, result)
+
+    def braintree_success_handler(self, request, response):
+        return render_to_response("billing/braintree_success.html", 
+                                  {"response": response},
+                                  context_instance=RequestContext(request))
+
+    def braintree_failure_handler(self, request, response):
+        return render_to_response("billing/braintree_failure.html", 
+                                  {"response": response},
+                                  context_instance=RequestContext(request))
 
     def get_urls(self):
         urlpatterns = patterns('',

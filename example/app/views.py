@@ -11,8 +11,9 @@ from billing.gateway import CardNotSupported
 from app.forms import CreditCardForm
 from app.urls import (google_checkout_obj, world_pay_obj,
                       pay_pal_obj, amazon_fps_obj,
-                      fps_recur_obj)
+                      fps_recur_obj, braintree_obj)
 from django.conf import settings
+from django.contrib.sites.models import RequestSite
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
@@ -159,7 +160,7 @@ def offsite_amazon_fps(request):
               "pipelineName": "SingleUse",
               "paymentReason": "Merchant Test",
               "paymentPage": request.build_absolute_uri(),
-              "returnURLPrefix": "http://merchant.agiliq.com",
+              "returnURLPrefix": RequestSite(request),
               }
     # Save the fps.fields["callerReference"] in the db along with
     # the amount to be charged or use the user's unique id as
@@ -176,3 +177,19 @@ def offsite_amazon_fps(request):
                      "fps_recur_obj": fps_recur_obj, 
                      "fps_obj": amazon_fps_obj}
     return render(request, 'app/amazon_fps.html', template_vars)
+
+def offsite_braintree(request):
+    fields = {"transaction": {
+            "order_id": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
+            "type": "sale",
+            "options": {
+                "submit_for_settlement": True
+                },
+            },
+              "site": "%s://%s" %("https" if request.is_secure() else "http",
+                                  RequestSite(request).domain)
+              }
+    braintree_obj.add_fields(fields)
+    template_vars = {'title': 'Braintree Payments Transparent Redirect', 
+                     "bp_obj": braintree_obj}
+    return render(request, "app/braintree_tr.html", template_vars)

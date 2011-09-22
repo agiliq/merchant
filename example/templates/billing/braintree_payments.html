@@ -1,0 +1,13 @@
+<form method="post" action="{{ integration.service_url }}">
+  <table>
+    {% with integration.generate_form as form %}
+    <tr><td>Credit Card Holder Name:</td><td>{{ form.transaction__credit_card__cardholder_name }}</td></tr>
+    <tr><td>Credit Card:</td><td>{{ form.transaction__credit_card__number }}</td></tr>
+    <tr><td>Credit Card Expiration Date (MM/YYYY):</td><td>{{ form.transaction__credit_card__expiration_date }}</td></tr>
+    <tr><td>CVV:</td><td>{{ form.transaction__credit_card__cvv }}</td></tr>
+    <tr><td>Amount:</td><td>{{ form.transaction__amount }}</td></tr>
+    <tr><td>{{ form.tr_data }}</td></tr>
+    {% endwith %}
+    <tr><td><input type="submit" value="Pay" /></td></tr>
+  </table>
+</form>

@@ -1,0 +1,7 @@
+{% extends "app/base.html" %}
+
+{% block content %}
+The transaction failed.
+
+The error was "{{ response.transaction.processor_response_text }}"
+{% endblock %}

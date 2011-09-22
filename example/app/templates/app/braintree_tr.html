@@ -1,0 +1,6 @@
+{% extends "app/base.html" %}
+{% load billing_tags %}
+
+{% block content %}
+{% braintree_payments bp_obj %}
+{% endblock %}
