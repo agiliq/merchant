@@ -21,6 +21,7 @@ Contents:
     * :doc:`PayPal <gateways/paypal_gateway>`
     * :doc:`Authorize.Net <gateways/authorize_net>`
     * :doc:`eWay <gateways/eway_gateway>`
+    * :doc:`Braintree Payments Server to Server <gateways/braintree_payments>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 
@@ -28,6 +29,7 @@ Contents:
     * :doc:`Google Checkout <offsite/google_checkout>`
     * :doc:`RBS WorldPay <offsite/rbs_worldpay>`
     * :doc:`Amazon FPS <offsite/amazon_fps>`
+    * :doc:`Braintree Payments Transparent Redirect <offsite/braintree_payments>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
