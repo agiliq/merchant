@@ -1,2 +1,0 @@
--e git+http://github.com/dcramer/django-paypal.git@5d67bb677a47c4051db0a9d65866f90a3a7ccd28#egg=django-paypal
-

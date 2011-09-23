@@ -113,7 +113,7 @@ setup(
     name="django-merchant",
     version=get_version(),
     description="A Django app that provides helpers for multiple pluggable payment backends.",
-    long_description=read("README.md"),
+    long_description=read("README.rst"),
     author="Agiliq Solutions",
     author_email="hello@agiliq.com",
     license="BSD",
