@@ -11,7 +11,7 @@ Following gateways are supported:
  * Authorize.net
  * Paypal
  * Eway
- * Braintree Payments
+ * Braintree Payments (Server to Server)
 
 ### Off-Site Processing
 
@@ -19,6 +19,7 @@ Following gateways are supported:
  * RBS WorldPay
  * Google Checkout
  * Amazon FPS
+ * Braintree Payments (Transparent Redirect)
 
 ## Documentation
 Documentation is automatically built and published online at:
