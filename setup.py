@@ -110,7 +110,7 @@ def find_package_data(
     return out
 
 setup(
-    name="merchant",
+    name="django-merchant",
     version=get_version(),
     description="A Django app that provides helpers for multiple pluggable payment backends.",
     long_description=read("README.md"),
