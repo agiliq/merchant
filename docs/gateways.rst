@@ -47,28 +47,28 @@ Method Reference
   is raised.
 * **service_url**: A property that returns the url to which the credit card
   and other transaction related details are submitted.
-* **purchase(money, credit_card, options = {})**: A method that charges the
+* **purchase(money, credit_card, options = None)**: A method that charges the
   given card (one-time) for the given amount `money` using the `options`
   provided. Subclasses have to implement this method.
-* **authorize(money, credit_card, options = {})**: A method that authorizes
+* **authorize(money, credit_card, options = None)**: A method that authorizes
   (for a future transaction) the credit card for the amount `money` using 
   the `options` provided. Subclasses have to implement this method.
-* **capture(money, authorization, options = {})**: A method that captures
+* **capture(money, authorization, options = None)**: A method that captures
   funds from a previously authorized transaction using the `options` 
   provided. Subclasses have to implement this method.
-* **void(identification, options = {})**: A method that nulls/voids/blanks
+* **void(identification, options = None)**: A method that nulls/voids/blanks
   an authorized transaction identified by `identification` to prevent a 
   subsequent capture. Subclasses have to implement this method.
-* **credit(money, identification, options = {})**: A method that refunds a
+* **credit(money, identification, options = None)**: A method that refunds a
   settled transaction with the transacation id `identification` and given
   `options`. Subclasses must implement this method.
-* **recurring(money, creditcard, options = {})**: A method that sets up a
+* **recurring(money, creditcard, options = None)**: A method that sets up a
   recurring transaction (or a subscription). Subclasses must implement
   this method.
-* **store(creditcard, options = {})**: A method that stores the credit
+* **store(creditcard, options = None)**: A method that stores the credit
   card and user profile information on the payment gateway's servers
   for future reference. Subclasses must implement this method.
-* **unstore(identification, options = {})**: A method that reverses the
+* **unstore(identification, options = None)**: A method that reverses the
   `store` method's results. Subclasses must implement this method.
 
 The `options` dictionary passed to the above methods consists of the following

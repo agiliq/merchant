@@ -21,28 +21,28 @@ to follow to write a new gateway:
   it would be `AuthorizeNetGateway`.
 * Implement all or any of following methods in the class::
 
-    def purchase(self, money, credit_card, options = {}):
+    def purchase(self, money, credit_card, options = None):
     ...
 
-    def authorize(self, money, credit_card, options = {}):
+    def authorize(self, money, credit_card, options = None):
     ...
 
-    def capture(self, money, authorization, options = {}):
+    def capture(self, money, authorization, options = None):
     ...
 
-    def void(self, identification, options = {}):
+    def void(self, identification, options = None):
     ...
 
-    def credit(self, money, identification, options = {}):
+    def credit(self, money, identification, options = None):
     ...
 
-    def recurring(self, money, creditcard, options = {}):
+    def recurring(self, money, creditcard, options = None):
     ...
 
-    def store(self, creditcard, options = {}):
+    def store(self, creditcard, options = None):
     ...
 
-    def unstore(self, identification, options = {}):
+    def unstore(self, identification, options = None):
     ...    
 
 .. _Merchant: http://github.com/agiliq/merchant 

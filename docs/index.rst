@@ -33,6 +33,7 @@ Contents:
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
+* :doc:`Customizing the inbuilt Gateway/Integration <customize>`
 * :doc:`Contributing to Merchant <contributing>`
 
 
