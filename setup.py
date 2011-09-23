@@ -118,8 +118,8 @@ setup(
     author_email="hello@agiliq.com",
     license="BSD",
     url="http://github.com/agiliq/merchant",
-    packages=find_packages(),
-    package_data=find_package_data("billing"),
+    packages=find_packages(exclude=['example*']),
+    package_data=find_package_data("billing", only_in_packages=False),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
