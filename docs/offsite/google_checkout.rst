@@ -49,7 +49,7 @@ In views.py::
 
 In some_template.html::
 
-  {% load billing_tags %}
+  {% load google_checkout from google_checkout_tags %}
   {% google_checkout obj %}
 
 Template renders to something like below::
