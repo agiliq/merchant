@@ -32,7 +32,7 @@ In urls.py::
 In views.py::
 
   >>> from billing import get_integration
-  >>> gc = get_integration("gc")
+  >>> gc = get_integration("google_checkout")
   >>> fields = {'items': [{
   ...    "amount": 100,
   ...    "name": "Name of the Item",
