@@ -33,7 +33,7 @@ In views.py::
 
   >>> from billing import get_integration
   >>> gc = get_integration("google_checkout")
-  >>> fields = {'items': [{
+  >>> gc.add_fields({'items': [{
   ...    "amount": 100,
   ...    "name": "Name of the Item",
   ...    "description": "Item's description",
@@ -42,7 +42,7 @@ In views.py::
   ...    "quantity": 1},
   ...    ....
   ... ],
-  ... "return_url": "http://example.com/return/", }
+  ... "return_url": "http://example.com/return/", })
   >>> return render_to_response("some_template.html",
   ...                           {"obj": gc},
   ...                           context_instance=RequestContext(request))
