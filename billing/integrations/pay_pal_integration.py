@@ -30,12 +30,12 @@ class PayPalIntegration(Integration):
         return urlpatterns
 
 def unsuccessful_txn_handler(sender, **kwargs):
-    transaction_was_unsuccesful.send(sender=sender.__class__,
+    transaction_was_unsuccessful.send(sender=sender.__class__,
                                      type="purchase",
                                      response=self)
 
 def successful_txn_handler(sender, **kwargs):
-    transaction_was_succesful.send(sender=sender.__class__,
+    transaction_was_successful.send(sender=sender.__class__,
                                    type="purchase",
                                    response=self)
 
