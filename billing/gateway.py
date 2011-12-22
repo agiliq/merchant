@@ -105,7 +105,6 @@ def get_gateway(gateway, *args, **kwargs):
     """
     # Is the class in the cache?
     clazz = gateway_cache.get(gateway, None)
-    
     if not clazz:
         # Let's actually load it (it's not in the cache)
         gateway_filename = "%s_gateway" %gateway

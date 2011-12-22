@@ -4,7 +4,8 @@
 src
 tmp
 *.db
-
+*.*~
+#*#
 example/tmp
 example/localsettings.py
 
