@@ -132,7 +132,24 @@ def braintree(request):
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Braintree Payments (S2S)'})
-
+def stripe(request):
+    amount = 1
+    response= None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("stripe")
+            response = merchant.purchase(amount,credit_card)
+    else:
+        form = CreditCardForm(initial={'number':'4242424242424242'})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount':amount,
+                                             'response':response,
+                                             'title':'Stripe Payment'})
+            
+    
 
 
 def offsite_paypal(request):
