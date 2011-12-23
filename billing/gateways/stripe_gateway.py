@@ -34,7 +34,7 @@ class StripeGateway(Gateway):
             return {'status': 'FAILURE', 'response': error}
         return {'status': 'SUCCESS', 'response':response}
     
-    def store(self, credit_card):
+    def store(self, credit_card,options=None):
         customer = self.stripe.Customer.create (
                    card={
                    'number':credit_card.number,
@@ -45,3 +45,25 @@ class StripeGateway(Gateway):
                     description = "Storing for future use"
         )
         return customer
+
+    def recurring(self,money,credit_card,options=None):
+        response = None
+        if  options['plan_id']:
+            try:
+                response = self.stripe.Customer.create (
+                    
+                    card={
+                        'number':credit_card.number,
+                        'exp_month':credit_card.month,
+                        'exp_year':credit_card.year,
+                        'cvc': credit_card.verification_value
+                    },
+                    plan=options['plan_id'],
+                    description = "Thanks for subscribing"
+
+                )
+            except self.stripe.CardError, error:
+                return error
+        return response
+
+
