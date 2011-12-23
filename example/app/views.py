@@ -148,8 +148,8 @@ def stripe(request):
                                              'amount':amount,
                                              'response':response,
                                              'title':'Stripe Payment'})
-            
-    
+
+   
 
 
 def offsite_paypal(request):

@@ -1,11 +1,11 @@
 from billing import Gateway
 from billing.gateway import InvalidData
 from billing.signals import *
-from billing.utils.credit_card import InvalidData,Visa,MasterCard,\
+from billing.utils.credit_card import InvalidCard,Visa,MasterCard,\
      AmericanExpress,Discover
 import stripe
-
-class StripePaymentGateway(Gateway):
+from django.conf import settings
+class StripeGateway(Gateway):
     supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
     supported_countries = ['US']
     default_currency = "USD"
@@ -21,7 +21,7 @@ class StripePaymentGateway(Gateway):
             raise InvalidCard("Invalid Card")
         try:
             response = self.stripe.Charge.create(
-                amount=amount,
+                amount=amount*100,
                 currency="usd",
                 card={
                    'number':credit_card.number,
@@ -31,10 +31,5 @@ class StripePaymentGateway(Gateway):
                    
                 },)
         except self.stripe.CardError, error:
-            return error
-        return response
-
-    
-    
-    
-    
+            return {'status': 'FAILURE', 'response': error}
+        return {'status': 'SUCCESS', 'response':response}
