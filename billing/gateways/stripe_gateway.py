@@ -33,3 +33,15 @@ class StripeGateway(Gateway):
         except self.stripe.CardError, error:
             return {'status': 'FAILURE', 'response': error}
         return {'status': 'SUCCESS', 'response':response}
+    
+    def store(self, credit_card):
+        customer = self.stripe.Customer.create (
+                   card={
+                   'number':credit_card.number,
+                   'exp_month':credit_card.month,
+                   'exp_year':credit_card.year,
+                   'cvc': credit_card.verification_value
+                    },
+                    description = "Storing for future use"
+        )
+        return customer
