@@ -74,3 +74,11 @@ class StripeGateway(Gateway):
             return {"status": "FAILED", "response": error}
         except TypeError:
             return {"status": "FAILED", "response": "please give a plan id"}
+
+    def unstore(self, identification, options=None):
+        try:
+            customer = self.stripe.Customer.retrieve(identification)
+            response = customer.delete()
+            return {"status": "SUCCESS", "response": response}
+        except self.stripe.InvalidRequestError, error:
+            return {"status": "FAILED", "response": error}
