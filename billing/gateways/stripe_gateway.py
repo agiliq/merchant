@@ -1,10 +1,12 @@
 from billing import Gateway
 from billing.gateway import InvalidData
 from billing.signals import *
-from billing.utils.credit_card import InvalidCard,Visa,MasterCard,\
-     AmericanExpress,Discover
+from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
+     AmericanExpress, Discover
 import stripe
 from django.conf import settings
+
+
 class StripeGateway(Gateway):
     supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
     supported_countries = ['US']
@@ -21,49 +23,54 @@ class StripeGateway(Gateway):
             raise InvalidCard("Invalid Card")
         try:
             response = self.stripe.Charge.create(
-                amount=amount*100,
+                amount=amount * 100,
                 currency="usd",
                 card={
-                   'number':credit_card.number,
-                   'exp_month':credit_card.month,
-                   'exp_year':credit_card.year,
+                   'number': credit_card.number,
+                   'exp_month': credit_card.month,
+                   'exp_year': credit_card.year,
                    'cvc': credit_card.verification_value
-                   
-                },)
+                   },)
         except self.stripe.CardError, error:
             return {'status': 'FAILURE', 'response': error}
-        return {'status': 'SUCCESS', 'response':response}
-    
-    def store(self, credit_card,options=None):
-        customer = self.stripe.Customer.create (
+        return {'status': 'SUCCESS', 'response': response}
+
+    def store(self, credit_card, options=None):
+        if not self.validate_card(credit_card):
+            raise InvalidCard("Invalid Card")
+        customer = self.stripe.Customer.create(
                    card={
-                   'number':credit_card.number,
-                   'exp_month':credit_card.month,
-                   'exp_year':credit_card.year,
+                   'number': credit_card.number,
+                   'exp_month': credit_card.month,
+                   'exp_year': credit_card.year,
                    'cvc': credit_card.verification_value
                     },
-                    description = "Storing for future use"
+                    description="Storing for future use"
         )
         return customer
 
-    def recurring(self,money,credit_card,options=None):
+    def recurring(self, credit_card, options=None):
+        if not self.validate_card(credit_card):
+            raise InvalidCard("Invalid Card")
         response = None
-        if  options['plan_id']:
+        try:
+            plan_id = options['plan_id']
+            plan = self.stripe.Plan.retrieve(options['plan_id'])
             try:
-                response = self.stripe.Customer.create (
-                    
+                response = self.stripe.Customer.create(
                     card={
-                        'number':credit_card.number,
-                        'exp_month':credit_card.month,
-                        'exp_year':credit_card.year,
+                        'number': credit_card.number,
+                        'exp_month': credit_card.month,
+                        'exp_year': credit_card.year,
                         'cvc': credit_card.verification_value
                     },
                     plan=options['plan_id'],
-                    description = "Thanks for subscribing"
-
+                    description="Thanks for subscribing"
                 )
+                return {"status": "SUCCESS", "response": response}
             except self.stripe.CardError, error:
-                return error
-        return response
-
-
+                return {"status": "FAILED", "response": error}
+        except self.stripe.InvalidRequestError, error:
+            return {"status": "FAILED", "response": error}
+        except TypeError:
+            return {"status": "FAILED", "response": "please give a plan id"}
