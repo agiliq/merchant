@@ -82,3 +82,11 @@ class StripeGateway(Gateway):
             return {"status": "SUCCESS", "response": response}
         except self.stripe.InvalidRequestError, error:
             return {"status": "FAILED", "response": error}
+
+    def credit(self, money, identification, options=None):
+        try:
+            charge = self.stripe.Charge.retrieve(identification)
+            response = charge.refund(amount=money)
+            return {"status": "SUCCESS", "response": response}
+        except self.stripe.InvalidRequestError, error:
+            return {"status": "FAILED", "error": error}
