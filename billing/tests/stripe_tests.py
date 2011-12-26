@@ -50,3 +50,10 @@ class StripeGatewayTestCase(TestCase):
         self.assertEquals(resp["status"], "SUCCESS")
         subscription = resp["response"].subscription
         self.assertEquals(subscription.status, "active")
+
+    def testCredit(self):
+        resp = self.merchant.purchase(1, self.credit_card)
+        self.assertEquals(resp["status"], "SUCCESS")
+        identification = resp["response"].id
+        resp = self.merchant.credit(identification=identification)
+        self.assertEquals(resp["status"], "SUCCESS")
