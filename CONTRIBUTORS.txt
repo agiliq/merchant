@@ -10,3 +10,4 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Markus Gattol <markus.gattol@sunoano.org>
 * Shabda Raaj <shabda@agiliq.com>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
+* Plaban Nayak <plaban.nayak@gmail.com>
