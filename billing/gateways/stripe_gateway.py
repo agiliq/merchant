@@ -22,7 +22,7 @@ class StripeGateway(Gateway):
         try:
             response = self.stripe.Charge.create(
                 amount=amount * 100,
-                currency="usd",
+                currency=self.default_currency.lower(),
                 card={
                    'number': credit_card.number,
                    'exp_month': credit_card.month,
@@ -45,7 +45,7 @@ class StripeGateway(Gateway):
                     },
                     description="Storing for future use"
         )
-        return customer
+        return {'status': 'SUCCESS', 'response': customer}
 
     def recurring(self, credit_card, options=None):
         if not self.validate_card(credit_card):
@@ -81,7 +81,7 @@ class StripeGateway(Gateway):
         except self.stripe.InvalidRequestError, error:
             return {"status": "FAILED", "response": error}
 
-    def credit(self, money, identification, options=None):
+    def credit(self, identification, money=None, options=None):
         try:
             charge = self.stripe.Charge.retrieve(identification)
             response = charge.refund(amount=money)
