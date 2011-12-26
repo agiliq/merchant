@@ -1,6 +1,4 @@
 from billing import Gateway
-from billing.gateway import InvalidData
-from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
      AmericanExpress, Discover
 import stripe
@@ -55,7 +53,7 @@ class StripeGateway(Gateway):
         response = None
         try:
             plan_id = options['plan_id']
-            plan = self.stripe.Plan.retrieve(options['plan_id'])
+            self.stripe.Plan.retrieve(options['plan_id'])
             try:
                 response = self.stripe.Customer.create(
                     card={
@@ -64,7 +62,7 @@ class StripeGateway(Gateway):
                         'exp_year': credit_card.year,
                         'cvc': credit_card.verification_value
                     },
-                    plan=options['plan_id'],
+                    plan=plan_id,
                     description="Thanks for subscribing"
                 )
                 return {"status": "SUCCESS", "response": response}
