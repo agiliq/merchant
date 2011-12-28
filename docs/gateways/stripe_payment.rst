@@ -34,10 +34,10 @@ Example:
     SUCCESS
 
     # Authorize the card for 1000 USD
-    >>> resp = braintree.authorize(1000, credit_card)
+    >>> resp = stripe.authorize(1000, credit_card)
 
     # Capture funds (900 USD) from a previously authorized transaction
-    >>> response = braintree.capture(900, resp["response"].id)
+    >>> response = stripe.capture(900, resp["response"].id)
     >>> response["status"]
     SUCCESS
 
