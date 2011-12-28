@@ -30,22 +30,31 @@ Example:
 
     # Bill the user for 1000 USD
     >>> resp = stripe.purchase(1000, credit_card)
-    >>> resp["response"].is_success
-    True
+    >>> resp["status"]
+    SUCCESS
+
+    # Authorize the card for 1000 USD
+    >>> resp = braintree.authorize(1000, credit_card)
+
+    # Capture funds (900 USD) from a previously authorized transaction
+    >>> response = braintree.capture(900, resp["response"].id)
+    >>> response["status"]
+    SUCCESS
+
    
     # Store Customer and Credit Card information in the vault
     >>> resp = stripe.store(credit_card)
 
     # Unstore a previously stored credit card from the vault
     >>> response = stripe.unstore(resp["response"].id)
-    >>> response["response"].is_success
-    True
+    >>> response["status"]
+    SUCCESS
 
     # A recurring plan charge
     >>> options = {"plan_id": "gold"}
     >>> resp = stripe.recurring(credit_card, options = options)
-    >>> resp["response"].is_success
-    True
+    >>> resp["status"]
+    SUCCESS
 
 
 

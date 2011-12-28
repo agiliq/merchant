@@ -16,7 +16,7 @@ class StripeGateway(Gateway):
         stripe.api_key = settings.STRIPE_API_KEY
         self.stripe = stripe
 
-    def purchase(self, amount, credit_card):
+    def purchase(self, amount, credit_card, options=None):
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
         try:
@@ -88,3 +88,31 @@ class StripeGateway(Gateway):
             return {"status": "SUCCESS", "response": response}
         except self.stripe.InvalidRequestError, error:
             return {"status": "FAILED", "error": error}
+
+    def authorize(self, money, credit_card, options=None):
+        if not self.validate_card(credit_card):
+            raise InvalidCard("Invalid Card")
+        try:
+            token = self.stripe.Token.create(
+                card={
+                    'number': credit_card.number,
+                    'exp_month': credit_card.month,
+                    'exp_year': credit_card.year,
+                    'cvc': credit_card.verification_value
+                },
+                amount=money * 100
+            )
+            return {'status': "SUCCESS", "response": token}
+        except self.stripe.InvalidRequestError, error:
+            return {"status": "FAILED", "response": error}
+
+    def capture(self, money, authorization, options=None):
+        try:
+            response = self.stripe.Charge.create(
+                amount=money * 100,
+                card=authorization,
+                currency="usd"
+            )
+            return {'status': "SUCCESS", "response": response}
+        except self.stripe.InvalidRequestError, error:
+            return {"status": "FAILED", "response": error}

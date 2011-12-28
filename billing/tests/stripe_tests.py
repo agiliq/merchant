@@ -57,3 +57,10 @@ class StripeGatewayTestCase(TestCase):
         identification = resp["response"].id
         resp = self.merchant.credit(identification=identification)
         self.assertEquals(resp["status"], "SUCCESS")
+
+    def testAuthorizeAndCapture(self):
+        resp = self.merchant.authorize(100, self.credit_card)
+        self.assertEquals(resp["status"], "SUCCESS")
+        response = self.merchant.capture(50, resp["response"].id)
+        self.assertEquals(response["status"], "SUCCESS")
+
