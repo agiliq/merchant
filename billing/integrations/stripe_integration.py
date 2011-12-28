@@ -1,14 +1,8 @@
 from billing import Integration
 from django.conf import settings
-from django.views.decorators.http import require_GET
-from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from django.conf.urls.defaults import patterns, url
 import stripe
-import urllib
-from django.core.urlresolvers import reverse
 from billing.forms.stripe_forms  import StripeForm
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 

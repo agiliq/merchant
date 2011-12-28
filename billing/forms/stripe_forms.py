@@ -1,6 +1,4 @@
 from django import forms
-from django.conf import settings
-import stripe
 
 
 class StripeForm(forms.Form):
