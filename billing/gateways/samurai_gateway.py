@@ -44,10 +44,25 @@ class SamuraiGateway(Gateway):
             return {'status': 'FAILURE', 'response': error}
         return {'status': 'SUCCESS', 'response': response}
         
-    def capture(self, money, authorization, options = None):
+    def capture(self, money, identification, options = None):
+        from samurai.transaction import Transaction
+        trans = Transaction.find(identification)
+        if not trans.errors:
+            new_trans = trans.capture(money)
+            return{'status': "SUCCESS", "response": new_trans}
+        else:
+            return{"status":"FAILED", "response": trans.errors}
+
+    def reverse(self, money, authorization, options=None):
         if not authorization.errors:
-            new_trans = authorization.capture(money)
+            new_trans = authorization.reverse(money)
             return{'status': "SUCCESS", "response": new_trans}
         else:
             return{"status":"FAILED", "response": authorization.errors}
-            
+
+    def void(self, authorization, options=None):
+        if not authorization.errors:
+            new_trans = authorization.void()
+            return{'status': "SUCCESS", "response": new_trans}
+        else:
+            return{"status":"FAILED", "response": authorization.errors}

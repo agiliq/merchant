@@ -11,7 +11,8 @@ from billing.gateway import CardNotSupported
 from app.forms import CreditCardForm
 from app.urls import (google_checkout_obj, world_pay_obj,
                       pay_pal_obj, amazon_fps_obj,
-                      fps_recur_obj, braintree_obj)
+                      fps_recur_obj, braintree_obj,
+                      stripe_obj)
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
 
@@ -232,3 +233,9 @@ def offsite_braintree(request):
     template_vars = {'title': 'Braintree Payments Transparent Redirect', 
                      "bp_obj": braintree_obj}
     return render(request, "app/braintree_tr.html", template_vars)
+
+def offsite_stripe(request):
+
+    template_vars = {'title': 'Stripe Non PCI Compliance', 
+                     "stripe_obj": stripe_obj}
+    return render(request, "app/stripe.html", template_vars)
