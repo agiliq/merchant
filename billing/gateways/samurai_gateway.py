@@ -43,3 +43,11 @@ class SamuraiGateway(Gateway):
         except Exception, error:
             return {'status': 'FAILURE', 'response': error}
         return {'status': 'SUCCESS', 'response': response}
+        
+    def capture(self, money, authorization, options = None):
+        if not authorization.errors:
+            new_trans = authorization.capture(money)
+            return{'status': "SUCCESS", "response": new_trans}
+        else:
+            return{"status":"FAILED", "response": authorization.errors}
+            
