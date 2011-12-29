@@ -67,11 +67,11 @@ class StripeGateway(Gateway):
                 )
                 return {"status": "SUCCESS", "response": response}
             except self.stripe.CardError, error:
-                return {"status": "FAILED", "response": error}
+                return {"status": "FAILURE", "response": error}
         except self.stripe.InvalidRequestError, error:
-            return {"status": "FAILED", "response": error}
+            return {"status": "FAILURE", "response": error}
         except TypeError:
-            return {"status": "FAILED", "response": "please give a plan id"}
+            return {"status": "FAILURE", "response": "please give a plan id"}
 
     def unstore(self, identification, options=None):
         try:
@@ -79,7 +79,7 @@ class StripeGateway(Gateway):
             response = customer.delete()
             return {"status": "SUCCESS", "response": response}
         except self.stripe.InvalidRequestError, error:
-            return {"status": "FAILED", "response": error}
+            return {"status": "FAILURE", "response": error}
 
     def credit(self, identification, money=None, options=None):
         try:
@@ -87,7 +87,7 @@ class StripeGateway(Gateway):
             response = charge.refund(amount=money)
             return {"status": "SUCCESS", "response": response}
         except self.stripe.InvalidRequestError, error:
-            return {"status": "FAILED", "error": error}
+            return {"status": "FAILURE", "error": error}
 
     def authorize(self, money, credit_card, options=None):
         if not self.validate_card(credit_card):
@@ -104,7 +104,7 @@ class StripeGateway(Gateway):
             )
             return {'status': "SUCCESS", "response": token}
         except self.stripe.InvalidRequestError, error:
-            return {"status": "FAILED", "response": error}
+            return {"status": "FAILURE", "response": error}
 
     def capture(self, money, authorization, options=None):
         try:
@@ -115,4 +115,4 @@ class StripeGateway(Gateway):
             )
             return {'status': "SUCCESS", "response": response}
         except self.stripe.InvalidRequestError, error:
-            return {"status": "FAILED", "response": error}
+            return {"status": "FAILURE", "response": error}

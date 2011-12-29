@@ -2,6 +2,8 @@ from django.test import TestCase
 from billing import get_gateway, CreditCard
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
+import stripe
+from django.conf import settings
 
 
 class StripeGatewayTestCase(TestCase):
@@ -11,11 +13,13 @@ class StripeGatewayTestCase(TestCase):
                                       month=10, year=2012,
                                       number="4242424242424242",
                                       verification_value="100")
+        stripe.api_key = settings.STRIPE_API_KEY
+        self.stripe = stripe
 
     def testCardSupported(self):
         self.credit_card.number = "5019222222222222"
         self.assertRaises(CardNotSupported,
-                          lambda: self.merchant.purchase(1000, self.credit_card))
+                     lambda: self.merchant.purchase(1000, self.credit_card))
 
     def testCardType(self):
         self.credit_card.number = '4242424242424242'
@@ -45,7 +49,16 @@ class StripeGatewayTestCase(TestCase):
         self.assertEquals(response["status"], "SUCCESS")
 
     def testRecurring1(self):
-        options = {"plan_id": "plaban"}
+        try:
+            plan = self.stripe.Plan.retrieve("plaba")
+        except self.stripe.InvalidRequestError:
+            response = self.stripe.Plan.create(
+                amount=1000,
+                interval='month',
+                name="plaban",
+                currency="usd",
+                id="plaba")
+        options = {"plan_id": "plaba"}
         resp = self.merchant.recurring(self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
         subscription = resp["response"].subscription
@@ -63,4 +76,3 @@ class StripeGatewayTestCase(TestCase):
         self.assertEquals(resp["status"], "SUCCESS")
         response = self.merchant.capture(50, resp["response"].id)
         self.assertEquals(response["status"], "SUCCESS")
-
