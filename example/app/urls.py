@@ -17,6 +17,7 @@ urlpatterns = patterns('app.views',
     url(r'^eway/$', 'eway', name='app_eway'),
     url(r'^braintree/$', 'braintree', name='app_braintree'),
     url(r'^stripe/$', 'stripe', name='app_stripe'),
+    url(r'^samurai/$', 'samurai', name='app_samurai'),
 )
 
 # offsite payments

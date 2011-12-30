@@ -148,7 +148,23 @@ def stripe(request):
     return render(request, 'app/index.html',{'form': form,
                                              'amount':amount,
                                              'response':response,
-                                             'title':'Stripe Payment'})
+                                             'title':'Stripe Payment'})   
+def samurai(request):
+    amount = 1
+    response= None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("samurai")
+            response = merchant.purchase(amount,credit_card)
+    else:
+        form = CreditCardForm(initial={'number':'4111111111111111'})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount':amount,
+                                             'response':response,
+                                             'title':'Samurai'})
 
    
 
