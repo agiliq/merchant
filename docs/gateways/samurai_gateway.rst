@@ -2,7 +2,7 @@
 Samurai Payments
 -----------------------------------
 
-`Samurai  Payments `_ is a gateway provided by `FeeFighters`_ 
+`Samurai Payments`_ is a gateway provided by `FeeFighters`_ 
 to services which are willing to take the burden of PCI compliance. This does not involve
 any redirects and only Server to Server calls happen in the background.
 
