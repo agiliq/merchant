@@ -84,7 +84,6 @@ class SamuraiGateway(Gateway):
 
     def store(self, credit_card, options=None):
         from samurai.payment_method import PaymentMethod
-        from samurai.processor import Processor
         pm = PaymentMethod.create(credit_card.number, credit_card.verification_value, credit_card.month, credit_card.year)
         response = pm.retain()
         return {'status': 'SUCCESS', 'response': response}
@@ -93,4 +92,4 @@ class SamuraiGateway(Gateway):
         from samurai.payment_method import PaymentMethod
         payment_method = PaymentMethod.find(identification)
         payment_method = payment_method.redact()
-        return payment_method
+        return {"status": "SUCCESS", "response": payment_method}
