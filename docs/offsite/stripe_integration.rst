@@ -3,7 +3,7 @@ Stripe Payment Integration
 ----------------------------------------
 
 `Stripe Payment Integration`_ is a service offered by 
-`Stripe`_ to reduce the complexity of PCI compliance.
+`Stripe Payment`_ to reduce the complexity of PCI compliance.
 
 .. note::
 
@@ -64,5 +64,5 @@ Example:
       {% stripe_payment stripe_obj %}
 
 
-.. _`Stripe`: https://stripe.com
+.. _`Stripe Payment`: https://stripe.com
 .. _`stripe`: http://pypi.python.org/pypi/stripe/
