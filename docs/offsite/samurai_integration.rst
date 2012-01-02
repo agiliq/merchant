@@ -65,3 +65,4 @@ Example:
 
 .. _`Samurai Payment`: https://samurai.feefighters.com/
 .. _`samurai`: http://pypi.python.org/pypi/samurai/0.6
+.. _`FeeFighters`: http://feefighters.com/
