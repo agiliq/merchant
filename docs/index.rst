@@ -33,6 +33,7 @@ Contents:
     * :doc:`Amazon FPS <offsite/amazon_fps>`
     * :doc:`Braintree Payments Transparent Redirect <offsite/braintree_payments>`
     * :doc:`Stripe  <offsite/stripe_integration>`
+    * :doc:`Samurai  <offsite/samurai_integration>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
