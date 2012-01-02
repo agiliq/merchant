@@ -43,6 +43,13 @@ BRAINTREE_MERCHANT_ACCOUNT_ID = ""
 BRAINTREE_PUBLIC_KEY = ""
 BRAINTREE_PRIVATE_KEY = ""
 
+#Stripe Payment Settings
+STRIPE_API_KEY = ''
+
+#SAMURAI Settings
+SAMURAI_MERCHANT_KEY = ''
+SAMURAI_MERCHANT_PASSWORD = ''
+SAMURAI_PROCESSOR_TOKEN = ''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.

@@ -5,6 +5,7 @@ from django import forms
 
 from billing import CreditCard
 
+
 class CreditCardForm(forms.Form):
     CARD_TYPES = [
         ('', ''),
@@ -14,7 +15,7 @@ class CreditCardForm(forms.Form):
         ('american_express', 'American Express'),
         ('diners_club', 'Diners Club'),
         # ('jcb', ''),
-        # ('switch', ''),  
+        # ('switch', ''),
         # ('solo', ''),
         # ('dankort', ''),
         ('maestro', 'Maestro'),
@@ -25,7 +26,6 @@ class CreditCardForm(forms.Form):
     today = datetime.date.today()
     MONTH_CHOICES = [(m, datetime.date(today.year, m, 1).strftime('%b')) for m in range(1, 13)]
     YEAR_CHOICES = [(y, y) for y in range(today.year, today.year + 21)]
-    
     first_name = forms.CharField()
     last_name = forms.CharField()
     month = forms.ChoiceField(choices=MONTH_CHOICES)
@@ -40,5 +40,3 @@ class CreditCardForm(forms.Form):
         if not credit_card.is_valid():
             raise forms.ValidationError('Credit card validation failed')
         return data
-
-   

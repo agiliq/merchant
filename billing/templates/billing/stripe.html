@@ -1,0 +1,6 @@
+<div class="payment-errors"> </div>
+<form method="post" id="payment-form">{% csrf_token %}
+
+  {{ integration.generate_form.as_p }}
+<input type="submit" value="Pay" class="submit-button"/>
+</form>

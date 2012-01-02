@@ -99,6 +99,8 @@ INSTALLED_APPS = (
     'paypal.standard', 
     'paypal.pro',
     'paypal.standard.ipn',
+    'stripe',
+    'samurai'
 )
 
 STATIC_URL = "http://merchant.agiliq.com/"

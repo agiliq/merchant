@@ -11,7 +11,8 @@ from billing.gateway import CardNotSupported
 from app.forms import CreditCardForm
 from app.urls import (google_checkout_obj, world_pay_obj,
                       pay_pal_obj, amazon_fps_obj,
-                      fps_recur_obj, braintree_obj)
+                      fps_recur_obj, braintree_obj,
+                      stripe_obj,samurai_obj)
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
 
@@ -37,8 +38,8 @@ def authorize(request):
             response = merchant.purchase(amount, credit_card)
             #response = merchant.recurring(amount, credit_card)
     else:
-        form = CreditCardForm(initial={'number':'4222222222222'})
-    return render(request, 'app/index.html', {'form': form, 
+        form = CreditCardForm(initial={'number': '4222222222222'})
+    return render(request, 'app/index.html', {'form': form,
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Authorize'})
@@ -60,7 +61,7 @@ def paypal(request):
             # response = merchant.purchase(amount, credit_card, options={'request': request})
             response = merchant.recurring(amount, credit_card, options={'request': request})
     else:
-        form = CreditCardForm(initial={'number':'4797503429879309', 
+        form = CreditCardForm(initial={'number': '4797503429879309',
                                        'verification_value': '037',
                                        'month': 1,
                                        'year': 2019,
@@ -132,7 +133,40 @@ def braintree(request):
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Braintree Payments (S2S)'})
+def stripe(request):
+    amount = 1
+    response= None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("stripe")
+            response = merchant.purchase(amount,credit_card)
+    else:
+        form = CreditCardForm(initial={'number':'4242424242424242'})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount':amount,
+                                             'response':response,
+                                             'title':'Stripe Payment'})   
+def samurai(request):
+    amount = 1
+    response= None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("samurai")
+            response = merchant.purchase(amount,credit_card)
+    else:
+        form = CreditCardForm(initial={'number':'4111111111111111'})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount':amount,
+                                             'response':response,
+                                             'title':'Samurai'})
 
+   
 
 
 def offsite_paypal(request):
@@ -215,3 +249,15 @@ def offsite_braintree(request):
     template_vars = {'title': 'Braintree Payments Transparent Redirect', 
                      "bp_obj": braintree_obj}
     return render(request, "app/braintree_tr.html", template_vars)
+
+def offsite_stripe(request):
+
+    template_vars = {'title': 'Stripe Non PCI Compliance', 
+                     "stripe_obj": stripe_obj}
+    return render(request, "app/stripe.html", template_vars)
+
+def offsite_samurai(request):
+    template_vars = {'title': 'Samurai Non PCI Compliance', 
+                     "samurai_obj": samurai_obj}
+    return render(request, "app/samurai.html", template_vars)
+
