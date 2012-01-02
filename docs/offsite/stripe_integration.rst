@@ -66,3 +66,4 @@ Example:
 
 .. _`Stripe Payment`: https://stripe.com
 .. _`stripe`: http://pypi.python.org/pypi/stripe/
+.. _`FeeFighters`: http://feefighters.com/
