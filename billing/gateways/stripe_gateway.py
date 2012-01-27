@@ -28,7 +28,7 @@ class StripeGateway(Gateway):
                    'exp_month': credit_card.month,
                    'exp_year': credit_card.year,
                    'cvc': credit_card.verification_value
-                   },)
+                   })
         except self.stripe.CardError, error:
             return {'status': 'FAILURE', 'response': error}
         return {'status': 'SUCCESS', 'response': response}
@@ -42,9 +42,7 @@ class StripeGateway(Gateway):
                    'exp_month': credit_card.month,
                    'exp_year': credit_card.year,
                    'cvc': credit_card.verification_value
-                    },
-                    description="Storing for future use"
-        )
+                    })
         return {'status': 'SUCCESS', 'response': customer}
 
     def recurring(self, credit_card, options=None):
@@ -62,8 +60,7 @@ class StripeGateway(Gateway):
                         'exp_year': credit_card.year,
                         'cvc': credit_card.verification_value
                     },
-                    plan=plan_id,
-                    description="Thanks for subscribing"
+                    plan=plan_id
                 )
                 return {"status": "SUCCESS", "response": response}
             except self.stripe.CardError, error:
