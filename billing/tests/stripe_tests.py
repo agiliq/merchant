@@ -31,8 +31,7 @@ class StripeGatewayTestCase(TestCase):
         self.assertEquals(resp["status"], "SUCCESS")
 
     def testStoreMissingCustomer(self):
-        self.assertRaises(TypeError,
-                          lambda: self.merchant.store())
+        self.assertRaises(TypeError, self.merchant.store)
 
     def testStoreWithoutBillingAddress(self):
         resp = self.merchant.store(self.credit_card)
@@ -49,16 +48,17 @@ class StripeGatewayTestCase(TestCase):
         self.assertEquals(response["status"], "SUCCESS")
 
     def testRecurring1(self):
+        plan_id = "test_plan"
         try:
-            plan = self.stripe.Plan.retrieve("plaba")
+            plan = self.stripe.Plan.retrieve(plan_id)
         except self.stripe.InvalidRequestError:
             response = self.stripe.Plan.create(
                 amount=1000,
                 interval='month',
-                name="plaban",
+                name="Test Plan",
                 currency="usd",
-                id="plaba")
-        options = {"plan_id": "plaba"}
+                id=plan_id)
+        options = {"plan_id": plan_id}
         resp = self.merchant.recurring(self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
         subscription = resp["response"].subscription
