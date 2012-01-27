@@ -7,7 +7,7 @@ from billing.forms.stripe_forms  import StripeForm
 class StripeIntegration(Integration):
     def __init__(self):
         super(StripeIntegration, self).__init__()
-        self.stripe_gateway = get_gateway("stripe")
+        self.gateway = get_gateway("stripe")
         self.publishable_key = settings.STRIPE_PUBLISHABLE_KEY
 
     def generate_form(self):

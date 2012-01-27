@@ -9,7 +9,7 @@ class SamuraiIntegration(Integration):
     def __init__(self):
         super(SamuraiIntegration, self).__init__()
         self.merchant_key = settings.SAMURAI_MERCHANT_KEY
-        self.samurai_gateway = get_gateway("samurai")
+        self.gateway = get_gateway("samurai")
 
     def generate_form(self):
         initial_data = self.fields
