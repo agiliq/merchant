@@ -13,5 +13,4 @@ class SamuraiExampleIntegration(SamuraiIntegration):
     def transaction(self, request):
         print request.POST["payment_method_token"]
         resp = self.samurai_gateway.purchase(1, request.POST["payment_method_token"])
-        print resp["response"].errors
         return HttpResponse(resp["response"].to_json())
