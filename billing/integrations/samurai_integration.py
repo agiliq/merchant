@@ -1,4 +1,4 @@
-from billing import Integration
+from billing import Integration, get_gateway
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +9,7 @@ class SamuraiIntegration(Integration):
     def __init__(self):
         super(SamuraiIntegration, self).__init__()
         self.merchant_key = settings.SAMURAI_MERCHANT_KEY
+        self.samurai_gateway = get_gateway("samurai")
 
     def generate_form(self):
         initial_data = self.fields
