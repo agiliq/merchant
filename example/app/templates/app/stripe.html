@@ -2,53 +2,5 @@
 {% load billing_tags %}
 
 {% block content %}
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
-<script type="text/javascript" src="https://js.stripe.com/v1/"></script>
-
-<script type="text/javascript">
-
-
-Stripe.setPublishableKey('pk_K2Z3rk1gTlIjSPRwDNyw3KEuDWmXY');
-
-$(document).ready(function() {
-   function stripeResponseHandler(status, response) {
-
-console.log(response);
-     if (response.error) {
-
-        //show the errors on the form
-        $(".payment-errors").html(response.error.message);
-
-     } else {
-
-        var url = "/stripe/stripe-get-token/";
-        var token = response['id'];
-        $.post(url, {
-          stripeToken:token          
-     });
-     }
-   }
-
-  $("#payment-form").submit(function(event) {
-
-    // disable the submit button to prevent repeated clicks
-    $('.submit-button').attr("disabled", "disabled");
-
-    var amount = 1000; //amount you want to charge in cents
-    Stripe.createToken({
-        number: $('#id_credit_card__number').val(),
-        cvc: $('#id_credit_card__cvc').val(),
-        exp_month: $('#id_credit_card__expiration_month').val(),
-        exp_year: $('#id_credit_card__expiration_year').val()
-    }, amount, stripeResponseHandler);
-
-
-
-    return false;
-  });
-
-});
-</script>
-
-{% stripe_payment  stripe_obj %}
+{% stripe_payment stripe_obj %}
 {% endblock %}
