@@ -1,4 +1,4 @@
-from billing import Integration
+from billing import Integration, get_gateway
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 import stripe
@@ -10,6 +10,7 @@ from django.http import HttpResponse
 class StripeIntegration(Integration):
     def __init__(self):
         super(StripeIntegration, self).__init__()
+        self.stripe_gateway = get_gateway("stripe")
         stripe.api_key = settings.STRIPE_API_KEY
         self.stripe = stripe
 
@@ -19,11 +20,11 @@ class StripeIntegration(Integration):
         return form
 
     @csrf_exempt
-    def get_token(self, request):
-        token = request.POST['stripeToken']
-        return HttpResponse('Success')
+    def transaction(self, request):
+        # Subclasses must override this
+        raise NotImplementedError
 
     def get_urls(self):
         urlpatterns = patterns('',
-           url('^stripe-get-token/$', self.get_token, name="get_token"),)
+           url('^stripe_token/$', self.transaction, name="stripe_transaction"),)
         return urlpatterns
