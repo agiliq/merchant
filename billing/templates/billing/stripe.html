@@ -16,7 +16,7 @@ $(document).ready(function() {
 
   $("#payment-form").submit(function(event) {
     $('.submit-button').attr("disabled", "disabled");
-    var amount = {{ amount }}; //amount you want to charge in cents
+    var amount = $('#id_amount').val(); //amount you want to charge in cents
     Stripe.createToken({
        number: $('#id_credit_card_number').val(),
        cvc: $('#id_credit_card_cvc').val(),

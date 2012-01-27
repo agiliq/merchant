@@ -251,13 +251,13 @@ def offsite_braintree(request):
     return render(request, "app/braintree_tr.html", template_vars)
 
 def offsite_stripe(request):
-
-    template_vars = {'title': 'Stripe Non PCI Compliance', 
+    stripe_obj.add_field("amount", 100)
+    template_vars = {'title': 'Stripe.js', 
                      "stripe_obj": stripe_obj}
     return render(request, "app/stripe.html", template_vars)
 
 def offsite_samurai(request):
-    template_vars = {'title': 'Samurai Non PCI Compliance', 
+    template_vars = {'title': 'Samurai Integration', 
                      "samurai_obj": samurai_obj}
     return render(request, "app/samurai.html", template_vars)
 
