@@ -1,17 +1,14 @@
 from billing import Integration, get_gateway
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
-import stripe
 from billing.forms.stripe_forms  import StripeForm
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
 
 
 class StripeIntegration(Integration):
     def __init__(self):
         super(StripeIntegration, self).__init__()
         self.stripe_gateway = get_gateway("stripe")
-        self.stripe = stripe
         self.publishable_key = settings.STRIPE_PUBLISHABLE_KEY
 
     def generate_form(self):
@@ -26,5 +23,6 @@ class StripeIntegration(Integration):
 
     def get_urls(self):
         urlpatterns = patterns('',
-           url('^stripe_token/$', self.transaction, name="stripe_transaction"),)
+           url('^stripe_token/$', self.transaction, name="stripe_transaction")
+        )
         return urlpatterns

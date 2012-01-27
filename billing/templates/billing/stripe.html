@@ -1,5 +1,5 @@
 <div class="payment-errors"></div>
-<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery.min.js"></script>
 <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
 <script type="text/javascript">
 $(document).ready(function() {
@@ -28,7 +28,7 @@ $(document).ready(function() {
   });
 });
 </script>
-<form method="post" id="payment-form">{% csrf_token %}
+<form method="post" id="payment-form">
   {{ integration.generate_form.as_p }}
 <input type="submit" value="Pay" class="submit-button"/>
 </form>
