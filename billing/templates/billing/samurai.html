@@ -1,6 +1,22 @@
-<div class="payment-errors"> </div>
-<form method="post" id="payment-form">{% csrf_token %}
+<script type="text/javascript" src="//code.jquery.com/jquery.min.js"></script>
+<script type="text/javascript" src="https://samurai.feefighters.com/assets/api/samurai.js"></script>
+<script type="text/javascript">
+Samurai.init({
+  merchant_key: '{{ integration.merchant_key }}' {% if integration.test_mode %},
+  sandbox: true
+  {% endif %}
+});
 
-  {{ integration.generate_form.as_p }}
-<input type="submit" value="Pay" class="submit-button"/>
-</form>
+Samurai.on('form', 'payment', function(event, data) {
+  $.post('{% url samurai_transaction %}', data.payment_method, function(data) {
+    var transaction = $.parseJSON(data).transaction;
+    if(transaction.success) {
+      $('form').children('.results').html('<h3>Your purchase is complete!</h3><h4>'+transaction.payment_method.payment_method.first_name+' '+transaction.payment_method.payment_method.last_name+': $'+transaction.amount+' - '+transaction.description+'</h4>');
+      Samurai.trigger('form', 'completed');
+    } else {
+      Samurai.PaymentErrorHandler.forForm($('form').get(0)).handleErrorsFromResponse(transaction);
+    }
+  });
+});
+</script>
+<div data-samurai-payment-form></div>
