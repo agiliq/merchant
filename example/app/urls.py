@@ -9,7 +9,7 @@ fps_recur_obj = get_integration("fps")
 world_pay_obj = get_integration("world_pay")
 braintree_obj = get_integration("braintree_payments")
 stripe_obj = get_integration("stripe_example")
-samurai_obj = get_integration("samurai")
+samurai_obj = get_integration("samurai_example")
 
 urlpatterns = patterns('app.views',
     url(r'^$', 'index', name='app_index'),

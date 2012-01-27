@@ -32,7 +32,7 @@ Here are the methods and attributes implemented on the ``SamuraiIntegration`` cl
         (r'^samurai/', include(samurai_obj.urls)),
      )
 
-* ``get_token(self, request)``: The view method that recieves the
+* ``transaction(self, request)``: The view method that recieves the
 token   
 
 * ``generate_form(self)``: The method that generates and returns the form (present in 
@@ -42,16 +42,32 @@ token
 Example:
 --------
 
+    In <some_app>/integrations/samurai_example_integration.py::
+
+       from billing.integrations.samurai_integration import SamuraiIntegration
+
+       class SamuraiExampleIntegration(SamuraiIntegration):
+           class transaction(self, request):
+               # The token is received in the POST request
+               resp = self.samurai_gateway.purchase(100, request.POST["payment_method_token"])
+	       if resp["status"] == "SUCCESS":
+                   # Redirect if the transaction is successful
+                   ...
+               else:
+                   # Transaction failed
+                   ...
+
+
     In the views.py::
 
-       samurai_obj = get_integration("samurai")
+       samurai_obj = get_integration("samurai_example")
        return render_to_response("some_template.html", 
                                {"samurai_obj": samurai_obj},
                                 context_instance=RequestContext(request))
 
    In the urls.py::
 
-      samurai_obj = get_integration("samurai")
+      samurai_obj = get_integration("samurai_example")
       urlpatterns += patterns('',
          (r'^samurai/', include(samurai_obj.urls)),
       )
@@ -64,5 +80,5 @@ Example:
 
 
 .. _`Samurai Payment`: https://samurai.feefighters.com/
-.. _`samurai`: http://pypi.python.org/pypi/samurai/0.6
+.. _`samurai`: http://pypi.python.org/pypi/samurai
 .. _`FeeFighters`: http://feefighters.com/

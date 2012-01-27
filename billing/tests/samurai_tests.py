@@ -2,6 +2,7 @@ from django.test import TestCase
 from billing import get_gateway, CreditCard
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
+from samurai.payment_method import PaymentMethod
 
 
 class SamuraiGatewayTestCase(TestCase):
@@ -55,3 +56,8 @@ class SamuraiGatewayTestCase(TestCase):
         self.assertEquals(resp["status"], "SUCCESS")
         response = self.merchant.unstore(resp["response"].payment_method_token)
         self.assertEquals(response["status"], "SUCCESS")
+
+    def testPurchaseWithToken(self):
+        resp = PaymentMethod.create('4111111111111111', '111', '07', '14')
+        resp = self.merchant.purchase(500, resp.payment_method_token)
+        self.assertEquals(resp["status"], "SUCCESS")
