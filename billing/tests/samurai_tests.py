@@ -4,7 +4,7 @@ from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
 
 
-class SamuraiTestCase(TestCase):
+class SamuraiGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("samurai")
         self.credit_card = CreditCard(first_name="Test", last_name="User",
@@ -27,8 +27,7 @@ class SamuraiTestCase(TestCase):
         self.assertEquals(resp["status"], "SUCCESS")
 
     def testStoreMissingCustomer(self):
-        self.assertRaises(TypeError,
-                          lambda: self.merchant.store())
+        self.assertRaises(TypeError, self.merchant.store)
 
     def testCredit(self):
         resp = self.merchant.purchase(1000, self.credit_card)
