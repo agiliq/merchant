@@ -11,8 +11,8 @@ class StripeIntegration(Integration):
     def __init__(self):
         super(StripeIntegration, self).__init__()
         self.stripe_gateway = get_gateway("stripe")
-        stripe.api_key = settings.STRIPE_API_KEY
         self.stripe = stripe
+        self.publishable_key = settings.STRIPE_PUBLISHABLE_KEY
 
     def generate_form(self):
         initial_data = self.fields
