@@ -3,15 +3,17 @@
 <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-  Stripe.setPublishableKey('{{ stripe.publishable_key }}');
+  Stripe.setPublishableKey('{{ integration.publishable_key }}');
 
   function stripeResponseHandler(status, response) {
     if (response.error) {
       $(".payment-errors").html(response.error.message);
     } else {
-      var url = "{% url stripe_transaction %}";
+console.log(response);
       var token = response['id'];
-      $.post(url, {stripeToken:token});
+      $("#payment-form input[name=stripeToken]").val(token);
+      $("#payment-form").attr("action", "{% url stripe_transaction %}");
+      $("#payment-form").get(0).submit();
     }
   }
 
@@ -28,7 +30,8 @@ $(document).ready(function() {
   });
 });
 </script>
-<form method="post" id="payment-form">
+<form method="post" id="payment-form">{% csrf_token %}
   {{ integration.generate_form.as_p }}
+  <input type="hidden" name="stripeToken" value="" />
 <input type="submit" value="Pay" class="submit-button"/>
 </form>

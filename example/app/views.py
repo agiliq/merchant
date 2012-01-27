@@ -251,9 +251,11 @@ def offsite_braintree(request):
     return render(request, "app/braintree_tr.html", template_vars)
 
 def offsite_stripe(request):
+    status = request.GET.get("status")
     stripe_obj.add_field("amount", 100)
     template_vars = {'title': 'Stripe.js', 
-                     "stripe_obj": stripe_obj}
+                     "stripe_obj": stripe_obj,
+                     "status": status}
     return render(request, "app/stripe.html", template_vars)
 
 def offsite_samurai(request):

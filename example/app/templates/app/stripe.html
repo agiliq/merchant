@@ -2,5 +2,6 @@
 {% load billing_tags %}
 
 {% block content %}
+{% if status %}<h2>{{ status }}</h2>{% endif %}
 {% stripe_payment stripe_obj %}
 {% endblock %}

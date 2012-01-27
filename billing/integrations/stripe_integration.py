@@ -2,7 +2,6 @@ from billing import Integration, get_gateway
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 from billing.forms.stripe_forms  import StripeForm
-from django.views.decorators.csrf import csrf_exempt
 
 
 class StripeIntegration(Integration):
@@ -16,7 +15,6 @@ class StripeIntegration(Integration):
         form = StripeForm(initial=initial_data)
         return form
 
-    @csrf_exempt
     def transaction(self, request):
         # Subclasses must override this
         raise NotImplementedError

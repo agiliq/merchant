@@ -8,7 +8,7 @@ amazon_fps_obj = get_integration("fps")
 fps_recur_obj = get_integration("fps")
 world_pay_obj = get_integration("world_pay")
 braintree_obj = get_integration("braintree_payments")
-stripe_obj = get_integration("stripe")
+stripe_obj = get_integration("stripe_example")
 samurai_obj = get_integration("samurai")
 
 urlpatterns = patterns('app.views',
