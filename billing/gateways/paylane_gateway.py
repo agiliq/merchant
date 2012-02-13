@@ -9,7 +9,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from billing import Gateway
-from billing.models import PaylaneResponse
+from billing.models import PaylaneTransaction,PaylaneAuthorization
 from billing.utils.credit_card import CreditCard,InvalidCard,Visa,MasterCard
 from billing.utils.paylane import PaylaneError
 from billing.signals import transaction_was_successful,transaction_was_unsuccessful
@@ -76,14 +76,32 @@ class PaylaneGateway(Gateway):
 
         res = self.client.service.multiSale(params)
 
+        transaction = PaylaneTransaction()
+        transaction.amount = money
+        transaction.customer_name = customer.name
+        transaction.customer_email = customer.email
+        transaction.product = product.description
+        
         if hasattr(res,'OK'):
-            return {'status':'SUCCESS','response':PaylaneResponse(sale_authorization_id=res.OK.id_sale)}
+            transaction.success = True
+            transaction.save()
+            
+            return {'status':'SUCCESS','response':{'transaction':transaction}}
         else:
+            transaction.success = False
+            error_code = int(getattr(res.ERROR,'error_number'))
+            error_description = getattr(res.ERROR,'error_description')
+            acquirer_error = getattr(res.ERROR,'processor_error_number','')
+            acquirer_description = getattr(res.ERROR,'processor_error_description','')
+            transaction.save()
+            
             return {'status':'FAILURE',
-                    'response':PaylaneError(getattr(res.ERROR,'error_number'),
+                    'response':{'error':PaylaneError(getattr(res.ERROR,'error_number'),
                                             getattr(res.ERROR,'error_description'),
                                             getattr(res.ERROR,'processor_error_number',''),
-                                            getattr(res.ERROR,'processor_error_description',''))
+                                            getattr(res.ERROR,'processor_error_description','')),
+                                'transaction':transaction
+                                }
                     }
 
     def recurring(self,money,credit_card,options=None):
@@ -120,33 +138,73 @@ class PaylaneGateway(Gateway):
 
         res = self.client.service.multiSale(params)
 
+        transaction = PaylaneTransaction()
+        transaction.amount = money
+        transaction.customer_name = customer.name
+        transaction.customer_email = customer.email
+        transaction.product = product.description
+        
         if hasattr(res,'OK'):
-            return {'status':'SUCCESS','response':PaylaneResponse(sale_authorization_id=res.OK.id_sale_authorization)}
+            transaction.success = True
+            transaction.save()
+            
+            authz = PaylaneAuthorization.objects.create(sale_authorization_id=res.OK.id_sale_authorization,transaction=transaction)
+            return {'status':'SUCCESS','response':{'transaction':transaction,'authorization':authz}}
         else:
+            transaction.success = False
+            error_code = int(getattr(res.ERROR,'error_number'))
+            error_description = getattr(res.ERROR,'error_description')
+            acquirer_error = getattr(res.ERROR,'processor_error_number','')
+            acquirer_description = getattr(res.ERROR,'processor_error_description','')
+            transaction.save()
+            
             return {'status':'FAILURE',
-                    'response':PaylaneError(getattr(res.ERROR,'error_number'),
+                    'response':{'error':PaylaneError(getattr(res.ERROR,'error_number'),
                                             getattr(res.ERROR,'error_description'),
                                             getattr(res.ERROR,'processor_error_number',''),
-                                            getattr(res.ERROR,'processor_error_description',''))
+                                            getattr(res.ERROR,'processor_error_description','')),
+                                'transaction':transaction
+                                }
                     }
 
-    def bill_recurring(self,amount,paylane_response,description):
+    def bill_recurring(self,amount,paylane_recurring,description):
         """ Debit a recurring transaction payment, eg. monthly subscription.
         
-            Use the result of recurring() as the paylane_response parameter.
+            Use the result of recurring() as the paylane_recurring parameter.
             If this transaction is successful, use it's response as input for the
             next bill_recurring() call.
         """
         processing_date = datetime.datetime.today().strftime("%Y-%m-%d")
-        res = self.client.service.resale(id_sale=paylane_response.sale_authorization_id,amount=amount,currency=self.default_currency,
+        res = self.client.service.resale(id_sale=paylane_recurring.sale_authorization_id,amount=amount,currency=self.default_currency,
                                         description=description,processing_date=processing_date)
         
+        previous_transaction = paylane_recurring.transaction
+        
+        transaction = PaylaneTransaction()
+        transaction.amount = previous_transaction.amount
+        transaction.customer_name = previous_transaction.name
+        transaction.customer_email = previous_transaction.email
+        transaction.product = previous_transaction.description
+
         if hasattr(res,'OK'):
-            return {'status':'SUCCESS','response':PaylaneResponse(sale_authorization_id=res.OK.id_sale)}
+            transaction.success = True
+            transaction.save()
+            
+            authz = PaylaneAuthorization.objects.create(sale_authorization_id=res.OK.id_sale_authorization,transaction=transaction)            
+            return {'status':'SUCCESS','response':{'transaction':transaction,'authorization':authz}}
         else:
-            return {'status':'FAILURE',
-                    'response':PaylaneError(getattr(res.ERROR,'error_number'),
+            transaction.success = False
+            error_code = int(getattr(res.ERROR,'error_number'))
+            error_description = getattr(res.ERROR,'error_description')
+            acquirer_error = getattr(res.ERROR,'processor_error_number','')
+            acquirer_description = getattr(res.ERROR,'processor_error_description','')
+            transaction.save()
+            
+            return {'status':'FAILURE',                    
+                    'response':{'error':PaylaneError(getattr(res.ERROR,'error_number'),
                                             getattr(res.ERROR,'error_description'),
                                             getattr(res.ERROR,'processor_error_number',''),
-                                            getattr(res.ERROR,'processor_error_description',''))
+                                            getattr(res.ERROR,'processor_error_description','')),
+                                'transaction':transaction
+                                }
                     }
