@@ -126,8 +126,14 @@ class PaylaneError(object):
         self.acquirer_error = acquirer_error
         self.acquirer_description = acquirer_description
     
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return 'Error Code: %s (%s). Acquirer Error: %s (%s)' % (self.error_code,self.description,self.acquirer_error,self.acquirer_description)
+
     def __unicode__(self):
-        return u'Error Code: %s (%s). Acquirer Error: %s (%s)' % (self.error_code,self.description,self.acquirer_error,self.acquirer_description)
+        return unicode(str(self))
         
     @property
     def is_customer_data_error(self):

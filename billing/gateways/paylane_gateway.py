@@ -89,10 +89,6 @@ class PaylaneGateway(Gateway):
             return {'status':'SUCCESS','response':{'transaction':transaction}}
         else:
             transaction.success = False
-            error_code = int(getattr(res.ERROR,'error_number'))
-            error_description = getattr(res.ERROR,'error_description')
-            acquirer_error = getattr(res.ERROR,'processor_error_number','')
-            acquirer_description = getattr(res.ERROR,'processor_error_description','')
             transaction.save()
             
             return {'status':'FAILURE',
@@ -148,14 +144,15 @@ class PaylaneGateway(Gateway):
             transaction.success = True
             transaction.save()
             
-            authz = PaylaneAuthorization.objects.create(sale_authorization_id=res.OK.id_sale_authorization,transaction=transaction)
+            authz = PaylaneAuthorization()
+            authz.sale_authorization_id=res.OK.id_sale_authorization
+            authz.transaction=transaction
+            authz.first_authorization = True
+            authz.save()
+            
             return {'status':'SUCCESS','response':{'transaction':transaction,'authorization':authz}}
         else:
             transaction.success = False
-            error_code = int(getattr(res.ERROR,'error_number'))
-            error_description = getattr(res.ERROR,'error_description')
-            acquirer_error = getattr(res.ERROR,'processor_error_number','')
-            acquirer_description = getattr(res.ERROR,'processor_error_description','')
             transaction.save()
             
             return {'status':'FAILURE',
@@ -167,7 +164,21 @@ class PaylaneGateway(Gateway):
                                 }
                     }
 
-    def bill_recurring(self,amount,paylane_recurring,description):
+    def void(self, identification, options=None):
+        """Null/Blank/Delete a previous transaction"""
+        res = self.client.service.closeSaleAuthorization(id_sale_authorization=identification)
+        if hasattr(res,'OK'):
+            return {'status':'SUCCESS'}
+        else:
+            return {'status':'FAILURE',                    
+                    'response':{'error':PaylaneError(getattr(res.ERROR,'error_number'),
+                                            getattr(res.ERROR,'error_description'),
+                                            getattr(res.ERROR,'processor_error_number',''),
+                                            getattr(res.ERROR,'processor_error_description','')),
+                                }
+                    }
+
+    def bill_recurring(self,amount,authorization,description):
         """ Debit a recurring transaction payment, eg. monthly subscription.
         
             Use the result of recurring() as the paylane_recurring parameter.
@@ -175,10 +186,10 @@ class PaylaneGateway(Gateway):
             next bill_recurring() call.
         """
         processing_date = datetime.datetime.today().strftime("%Y-%m-%d")
-        res = self.client.service.resale(id_sale=paylane_recurring.sale_authorization_id,amount=amount,currency=self.default_currency,
-                                        description=description,processing_date=processing_date)
+        res = self.client.service.resale(id_sale=authorization.sale_authorization_id,amount=amount,currency=self.default_currency,
+                                        description=description,processing_date=processing_date,resale_by_authorization=authorization)
         
-        previous_transaction = paylane_recurring.transaction
+        previous_transaction = authorization.transaction
         
         transaction = PaylaneTransaction()
         transaction.amount = previous_transaction.amount
@@ -190,14 +201,14 @@ class PaylaneGateway(Gateway):
             transaction.success = True
             transaction.save()
             
-            authz = PaylaneAuthorization.objects.create(sale_authorization_id=res.OK.id_sale_authorization,transaction=transaction)            
+            authz = PaylaneAuthorization()
+            authz.sale_authorization_id=authorization.sale_authorization_id
+            authz.transaction=transaction
+            authz.save()
+
             return {'status':'SUCCESS','response':{'transaction':transaction,'authorization':authz}}
         else:
             transaction.success = False
-            error_code = int(getattr(res.ERROR,'error_number'))
-            error_description = getattr(res.ERROR,'error_description')
-            acquirer_error = getattr(res.ERROR,'processor_error_number','')
-            acquirer_description = getattr(res.ERROR,'processor_error_description','')
             transaction.save()
             
             return {'status':'FAILURE',                    

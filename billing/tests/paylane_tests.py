@@ -15,6 +15,9 @@ from billing.models import PaylaneTransaction,PaylaneAuthorization
 VALID_TEST_VISA = ''
 VALID_TEST_MASTERCARD = '5500000000000004'
 
+#This is needed because Paylane doesn't like too many requests in a very short time
+THROTTLE_CONTROL_SECONDS = 60
+
 class PaylaneTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("paylane")
@@ -28,7 +31,8 @@ class PaylaneTestCase(TestCase):
         self.product = PaylanePaymentProduct(description='Paylane test payment')
         
     def tearDown(self):
-        pass
+        for authz in PaylaneAuthorization.objects.all():
+            self.merchant.void(authz.sale_authorization_id)
         
     def testOneShotPurchaseOK(self):
         credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4012888888881881',verification_value=435)
@@ -52,8 +56,7 @@ class PaylaneTestCase(TestCase):
         self.assertTrue(res['response']['authorization'].sale_authorization_id > 0)
         
     def testRecurringBillingOK(self):
-        time.sleep(60)
-        credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4111111111111111',verification_value=435)
+        credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4000111111111115',verification_value="100")
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
@@ -61,21 +64,21 @@ class PaylaneTestCase(TestCase):
         self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
         self.assertTrue('transaction' in res['response'])
         self.assertTrue('authorization' in res['response'])
-        
-        time.sleep(60)
-        res = self.merchant.bill_recurring(12.0,res['response']['authorization'],'OK recurring')
-        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
-        self.assertTrue('transaction' in res['response'])
-        self.assertTrue('authorization' in res['response'])
+        self.assertTrue(res['response']['authorization'].sale_authorization_id > 0)
+                
+        time.sleep(THROTTLE_CONTROL_SECONDS)
+        bill1 = self.merchant.bill_recurring(12.0,res['response']['authorization'],'OK recurring')
+        self.assertEqual(bill1['status'],'SUCCESS',unicode(bill1['response']))
+        self.assertTrue('transaction' in bill1['response'])
+        self.assertTrue('authorization' in bill1['response'])
 
-        time.sleep(60)
-        res = self.merchant.bill_recurring(12.0,res['response']['authorization'],'OK recurring')
-        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
-        self.assertTrue('transaction' in res['response'])
-        self.assertTrue('authorization' in res['response'])
+        time.sleep(THROTTLE_CONTROL_SECONDS)
+        bill2 = self.merchant.bill_recurring(12.0,bill1['response']['authorization'],'OK recurring')
+        self.assertEqual(bill2['status'],'SUCCESS',unicode(bill2['response']))
+        self.assertTrue('transaction' in bill2['response'])
+        self.assertTrue('authorization' in bill2['response'])
 
     def testRecurringBillingFailWithChargeback(self):
-        time.sleep(60)
         credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4111111111111111',verification_value=435)
         options = {}
         options['customer'] = self.customer
@@ -84,10 +87,17 @@ class PaylaneTestCase(TestCase):
         self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
         self.assertTrue('transaction' in res['response'])
         self.assertTrue('authorization' in res['response'])
+        self.assertTrue(res['response']['authorization'].sale_authorization_id > 0)
 
-        time.sleep(60)
-        res = self.merchant.bill_recurring(float(PaylaneError.ERR_RESALE_WITH_CHARGEBACK),res['response']['authorization'],'Fail recurring')
-        self.assertEqual(res['status'],'FAILURE',unicode(res['response']))
-        self.assertTrue('transaction' in res['response'])
-        self.assertTrue('error' in res['response'])
-        self.assertEqual(res['response']['error'].error_code,PaylaneError.ERR_RESALE_WITH_CHARGEBACK)
+        time.sleep(THROTTLE_CONTROL_SECONDS)
+        bill1 = self.merchant.bill_recurring(12.0,res['response']['authorization'],'OK recurring')
+        self.assertEqual(bill1['status'],'SUCCESS',unicode(bill1['response']))
+        self.assertTrue('transaction' in bill1['response'])
+        self.assertTrue('authorization' in bill1['response'])
+
+        time.sleep(THROTTLE_CONTROL_SECONDS)
+        bill2 = self.merchant.bill_recurring(float(PaylaneError.ERR_RESALE_WITH_CHARGEBACK),bill1['response']['authorization'],'Fail recurring')
+        self.assertEqual(bill2['status'],'FAILURE',unicode(bill2['response']))
+        self.assertTrue('transaction' in bill2['response'])
+        self.assertTrue('error' in bill2['response'])
+        self.assertEqual(bill2['response']['error'].error_code,PaylaneError.ERR_RESALE_WITH_CHARGEBACK)

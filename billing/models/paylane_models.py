@@ -23,6 +23,7 @@ class PaylaneTransaction(models.Model):
 
 class PaylaneAuthorization(models.Model):
     sale_authorization_id = models.BigIntegerField(db_index=True)
+    first_authorization = models.BooleanField(default=False)
     transaction = models.OneToOneField(PaylaneTransaction)
 
     def __unicode__(self):
