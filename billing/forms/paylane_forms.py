@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vim:tabstop=4:expandtab:sw=4:softtabstop=4
+import datetime
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from billing.utils.credit_card import InvalidCard,Visa,MasterCard
