@@ -28,8 +28,8 @@ class PaylaneGateway(Gateway):
         wsdl = getattr(settings,'PAYLANE_WSDL','https://direct.paylane.com/wsdl/production/Direct.wsdl')
         wsdl_cache = getattr(settings,'SUDS_CACHE_DIR','/tmp/suds')
         if self.test_mode:
-            username = getattr(settings, 'PAYLANE_USERNAME_TEST', '')
-            password = getattr(settings, 'PAYLANE_PASSWORD_TEST', '')
+            username = getattr(settings, 'PAYLANE_USERNAME', '')
+            password = getattr(settings, 'PAYLANE_PASSWORD', '')
         else:
             username = settings.PAYLANE_USERNAME
             password = settings.PAYLANE_PASSWORD
