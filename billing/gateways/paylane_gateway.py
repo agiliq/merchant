@@ -82,23 +82,26 @@ class PaylaneGateway(Gateway):
         transaction.customer_email = customer.email
         transaction.product = product.description
         
+        status = None
+        response = None
+        transaction.success = hasattr(res,'OK')
+        transaction.save()
+        
         if hasattr(res,'OK'):
-            transaction.success = True
-            transaction.save()
-            
-            return {'status':'SUCCESS','response':{'transaction':transaction}}
+            status = 'SUCCESS'
+            response = {'transaction':transaction}
+            transaction_was_successful.send(sender=self,type='purchase',response=response)
         else:
-            transaction.success = False
-            transaction.save()
+            status = 'FAILURE'
+            response = {'error':PaylaneError(getattr(res.ERROR,'error_number'),
+                                    getattr(res.ERROR,'error_description'),
+                                    getattr(res.ERROR,'processor_error_number',''),
+                                    getattr(res.ERROR,'processor_error_description','')),
+                        'transaction':transaction
+                        }
+            transaction_was_unsuccessful.send(sender=self,type='purchase',response=response)
             
-            return {'status':'FAILURE',
-                    'response':{'error':PaylaneError(getattr(res.ERROR,'error_number'),
-                                            getattr(res.ERROR,'error_description'),
-                                            getattr(res.ERROR,'processor_error_number',''),
-                                            getattr(res.ERROR,'processor_error_description','')),
-                                'transaction':transaction
-                                }
-                    }
+        return {'status':status, 'response':response}
 
     def recurring(self,money,credit_card,options=None):
         """Setup a recurring transaction"""
@@ -140,29 +143,34 @@ class PaylaneGateway(Gateway):
         transaction.customer_email = customer.email
         transaction.product = product.description
         
+        
+        status = None
+        response = None
+        transaction.success = hasattr(res,'OK')
+        transaction.save()
+        
         if hasattr(res,'OK'):
-            transaction.success = True
-            transaction.save()
-            
+            status = 'SUCCESS'
             authz = PaylaneAuthorization()
             authz.sale_authorization_id=res.OK.id_sale_authorization
             authz.transaction=transaction
             authz.first_authorization = True
             authz.save()
+
+            response = {'transaction':transaction,'authorization':authz}
+            transaction_was_successful.send(sender=self,type='recurring',response=response)
             
-            return {'status':'SUCCESS','response':{'transaction':transaction,'authorization':authz}}
         else:
-            transaction.success = False
-            transaction.save()
+            status = 'FAILURE'
+            response = {'error':PaylaneError(getattr(res.ERROR,'error_number'),
+                                    getattr(res.ERROR,'error_description'),
+                                    getattr(res.ERROR,'processor_error_number',''),
+                                    getattr(res.ERROR,'processor_error_description','')),
+                        'transaction':transaction
+                        }
+            transaction_was_unsuccessful.send(sender=self,type='recurring',response=response)
             
-            return {'status':'FAILURE',
-                    'response':{'error':PaylaneError(getattr(res.ERROR,'error_number'),
-                                            getattr(res.ERROR,'error_description'),
-                                            getattr(res.ERROR,'processor_error_number',''),
-                                            getattr(res.ERROR,'processor_error_description','')),
-                                'transaction':transaction
-                                }
-                    }
+        return {'status':status, 'response':response}
 
     def void(self, identification, options=None):
         """Null/Blank/Delete a previous transaction"""
@@ -197,25 +205,27 @@ class PaylaneGateway(Gateway):
         transaction.customer_email = previous_transaction.customer_email
         transaction.product = previous_transaction.product
 
+        status = None
+        response = None
+        transaction.success = hasattr(res,'OK')
+        transaction.save()
         if hasattr(res,'OK'):
-            transaction.success = True
-            transaction.save()
-            
+            status = 'SUCCESS'
             authz = PaylaneAuthorization()
             authz.sale_authorization_id=authorization.sale_authorization_id
             authz.transaction=transaction
             authz.save()
-
-            return {'status':'SUCCESS','response':{'transaction':transaction,'authorization':authz}}
-        else:
-            transaction.success = False
-            transaction.save()
+            response = {'transaction':transaction,'authorization':authz}
+            transaction_was_successful.send(sender=self,type='bill_recurring',response=response)
             
-            return {'status':'FAILURE',                    
-                    'response':{'error':PaylaneError(getattr(res.ERROR,'error_number'),
-                                            getattr(res.ERROR,'error_description'),
-                                            getattr(res.ERROR,'processor_error_number',''),
-                                            getattr(res.ERROR,'processor_error_description','')),
-                                'transaction':transaction
-                                }
-                    }
+        else:
+            status = 'FAILURE'
+            response = {'error':PaylaneError(getattr(res.ERROR,'error_number'),
+                                    getattr(res.ERROR,'error_description'),
+                                    getattr(res.ERROR,'processor_error_number',''),
+                                    getattr(res.ERROR,'processor_error_description','')),
+                        'transaction':transaction
+                        }
+            transaction_was_unsuccessful.send(sender=self,type='bill_recurring',response=response)
+            
+        return {'status':status,'response':response}
