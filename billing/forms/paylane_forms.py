@@ -4,6 +4,7 @@ import datetime
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from billing.utils.credit_card import InvalidCard,Visa,MasterCard
+from billing.utils.countries import COUNTRIES
 
 curr_year = datetime.datetime.now().year
 month_choices = ((ii, ii) for ii in range(1, 13))
