@@ -4,6 +4,7 @@
 import datetime
 
 from suds.client import Client
+from suds.cache import ObjectCache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
@@ -14,7 +15,9 @@ from billing.utils.paylane import PaylaneError
 from billing.signals import transaction_was_successful,transaction_was_unsuccessful
 
 class PaylaneGateway(Gateway):
-
+    """
+        
+    """
     default_currency = "EUR"
     supported_cardtypes = [Visa,MasterCard]
     supported_countries = ['PT',]
@@ -22,16 +25,16 @@ class PaylaneGateway(Gateway):
     display_name = 'Paylane'
     
     def __init__(self):
-        wsdl = 'https://direct.paylane.com/wsdl/production/Direct.wsdl'
-        
+        wsdl = getattr(settings,'PAYLANE_WSDL','https://direct.paylane.com/wsdl/production/Direct.wsdl')
+        wsdl_cache = getattr(settings,'SUDS_CACHE_DIR','/tmp/suds')
         if self.test_mode:
-            username = getattr(settings, "PAYLANE_USERNAME_TEST", '')
-            password = getattr(settings, "PAYLANE_PASSWORD_TEST", '')
+            username = getattr(settings, 'PAYLANE_USERNAME_TEST', '')
+            password = getattr(settings, 'PAYLANE_PASSWORD_TEST', '')
         else:
             username = settings.PAYLANE_USERNAME
             password = settings.PAYLANE_PASSWORD
             
-        self.client = Client(wsdl, username=username, password=password)
+        self.client = Client(wsdl, username=username, password=password,cache = ObjectCache(location=wsdl_cache,days=15))
 
     def _validate(self,card):
         if not isinstance(card,CreditCard):
@@ -128,6 +131,12 @@ class PaylaneGateway(Gateway):
                     }
 
     def bill_recurring(self,amount,paylane_response,description):
+        """ Debit a recurring transaction payment, eg. monthly subscription.
+        
+            Use the result of recurring() as the paylane_response parameter.
+            If this transaction is successful, use it's response as input for the
+            next bill_recurring() call.
+        """
         processing_date = datetime.datetime.today().strftime("%Y-%m-%d")
         res = self.client.service.resale(id_sale=paylane_response.sale_authorization_id,amount=amount,currency=self.default_currency,
                                         description=description,processing_date=processing_date)

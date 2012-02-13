@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vim:tabstop=4:expandtab:sw=4:softtabstop=4
 
+import time
+
 from django.test import TestCase
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa,CreditCard
@@ -34,7 +36,7 @@ class PaylaneTestCase(TestCase):
         options['customer'] = self.customer
         options['product'] = self.product
         res = self.merchant.purchase(1.0,credit_card,options=options)
-        self.assertEqual(res['status'],'SUCCESS',res)
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
         self.assertTrue(isinstance(res['response'],PaylaneResponse))
         self.assertTrue(res['response'].sale_authorization_id > 0)
         
@@ -44,19 +46,39 @@ class PaylaneTestCase(TestCase):
         options['customer'] = self.customer
         options['product'] = self.product
         res = self.merchant.recurring(1.0,credit_card,options=options)
-        self.assertEqual(res['status'],'SUCCESS',res)
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
         self.assertTrue(isinstance(res['response'],PaylaneResponse))
         self.assertTrue(res['response'].sale_authorization_id > 0)
         
     def testRecurringBillingOK(self):
+        time.sleep(60)
         credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4111111111111111',verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
         res = self.merchant.purchase(1.0,credit_card,options=options)
-        self.assertEqual(res['status'],'SUCCESS',res)
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
         
+        time.sleep(60)
         pr = res['response']
         res = self.merchant.bill_recurring(12.0,pr,'OK recurring')
-        self.assertEqual(res['status'],'SUCCESS',res)
-        
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
+
+        time.sleep(60)
+        res = self.merchant.bill_recurring(12.0,pr,'OK recurring')
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
+
+    def testRecurringBillingFailWithChargeback(self):
+        time.sleep(60)
+        credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4111111111111111',verification_value=435)
+        options = {}
+        options['customer'] = self.customer
+        options['product'] = self.product
+        res = self.merchant.purchase(1.0,credit_card,options=options)
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
+
+        time.sleep(60)
+        pr = res['response']
+        res = self.merchant.bill_recurring(float(PaylaneError.ERR_RESALE_WITH_CHARGEBACK),pr,'OK recurring')
+        self.assertEqual(res['status'],'FAILURE',unicode(res['response']))
+        self.assertEqual(res['response'].error_code,PaylaneError.ERR_RESALE_WITH_CHARGEBACK)
