@@ -26,44 +26,52 @@ class PaylaneForm(forms.Form):
     def clean(self):
         cleaned_data = super(PaylaneForm,self).clean()
         
-        name = cleaned_data.get('name_on_card','').split(' ',1)
-        first_name = name[0]
-        last_name = name[1:]
+        if not self._errors:
+            name = cleaned_data.get('name_on_card','').split(' ',1)
+            first_name = name[0]
+            last_name = ' '.join(name[1:])
 
-        cc = Visa(first_name=first_name,
-                last_name=last_name,
-                month = cleaned_data.get('expiration_month'),
-                year = cleaned_data.get('expiration_year'),
-                number = cleaned_data.get('card_number'),
-                verification_value = cleaned_data.get('card_code'))
+            cc = Visa(first_name=first_name,
+                    last_name=last_name,
+                    month = cleaned_data.get('expiration_month'),
+                    year = cleaned_data.get('expiration_year'),
+                    number = cleaned_data.get('card_number'),
+                    verification_value = cleaned_data.get('card_code'))
 
-        if not cc.is_valid():
-            raise forms.ValidationError(_('Invalid credit card'))
+            if cc.is_expired():
+                raise forms.ValidationError(_('This credit card has expired.'))
+            
+            if not cc.is_luhn_valid():
+                raise forms.ValidationError(_('This credit card number isn\'t valid'))
+            
+            if not cc.is_valid():
+                #this should never occur
+                raise forms.ValidationError(_('Invalid credit card'))
 
-        options = {
-                'customer':cleaned_data.get('name_on_card'),
-                'email':'',
-                'order_id':'',
-                'ip':'',
-                'description':'',
-                'merchant':'',
-                'billing_address':{
-                        'name':cleaned_data.get('name_on_card'),
-                        'company':'',
-                        'address1':cleaned_data.get('street_house'),
-                        'address2':'',
-                        'city':cleaned_data.get('city'),
-                        'state':'',
-                        'country':cleaned_data.get('country_code'),
-                        'zip':cleaned_data.get('zip_code'),
-                        'phone':'',
-                    },
-                'shipping_address':{}
-            }
+            options = {
+                    'customer':cleaned_data.get('name_on_card'),
+                    'email':'',
+                    'order_id':'',
+                    'ip':'',
+                    'description':'',
+                    'merchant':'',
+                    'billing_address':{
+                            'name':cleaned_data.get('name_on_card'),
+                            'company':'',
+                            'address1':cleaned_data.get('street_house'),
+                            'address2':'',
+                            'city':cleaned_data.get('city'),
+                            'state':'',
+                            'country':cleaned_data.get('country_code'),
+                            'zip':cleaned_data.get('zip_code'),
+                            'phone':'',
+                        },
+                    'shipping_address':{}
+                }
         
-        cleaned_data['paylane'] = {
-                'credit_card':cc,
-                'options':options
-            }
+            cleaned_data['paylane'] = {
+                    'credit_card':cc,
+                    'options':options
+                }
 
         return cleaned_data
