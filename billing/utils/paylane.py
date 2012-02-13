@@ -117,8 +117,11 @@ class PaylaneError(object):
     ERR_BLACKLISTED_CUSTOMER_EMAIL = 615
     ERR_BLACKLISTED_CUSTOMER_IP = 616
         
-    FRAUD_ERRORS = [ERR_FRAUD_DETECTED,ERR_BLACKLISTED_NUMBER,ERR_BLACKLISTED_COUNTRY,ERR_BLACKLISTED_CARD_NUMBER,ERR_BLACKLISTED_CUSTOMER_COUNTRY,
-                    ERR_BLACKLISTED_CUSTOMER_EMAIL,ERR_BLACKLISTED_CUSTOMER_IP]
+    FRAUD_ERRORS = [PaylaneError.ERR_FRAUD_DETECTED,PaylaneError.ERR_BLACKLISTED_NUMBER,
+                    PaylaneError.ERR_BLACKLISTED_COUNTRY,PaylaneError.ERR_BLACKLISTED_CARD_NUMBER,
+                    PaylaneError.ERR_BLACKLISTED_CUSTOMER_COUNTRY,
+                    PaylaneError.ERR_BLACKLISTED_CUSTOMER_EMAIL,
+                    PaylaneError.ERR_BLACKLISTED_CUSTOMER_IP]
                     
     def __init__(self,error_code,description,acquirer_error=None,acquirer_description=None):
         self.error_code = error_code
@@ -139,71 +142,71 @@ class PaylaneError(object):
     def is_customer_data_error(self):
         """True if error is related to the card/account data the customer provided."""
         return self.error_code in [
-                ERR_INVALID_ACCOUNT_HOLDER_NAME,
-                ERR_INVALID_CUSTOMER_NAME,
-                ERR_INVALID_CUSTOMER_EMAIL,
-                ERR_INVALID_CUSTOMER_ADDRESS,
-                ERR_INVALID_CUSTOMER_CITY,
-                ERR_INVALID_CUSTOMER_ZIP,
-                ERR_INVALID_CUSTOMER_STATE,
-                ERR_INVALID_CUSTOMER_COUNTRY,
-                ERR_INVALID_ACCOUNT_COUNTRY,
-                ERR_INVALID_BANK_CODE,
-                ERR_INVALID_ACCOUNT_NUMBER,
-                ERR_INVALID_CARD_NAME,
-                ERR_INVALID_CARDHOLDER_NAME,
-                ERR_INVALID_CARDHOLDER_EMAIL,
-                ERR_INVALID_CARDHOLDER_ADDRESS,
-                ERR_INVALID_CARDHOLDER_CITY,
-                ERR_INVALID_CARDHOLDER_ZIP,
-                ERR_INVALID_CARDHOLDER_STATE,
-                ERR_INVALID_CARDHOLDER_COUNTRY,
+                self.ERR_INVALID_ACCOUNT_HOLDER_NAME,
+                self.ERR_INVALID_CUSTOMER_NAME,
+                self.ERR_INVALID_CUSTOMER_EMAIL,
+                self.ERR_INVALID_CUSTOMER_ADDRESS,
+                self.ERR_INVALID_CUSTOMER_CITY,
+                self.ERR_INVALID_CUSTOMER_ZIP,
+                self.ERR_INVALID_CUSTOMER_STATE,
+                self.ERR_INVALID_CUSTOMER_COUNTRY,
+                self.ERR_INVALID_ACCOUNT_COUNTRY,
+                self.ERR_INVALID_BANK_CODE,
+                self.ERR_INVALID_ACCOUNT_NUMBER,
+                self.ERR_INVALID_CARD_NAME,
+                self.ERR_INVALID_CARDHOLDER_NAME,
+                self.ERR_INVALID_CARDHOLDER_EMAIL,
+                self.ERR_INVALID_CARDHOLDER_ADDRESS,
+                self.ERR_INVALID_CARDHOLDER_CITY,
+                self.ERR_INVALID_CARDHOLDER_ZIP,
+                self.ERR_INVALID_CARDHOLDER_STATE,
+                self.ERR_INVALID_CARDHOLDER_COUNTRY,
             ]
         
     @property
     def is_card_data_error(self):
         """True if error is related to the card data the customer provided."""
         return self.error_code in [
-                ERR_UNKNOWN_CARD_TYPE_NUMBER,
-                ERR_INVALID_CARD_ISSUE_NUMBER,
+                self.ERR_UNKNOWN_CARD_TYPE_NUMBER,
+                self.ERR_INVALID_CARD_ISSUE_NUMBER,
             ]
     
     @property
     def was_card_declined(self):
         """True if this error is related to the card being declined for some reason."""
         return self.error_code in [
-                ERR_CARD_DECLINED,        
+                self.ERR_CARD_DECLINED,        
             ] or self.is_card_expired
             
     @property
     def is_card_expired(self):
         """True if this error is related to card expiration."""
         return self.error_code in [
-                ERR_CARD_EXPIRED,
-                ERR_RESALE_CARD_EXPIRED,
+                self.ERR_CARD_EXPIRED,
+                self.ERR_RESALE_CARD_EXPIRED,
             ]
         
     @property
     def is_recurring_impossible(self):
         """Whether this error should nullify a recurring transaction."""
         return self.error_code in [
-                ERR_CARD_DECLINED,
-                ERR_CARD_CODE_INVALID,
-                ERR_CARD_CODE_MANDATORY,
-                ERR_INVALID_SALE_ID,
-                ERR_INVALID_RESALE_AMOUNT,
-                ERR_RESALE_AMOUNT_TOO_LOW,
-                ERR_SALE_ID_NOT_FOUND,
-                ERR_RESALE_WITH_CHARGEBACK,
-                ERR_CANNOT_RESALE_SALE,
-                ERR_RESALE_CARD_EXPIRED,
-                ERR_RESALE_WITH_REVERSAL,
+                self.ERR_CARD_DECLINED,
+                self.ERR_CARD_CODE_INVALID,
+                self.ERR_CARD_CODE_MANDATORY,
+                self.ERR_INVALID_SALE_ID,
+                self.ERR_INVALID_RESALE_AMOUNT,
+                self.ERR_RESALE_AMOUNT_TOO_LOW,
+                self.ERR_SALE_ID_NOT_FOUND,
+                self.ERR_RESALE_WITH_CHARGEBACK,
+                self.ERR_CANNOT_RESALE_SALE,
+                self.ERR_RESALE_CARD_EXPIRED,
+                self.ERR_RESALE_WITH_REVERSAL,
             ]
         
     @property
     def is_fatal(self):
         """Whether this is a fatal error that, in principle, cannot be retried."""
-        return self.error_code == ERR_CANNOT_REFUND_SALE or self.error_code >= 500
+        return self.error_code == self.ERR_CANNOT_REFUND_SALE or self.error_code >= 500
         
     @property        
     def is_fraud(self):
@@ -214,7 +217,7 @@ class PaylaneError(object):
     def can_retry_later(self):
         """Whether this resale fatal error can disappear in the future."""
         return self.error_code in [
-                ERR_INTERNAL_ERROR,
-                ERR_GATEWAY_ERROR,
+                self.ERR_INTERNAL_ERROR,
+                self.ERR_GATEWAY_ERROR,
             ]
     
