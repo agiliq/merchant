@@ -39,9 +39,12 @@ class PaylaneGateway(Gateway):
     def _validate(self,card):
         if not isinstance(card,CreditCard):
             raise InvalidCard('credit_card not an instance of CreditCard')
+            
         if not self.validate_card(card):
             raise InvalidCard('Invalid Card')
-
+            
+        card.month = '%02d' % card.month
+        
     def authorize(self, money, credit_card, options=None):
         """Authorization for a future capture transaction"""
         self._validate(credit_card)
