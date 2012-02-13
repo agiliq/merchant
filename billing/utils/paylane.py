@@ -116,14 +116,13 @@ class PaylaneError(object):
     ERR_BLACKLISTED_CUSTOMER_COUNTRY = 614
     ERR_BLACKLISTED_CUSTOMER_EMAIL = 615
     ERR_BLACKLISTED_CUSTOMER_IP = 616
-        
-    FRAUD_ERRORS = [PaylaneError.ERR_FRAUD_DETECTED,PaylaneError.ERR_BLACKLISTED_NUMBER,
-                    PaylaneError.ERR_BLACKLISTED_COUNTRY,PaylaneError.ERR_BLACKLISTED_CARD_NUMBER,
-                    PaylaneError.ERR_BLACKLISTED_CUSTOMER_COUNTRY,
-                    PaylaneError.ERR_BLACKLISTED_CUSTOMER_EMAIL,
-                    PaylaneError.ERR_BLACKLISTED_CUSTOMER_IP]
-                    
+                            
     def __init__(self,error_code,description,acquirer_error=None,acquirer_description=None):
+        self.FRAUD_ERRORS = [self.ERR_FRAUD_DETECTED,self.ERR_BLACKLISTED_NUMBER,
+                            self.ERR_BLACKLISTED_COUNTRY,self.ERR_BLACKLISTED_CARD_NUMBER,
+                            self.ERR_BLACKLISTED_CUSTOMER_COUNTRY,
+                            self.ERR_BLACKLISTED_CUSTOMER_EMAIL,
+                            self.ERR_BLACKLISTED_CUSTOMER_IP]
         self.error_code = error_code
         self.description = description
         self.acquirer_error = acquirer_error
