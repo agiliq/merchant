@@ -14,8 +14,8 @@ from billing.models import PaylaneTransaction,PaylaneAuthorization
 THROTTLE_CONTROL_SECONDS = 60
 
 # VISA test card numbers
-# 4929966723331981
-# 4916437826836305
+# 4929966723331981 #
+# 4916437826836305 #
 # 4532830407731057
 # 4539824967650347
 # 4278255665174428
@@ -130,3 +130,59 @@ class PaylaneTestCase(TestCase):
         self.assertTrue('transaction' in bill2['response'])
         self.assertTrue('error' in bill2['response'])
         self.assertEqual(bill2['response']['error'].error_code,PaylaneError.ERR_RESALE_WITH_CHARGEBACK)
+
+    def testAuthorizeOK(self):
+        credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4532830407731057',verification_value=435)
+        options = {}
+        options['customer'] = self.customer
+        options['product'] = self.product
+        res = self.merchant.authorize(1.0,credit_card,options=options)
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
+        self.assertTrue('transaction' in res['response'])
+        self.assertTrue('authorization' in res['response'])
+        self.assertTrue(res['response']['authorization'].sale_authorization_id > 0)
+        
+    def testAuthorizeError(self):
+        credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4539824967650347',verification_value=435)
+        options = {}
+        options['customer'] = self.customer
+        options['product'] = self.product
+        res = self.merchant.authorize(float(PaylaneError.ERR_CARD_EXPIRED),credit_card,options=options)
+        self.assertEqual(res['status'],'FAILURE',unicode(res['response']))
+        self.assertTrue('transaction' in res['response'])
+        self.assertFalse('authorization' in res['response'])
+        self.assertTrue('error' in res['response'])
+        self.assertEqual(res['response']['error'].error_code,PaylaneError.ERR_CARD_EXPIRED)
+        
+    def testCaptureOK(self):
+        credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4278255665174428',verification_value="100")
+        options = {}
+        options['customer'] = self.customer
+        options['product'] = self.product
+        res = self.merchant.authorize(36.0,credit_card,options=options)
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
+        self.assertTrue('transaction' in res['response'])
+        self.assertTrue('authorization' in res['response'])
+        self.assertTrue(res['response']['authorization'].sale_authorization_id > 0)
+                
+        bill1 = self.merchant.capture(36.0,res['response']['authorization'],options)
+        self.assertEqual(bill1['status'],'SUCCESS',unicode(bill1['response']))
+        self.assertTrue('transaction' in bill1['response'])
+        self.assertTrue('authorization' in bill1['response'])
+        
+    def testCaptureError(self):
+        credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4556096020428973',verification_value=435)
+        options = {}
+        options['customer'] = self.customer
+        options['product'] = self.product
+        res = self.merchant.authorize(1.0,credit_card,options=options)
+        self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
+        self.assertTrue('transaction' in res['response'])
+        self.assertTrue('authorization' in res['response'])
+        self.assertTrue(res['response']['authorization'].sale_authorization_id > 0)
+
+        bill2 = self.merchant.capture(float(PaylaneError.ERR_RESALE_WITH_CHARGEBACK),res['response']['authorization'],options)
+        self.assertEqual(bill2['status'],'FAILURE',unicode(bill2['response']))
+        self.assertTrue('transaction' in bill2['response'])
+        self.assertTrue('error' in bill2['response'])
+        self.assertEqual(bill2['response']['error'].error_code,443)
