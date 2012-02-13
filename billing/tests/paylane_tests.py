@@ -12,9 +12,6 @@ from billing.signals import *
 from billing.utils.paylane import *
 from billing.models import PaylaneTransaction,PaylaneAuthorization
 
-VALID_TEST_VISA = ''
-VALID_TEST_MASTERCARD = '5500000000000004'
-
 #This is needed because Paylane doesn't like too many requests in a very short time
 THROTTLE_CONTROL_SECONDS = 60
 
