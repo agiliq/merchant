@@ -39,7 +39,7 @@ class PaylaneForm(forms.Form):
             raise forms.ValidationError(_('Invalid credit card'))
 
         options = {
-                'customer':cleaned_data.get('name_on_card')
+                'customer':cleaned_data.get('name_on_card'),
                 'email':'',
                 'order_id':'',
                 'ip':'',
