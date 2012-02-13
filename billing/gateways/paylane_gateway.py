@@ -182,9 +182,9 @@ class PaylaneGateway(Gateway):
         
         transaction = PaylaneTransaction()
         transaction.amount = previous_transaction.amount
-        transaction.customer_name = previous_transaction.name
-        transaction.customer_email = previous_transaction.email
-        transaction.product = previous_transaction.description
+        transaction.customer_name = previous_transaction.customer_name
+        transaction.customer_email = previous_transaction.customer_email
+        transaction.product = previous_transaction.product
 
         if hasattr(res,'OK'):
             transaction.success = True
