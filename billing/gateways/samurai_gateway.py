@@ -1,4 +1,5 @@
 from billing import Gateway
+from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
      AmericanExpress, Discover, CreditCard
 import samurai
@@ -33,7 +34,13 @@ class SamuraiGateway(Gateway):
             payment_method_token = pm.payment_method_token
         response = Processor.purchase(payment_method_token, money)
         if response.errors:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="purchase",
+                                              response=response)
             return {'status': 'FAILURE', 'response': response}
+        transaction_was_successful.send(sender=self, 
+                                        type="purchase",
+                                        response=response)
         return {'status': 'SUCCESS', 'response': response}
 
     def authorize(self, money, credit_card, options=None):
@@ -46,28 +53,52 @@ class SamuraiGateway(Gateway):
             payment_method_token = pm.payment_method_token
         response = Processor.authorize(payment_method_token, money)
         if response.errors:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="authorize",
+                                              response=response)
             return {'status': 'FAILURE', 'response': response}
+        transaction_was_successful.send(sender=self, 
+                                        type="authorize",
+                                        response=response)
         return {'status': 'SUCCESS', 'response': response}
 
     def capture(self, money, identification, options=None):
         trans = Transaction.find(identification)
         if not trans.errors:
             new_trans = trans.capture(money)
+            transaction_was_successful.send(sender=self, 
+                                            type="capture",
+                                            response=trans)
             return{'status': "SUCCESS", "response": new_trans}
+        transaction_was_unsuccessful.send(sender=self, 
+                                          type="capture",
+                                          response=trans)
         return{"status": "FAILURE", "response": trans}
 
     def void(self, identification, options=None):
         trans = Transaction.find(identification)
         if not trans.errors:
             new_trans = trans.void()
+            transaction_was_successful.send(sender=self, 
+                                            type="void",
+                                            response=trans)
             return{'status': "SUCCESS", "response": new_trans}
+        transaction_was_unsuccessful.send(sender=self, 
+                                          type="void",
+                                          response=trans)
         return{"status": "FAILURE", "response": trans}
 
     def credit(self, money, identification, options=None):
         trans = Transaction.find(identification)
         if not trans.errors:
             new_trans = trans.reverse(money)
+            transaction_was_successful.send(sender=self, 
+                                            type="credit",
+                                            response=trans)
             return{'status': "SUCCESS", "response": new_trans}
+        transaction_was_unsuccessful.send(sender=self, 
+                                          type="credit",
+                                          response=trans)
         return{"status": "FAILURE", "response": trans}
 
     def store(self, credit_card, options=None):
@@ -81,17 +112,35 @@ class SamuraiGateway(Gateway):
             # Using the token which has to be retained
             payment_method = PaymentMethod.find(credit_card)
             if payment_method.errors:
+                transaction_was_unsuccessful.send(sender=self, 
+                                                  type="store",
+                                                  response=payment_method)
                 return {'status': 'FAILURE', 'response': payment_method}
         response = payment_method.retain()
         if response.errors:
-            return {'status': 'SUCCESS', 'response': response}
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="store",
+                                              response=response)
+            return {'status': 'FAILURE', 'response': response}
+        transaction_was_successful.send(sender=self, 
+                                        type="store",
+                                        response=response)
         return {'status': 'SUCCESS', 'response': response}
 
     def unstore(self, identification, options=None):
         payment_method = PaymentMethod.find(identification)
         if payment_method.errors:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="unstore",
+                                              response=payment_method)
             return {"status": "FAILURE", "response": payment_method}
         payment_method = payment_method.redact()
         if payment_method.errors:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="unstore",
+                                              response=payment_method)
             return {"status": "FAILURE", "response": payment_method}
+        transaction_was_successful.send(sender=self, 
+                                        type="unstore",
+                                        response=payment_method)
         return {"status": "SUCCESS", "response": payment_method}
