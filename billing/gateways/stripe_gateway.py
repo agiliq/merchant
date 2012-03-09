@@ -1,4 +1,5 @@
 from billing import Gateway
+from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
      AmericanExpress, Discover, CreditCard
 import stripe
@@ -33,7 +34,13 @@ class StripeGateway(Gateway):
                 currency=self.default_currency.lower(),
                 card=card)
         except self.stripe.CardError, error:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="purchase",
+                                              response=response)
             return {'status': 'FAILURE', 'response': error}
+        transaction_was_successful.send(sender=self, 
+                                        type="purchase",
+                                        response=response)
         return {'status': 'SUCCESS', 'response': response}
 
     def store(self, credit_card, options=None):
@@ -47,8 +54,16 @@ class StripeGateway(Gateway):
                 'exp_year': credit_card.year,
                 'cvc': credit_card.verification_value
                 }
-        customer = self.stripe.Customer.create(
-                   card=card)
+        try:
+            customer = self.stripe.Customer.create(card=card)
+        except (self.stripe.CardError, self.stripe.InvalidRequestError), error:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="store",
+                                              response=error)
+            return {'status': 'FAILURE', 'response': error}
+        transaction_was_successful.send(sender=self, 
+                                        type="store",
+                                        response=customer)
         return {'status': 'SUCCESS', 'response': customer}
 
     def recurring(self, credit_card, options=None):
@@ -70,28 +85,52 @@ class StripeGateway(Gateway):
                     card=card,
                     plan=plan_id
                 )
+                transaction_was_successful.send(sender=self, 
+                                                type="recurring",
+                                                response=response)
                 return {"status": "SUCCESS", "response": response}
             except self.stripe.CardError, error:
+                transaction_was_unsuccessful.send(sender=self, 
+                                                  type="recurring",
+                                                  response=error)
                 return {"status": "FAILURE", "response": error}
         except self.stripe.InvalidRequestError, error:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="recurring",
+                                              response=error)
             return {"status": "FAILURE", "response": error}
-        except TypeError:
+        except TypeError, error:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="recurring",
+                                              response=error)
             return {"status": "FAILURE", "response": "Missing Plan Id"}
 
     def unstore(self, identification, options=None):
         try:
             customer = self.stripe.Customer.retrieve(identification)
             response = customer.delete()
+            transaction_was_successful.send(sender=self, 
+                                              type="unstore",
+                                              response=response)
             return {"status": "SUCCESS", "response": response}
         except self.stripe.InvalidRequestError, error:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="unstore",
+                                              response=error)
             return {"status": "FAILURE", "response": error}
 
     def credit(self, identification, money=None, options=None):
         try:
             charge = self.stripe.Charge.retrieve(identification)
             response = charge.refund(amount=money)
+            transaction_was_successful.send(sender=self, 
+                                            type="credit",
+                                            response=response)
             return {"status": "SUCCESS", "response": response}
         except self.stripe.InvalidRequestError, error:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="credit",
+                                              response=error)
             return {"status": "FAILURE", "error": error}
 
     def authorize(self, money, credit_card, options=None):
@@ -110,8 +149,14 @@ class StripeGateway(Gateway):
                 card=card,
                 amount=money * 100
             )
+            transaction_was_successful.send(sender=self, 
+                                            type="authorize",
+                                            response=token)
             return {'status': "SUCCESS", "response": token}
         except self.stripe.InvalidRequestError, error:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="authorize",
+                                              response=error)
             return {"status": "FAILURE", "response": error}
 
     def capture(self, money, authorization, options=None):
@@ -121,6 +166,12 @@ class StripeGateway(Gateway):
                 card=authorization,
                 currency=self.default_currency.lower()
             )
+            transaction_was_successful.send(sender=self, 
+                                            type="capture",
+                                            response=response)
             return {'status': "SUCCESS", "response": response}
         except self.stripe.InvalidRequestError, error:
+            transaction_was_unsuccessful.send(sender=self, 
+                                              type="capture",
+                                              response=error)
             return {"status": "FAILURE", "response": error}
