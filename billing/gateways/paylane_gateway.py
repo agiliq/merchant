@@ -118,7 +118,7 @@ class PaylaneGateway(Gateway):
         product = options['product']
         res = self.client.service.captureSale(id_sale_authorization=authorization.sale_authorization_id,
                     amount=money,
-                    description=product.description)
+                    description=product)
         
         previous_transaction = authorization.transaction
         
@@ -183,7 +183,7 @@ class PaylaneGateway(Gateway):
         
         product = options['product']
         params['product'] = {}
-        params['product']['description'] = product.description
+        params['product']['description'] = product
 
         res = self.client.service.multiSale(params)
 
@@ -191,7 +191,7 @@ class PaylaneGateway(Gateway):
         transaction.amount = money
         transaction.customer_name = customer.name
         transaction.customer_email = customer.email
-        transaction.product = product.description
+        transaction.product = product
         
         status = None
         response = None
