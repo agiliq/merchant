@@ -1,7 +1,6 @@
 '''
 Template tags for google checkout offsite payments
 '''
-from paypal.standard.forms import PayPalPaymentsForm
 from django import template
 from django.template.loader import render_to_string
 
