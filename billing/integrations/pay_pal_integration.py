@@ -3,6 +3,7 @@ from django.conf import settings
 from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
 from django.conf.urls.defaults import patterns, include
 from paypal.standard.ipn.signals import payment_was_flagged, payment_was_successful
+from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 
 class PayPalIntegration(Integration):
     def __init__(self):
@@ -29,14 +30,14 @@ class PayPalIntegration(Integration):
         return urlpatterns
 
 def unsuccessful_txn_handler(sender, **kwargs):
-    from billing.signals import transaction_was_unsuccessful
-    transaction_was_unsuccesful.send(sender=sender,
-                                     type="purchase")
+    transaction_was_unsuccessful.send(sender=sender.__class__,
+                                      type="purchase",
+                                      response=sender)
 
 def successful_txn_handler(sender, **kwargs):
-    from billing.signals import transaction_was_successful
-    transaction_was_succesful.send(sender=sender,
-                                   type="purchase")
+    transaction_was_successful.send(sender=sender.__class__,
+                                    type="purchase",
+                                    response=sender)
 
 payment_was_flagged.connect(unsuccessful_txn_handler)
 payment_was_successful.connect(successful_txn_handler)
