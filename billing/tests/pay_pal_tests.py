@@ -38,7 +38,7 @@ class PayPalGatewayTestCase(TestCase):
         self.merchant = get_gateway("pay_pal")
         self.merchant.test_mode = True
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2011, 
+                                      month=10, year=2017, 
                                       number="4500775008976759", 
                                       verification_value="000")
 
