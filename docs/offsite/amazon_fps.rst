@@ -91,11 +91,18 @@ In views.py::
 
     def productPage(request):
        amazon_fps = get_integration("fps")
+       url_scheme = "http"
+       if request.is_secure():
+           url_scheme = "https"
+       domain = RequestSite(request).domain
        fields = {"transactionAmount": "100",
                  "pipelineName": "SingleUse",
                  "paymentReason": "Merchant Test",
                  "paymentPage": request.build_absolute_uri(),
-                 "returnURLPrefix": "http://merchant.agiliq.com",
+		 # Send the correct url where the redirect should happen
+                 "returnURL": "%s://%s%s" % (url_scheme,
+		                             domain,
+					     reverse("fps_return_url")),
                 }
         # You might want to save the fields["callerReference"] that
         # is auto-generated in the db or session to uniquely identify
@@ -105,13 +112,6 @@ In views.py::
 	return render_to_response("some_template.html", 
 	                          {"fps": amazon_fps},
 				  context_instance=RequestContext(request))
-
-.. note::
-
-   The "returnURLPrefix" is not a standard Amazon AWS attribute. It is used
-   as a prefix to the return url (which is defined in the get_urls method)
-   and by default is /fps-return-url/. The other attributes used in the fields
-   are standard and described in the FPS documentation.
 
 
 In some_template.html::

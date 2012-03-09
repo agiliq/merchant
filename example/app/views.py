@@ -212,11 +212,16 @@ def offsite_world_pay(request):
     return render(request, 'app/world_pay.html', template_vars)
 
 def offsite_amazon_fps(request):
+    url_scheme = "http"
+    if request.is_secure():
+        url_scheme = "https"
     fields = {"transactionAmount": "100",
               "pipelineName": "SingleUse",
               "paymentReason": "Merchant Test",
               "paymentPage": request.build_absolute_uri(),
-              "returnURLPrefix": RequestSite(request),
+              "returnURL": "%s://%s%s" % (url_scheme,
+                                          RequestSite(request).domain,
+                                          reverse("fps_return_url"))
               }
     # Save the fps.fields["callerReference"] in the db along with
     # the amount to be charged or use the user's unique id as
