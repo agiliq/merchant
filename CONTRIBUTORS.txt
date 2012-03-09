@@ -8,6 +8,8 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
 * Markus Gattol <markus.gattol@sunoano.org>
+* Mikey Ryan <https://github.com/mikery>
+* nmonteiro <https://github.com/nmonteiro>
+* Plaban Nayak <plaban.nayak@gmail.com>
 * Shabda Raaj <shabda@agiliq.com>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
-* Plaban Nayak <plaban.nayak@gmail.com>
