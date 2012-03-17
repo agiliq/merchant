@@ -6,6 +6,9 @@ class GCNewOrderNotification(models.Model):
     serial_number       = models.CharField(max_length=255)
     google_order_number = models.CharField(max_length=255)
     buyer_id            = models.CharField(max_length=255)
+
+    # Private merchant data
+    private_data        = models.CharField(max_length=255, blank=True)
     
     # Buyer Shipping Address details
     shipping_contact_name = models.CharField(max_length=255, blank=True)
