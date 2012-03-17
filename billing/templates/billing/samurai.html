@@ -1,0 +1,24 @@
+<script type="text/javascript" src="//code.jquery.com/jquery.min.js"></script>
+<script type="text/javascript" src="https://samurai.feefighters.com/assets/api/samurai.js"></script>
+<script type="text/javascript">
+Samurai.init({
+  merchant_key: '{{ integration.merchant_key }}' {% if integration.test_mode %},
+  sandbox: true
+  {% endif %}
+});
+
+Samurai.ready(function() {
+  Samurai.on('form', 'payment', function(event, data) {
+    $.post('{% url samurai_transaction %}', data.payment_method, function(data) {
+      var transaction = $.parseJSON(data);
+      if (transaction.errors) {
+        Samurai.PaymentErrorHandler.forForm($('form').get(0)).handleErrorsFromResponse(transaction);
+      } else {
+        $('form').children('.results').html('<h3>Your purchase is complete!</h3><h4>'+transaction.payment_method.payment_method.first_name+' '+transaction.payment_method.payment_method.last_name+': $'+transaction.amount+' - '+transaction.description+'</h4>');
+        Samurai.trigger('form', 'completed');
+      }
+    });
+  });
+});
+</script>
+<div data-samurai-payment-form></div>

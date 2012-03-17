@@ -1,0 +1,37 @@
+<div class="payment-errors"></div>
+<script type="text/javascript" src="//code.jquery.com/jquery.min.js"></script>
+<script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+  Stripe.setPublishableKey('{{ integration.publishable_key }}');
+
+  function stripeResponseHandler(status, response) {
+    if (response.error) {
+      $(".payment-errors").html(response.error.message);
+    } else {
+console.log(response);
+      var token = response['id'];
+      $("#payment-form input[name=stripeToken]").val(token);
+      $("#payment-form").attr("action", "{% url stripe_transaction %}");
+      $("#payment-form").get(0).submit();
+    }
+  }
+
+  $("#payment-form").submit(function(event) {
+    $('.submit-button').attr("disabled", "disabled");
+    var amount = $('#id_amount').val(); //amount you want to charge in cents
+    Stripe.createToken({
+       number: $('#id_credit_card_number').val(),
+       cvc: $('#id_credit_card_cvc').val(),
+       exp_month: $('#id_credit_card_expiration_month').val(),
+       exp_year: $('#id_credit_card_expiration_year').val()
+    }, amount, stripeResponseHandler);
+    return false;
+  });
+});
+</script>
+<form method="post" id="payment-form">{% csrf_token %}
+  {{ integration.generate_form.as_p }}
+  <input type="hidden" name="stripeToken" value="" />
+<input type="submit" value="Pay" class="submit-button"/>
+</form>

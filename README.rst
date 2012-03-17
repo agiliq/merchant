@@ -14,6 +14,8 @@ Following gateways are supported:
 * Paypal
 * Eway
 * Braintree Payments (Server to Server)
+* Stripe
+* Samurai from Fee Fighters
 
 Off-Site Processing
 --------------------
@@ -23,6 +25,8 @@ Off-Site Processing
 * Google Checkout
 * Amazon FPS
 * Braintree Payments (Transparent Redirect)
+* Stripe.js
+* Samurai
 
 Documentation
 --------------

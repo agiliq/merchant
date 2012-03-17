@@ -24,7 +24,7 @@ Usage
     ...                number="4222222222222",
     ...                verification_value="100")
     >>>
-    >>> response1 = g1.purchase(100, cc, options = {...})
+    >>> response1 = g1.purchase(1, cc, options = {...})
     >>> response1
     {"status": "SUCCESS", "response": <AuthorizeNetAIMResponse object>}
 

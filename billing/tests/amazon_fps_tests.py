@@ -13,7 +13,7 @@ class AmazonFPSTestCase(TestCase):
             "paymentReason": "Digital Download",
             "pipelineName": "SingleUse",
             "transactionAmount": 30,
-            "returnURLPrefix": "http://localhost",
+            "returnURL": "http://localhost/fps/fps-return-url/",
             }
         self.fps.add_fields(fields)
 

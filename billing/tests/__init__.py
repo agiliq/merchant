@@ -8,6 +8,8 @@ from google_checkout_tests import *
 from amazon_fps_tests import *
 from braintree_payments_tests import *
 from braintree_payments_tr_tests import *
+from stripe_tests import *
+from samurai_tests import *
 
 if __name__ == "__main__":
     unittest.main()

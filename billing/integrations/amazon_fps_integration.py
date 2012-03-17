@@ -26,7 +26,6 @@ class AmazonFpsIntegration(Integration):
     transactionAmount: Amount to be charged/authorized
     paymentReason: Description of the transaction
     paymentPage: Page to direct the user on completion/failure of transaction
-    returnURLPrefix: The domain and path that is prefixed to the fps return url defined below
     """
     def __init__(self, options=None):
         if not options:
@@ -47,10 +46,8 @@ class AmazonFpsIntegration(Integration):
         tmp_fields = self.fields.copy()
         tmp_fields.pop("aws_access_key", None)
         tmp_fields.pop("aws_secret_access_key", None)
-        tmp_fields.pop("returnURL", None)
         tmp_fields.pop("paymentPage", None)
-        return self.fps_connection.make_url("%s%s" %(tmp_fields.pop("returnURLPrefix"), 
-                                                     reverse("fps_return_url")),
+        return self.fps_connection.make_url(tmp_fields.pop("returnURL"), 
                                             tmp_fields.pop("paymentReason"),
                                             tmp_fields.pop("pipelineName"),
                                             str(tmp_fields.pop("transactionAmount")),

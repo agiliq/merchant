@@ -1,4 +1,4 @@
-VERSION = (0, 0, 2, "a", 0)  # following PEP 386
+VERSION = (0, 0, 3, "a", 0)  # following PEP 386
 DEV_N = None
 
 import os
@@ -113,7 +113,7 @@ setup(
     name="django-merchant",
     version=get_version(),
     description="A Django app that provides helpers for multiple pluggable payment backends.",
-    long_description=read("README.txt"),
+    long_description=read("README.rst"),
     author="Agiliq Solutions",
     author_email="hello@agiliq.com",
     license="BSD",

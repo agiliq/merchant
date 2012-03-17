@@ -28,7 +28,7 @@ class Gateway(object):
     # Sequence of countries supported by the gateway in ISO 3166 alpha-2 format.
     # http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
     supported_countries = []
-    # Sequence of supported card types by the gateway. Members should be valid 
+    # Sequence of supported card types by the gateway. Members should be valid
     # subclasses of the Credit Card object.
     supported_cardtypes = []
     # Home page URL for the gateway. Used for information purposes only.
@@ -55,39 +55,39 @@ class Gateway(object):
         # Gateways might provide some random number which
         # might not pass Luhn's test.
         if self.test_mode:
-            return True 
+            return True
         return credit_card.is_valid()
 
-    def purchase(self, money, credit_card, options = None):
+    def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
         raise NotImplementedError
 
-    def authorize(self, money, credit_card, options = None):
+    def authorize(self, money, credit_card, options=None):
         """Authorization for a future capture transaction"""
         raise NotImplementedError
 
-    def capture(self, money, authorization, options = None):
+    def capture(self, money, authorization, options=None):
         """Capture funds from a previously authorized transaction"""
         raise NotImplementedError
 
-    def void(self, identification, options = None):
+    def void(self, identification, options=None):
         """Null/Blank/Delete a previous transaction"""
         raise NotImplementedError
 
-    def credit(self, money, identification, options = None):
+    def credit(self, money, identification, options=None):
         """Refund a previously 'settled' transaction"""
         raise NotImplementedError
 
-    def recurring(self, money, creditcard, options = None):
+    def recurring(self, money, creditcard, options=None):
         """Setup a recurring transaction"""
         raise NotImplementedError
 
-    def store(self, creditcard, options = None):
+    def store(self, creditcard, options=None):
         """Store the credit card and user profile information
         on the gateway for future use"""
         raise NotImplementedError
 
-    def unstore(self, identification, options = None):
+    def unstore(self, identification, options=None):
         """Delete the previously stored credit card and user
         profile information on the gateway"""
         raise NotImplementedError
@@ -98,14 +98,13 @@ def get_gateway(gateway, *args, **kwargs):
     This caches gateway classes in a module-level dictionnary to avoid hitting
     the filesystem every time we require a gateway.
     
-    Should the list of available gateways change at runtime, one should then 
+    Should the list of available gateways change at runtime, one should then
     invalidate the cache, the simplest of ways would be to:
     
     >>> gateway_cache = {}
     """
     # Is the class in the cache?
     clazz = gateway_cache.get(gateway, None)
-    
     if not clazz:
         # Let's actually load it (it's not in the cache)
         gateway_filename = "%s_gateway" %gateway

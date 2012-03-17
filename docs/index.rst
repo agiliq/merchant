@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Merchant Documentation's documentation!
-==================================================
+Welcome to Merchant's documentation!
+======================================
 
 Contents:
 
@@ -22,6 +22,8 @@ Contents:
     * :doc:`Authorize.Net <gateways/authorize_net>`
     * :doc:`eWay <gateways/eway_gateway>`
     * :doc:`Braintree Payments Server to Server <gateways/braintree_payments>`
+    * :doc:`Stripe Payments  <gateways/stripe_payment>`
+    * :doc:`Samurai Payment <gateways/samurai_gateway>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 
@@ -30,12 +32,14 @@ Contents:
     * :doc:`RBS WorldPay <offsite/rbs_worldpay>`
     * :doc:`Amazon FPS <offsite/amazon_fps>`
     * :doc:`Braintree Payments Transparent Redirect <offsite/braintree_payments>`
+    * :doc:`Stripe  <offsite/stripe_integration>`
+    * :doc:`Samurai  <offsite/samurai_integration>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
 * :doc:`Customizing the inbuilt Gateway/Integrations <customize>`
 * :doc:`Contributing to Merchant <contributing>`
-
+* :doc:`Changelist <changelist>`
 
 Indices and tables
 ==================

@@ -31,13 +31,13 @@ class PayPalIntegration(Integration):
 
 def unsuccessful_txn_handler(sender, **kwargs):
     transaction_was_unsuccessful.send(sender=sender.__class__,
-                                     type="purchase",
-                                     response=self)
+                                      type="purchase",
+                                      response=sender)
 
 def successful_txn_handler(sender, **kwargs):
     transaction_was_successful.send(sender=sender.__class__,
-                                   type="purchase",
-                                   response=self)
+                                    type="purchase",
+                                    response=sender)
 
 payment_was_flagged.connect(unsuccessful_txn_handler)
 payment_was_successful.connect(successful_txn_handler)
