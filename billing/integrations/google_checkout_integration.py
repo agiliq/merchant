@@ -67,6 +67,11 @@ class GoogleCheckoutIntegration(Integration):
         items = doc.createElement('items')
         cart.appendChild(items)
 
+        merchant_private_data = doc.createElement('merchant-private-data')
+        cart.appendChild(merchant_private_data)
+        private_data = unicode(self.fields.get("private_data", ""))
+        merchant_private_data.appendChild(doc.createTextNode(private_data))
+
         ip_items = self.fields.get("items", [])
         for item in ip_items:
             it = doc.createElement("item")
@@ -95,6 +100,7 @@ class GoogleCheckoutIntegration(Integration):
         return_url = doc.createElement('continue-shopping-url')
         return_url.appendChild(doc.createTextNode(self.fields["return_url"]))
         merchant_checkout_flow.appendChild(return_url)
+
 
         cart_xml = doc.toxml(encoding="utf-8")
         hmac_signature = hmac.new(self.merchant_key, cart_xml, hashlib.sha1).digest()
@@ -174,6 +180,7 @@ class GoogleCheckoutIntegration(Integration):
             "financial-order-state" : "financial_order_state",  
             "fulfillment-order-state" : "fulfillment_order_state",
             "timestamp" : "timestamp",
+            "shopping-cart.merchant-private-data": "private_data",
             }
         
         for (key, val) in resp_fields.iteritems():
