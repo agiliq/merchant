@@ -1,6 +1,5 @@
 from django import forms
 from django.conf import settings
-import braintree
 
 class BraintreePaymentsForm(forms.Form):
     transaction__customer__first_name = forms.CharField(max_length=50, required=False)
