@@ -1,6 +1,6 @@
----------------------------------
+--------------------------------
 PayPal Website Payments Standard
----------------------------------
+--------------------------------
 
 `PayPal Website Payments Standard`_ (PWS) is an offsite payment processor. This
 method of payment is implemented in merchant as a wrapper on top of 
@@ -13,6 +13,15 @@ PWS and django-paypal documentation.
 After a transaction, PayPal pings the notification URL and all the 
 data sent is stored in the `PayPalIPN` model instance that can be 
 viewed from the django admin.
+
+Test or Live Mode
+-----------------
+By default the form renders in test mode with POST against sandbox.paypal.com. Add
+following to you `settings.py` to put the form into live mode::
+
+	### Django Merchant
+	MERCHANT_TEST_MODE = False
+	PAYPAL_TEST = MERCHANT_TEST_MODE 
 
 Example
 -------
