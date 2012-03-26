@@ -43,7 +43,7 @@ In views.py::
 In some_template.html::
 
   {% load billing_tags %}
-  {% pay_pal obj %}
+  {% paypal obj %}
 
 
 Template renders to something like below::
