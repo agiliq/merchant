@@ -16,3 +16,4 @@ docs/_build/*
 .py#
 
 *egg*
+dist/*
