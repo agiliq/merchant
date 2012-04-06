@@ -271,10 +271,9 @@ def offsite_samurai(request):
     return render(request, "app/samurai.html", template_vars)
 
 def offsite_ogone(request):
-    og_o = ogone_obj()
     context = {}
-    action = og_o.service_url
-    form = og_o.generate_form()
+    action = ogone_obj.service_url
+    form = ogone_obj.generate_form()
     context['form'] = form
     return render_to_response('app/ogone.html', context, \
     context_instance=RequestContext(request, {'action': action}))

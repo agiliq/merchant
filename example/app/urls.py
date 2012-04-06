@@ -10,8 +10,7 @@ world_pay_obj = get_integration("world_pay")
 braintree_obj = get_integration("braintree_payments")
 stripe_obj = get_integration("stripe_example")
 samurai_obj = get_integration("samurai_example")
-from billing.integrations.ogone_payments_integration import OgonePaymentsIntegration as ogone_obj
-#ogone_obj = get_integration("ogone_payment")
+ogone_obj = get_integration("ogone_payments")
 
 urlpatterns = patterns('app.views',
     url(r'^$', 'index', name='app_index'),
