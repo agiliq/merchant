@@ -22,8 +22,8 @@ EWAY_PASSWORD = ''
 EWAY_TEST_CUSTOMER_ID = ''
 
 # GOOGLE CHECKOUT SETTINGS
-GOOGLE_CHECKOUT_MERCHANT_ID = '' 
-GOOGLE_CHECKOUT_MERCHANT_KEY = ''
+GOOGLE_CHECKOUT_MERCHANT_ID = 'a'
+GOOGLE_CHECKOUT_MERCHANT_KEY = 'b'
 
 # WORLDPAY settings
 WORLDPAY_HOSTED_URL_TEST = "https://select-test.wp3.rbsworldpay.com/wcc/purchase"
@@ -51,6 +51,17 @@ STRIPE_PUBLISHABLE_KEY = ''
 SAMURAI_MERCHANT_KEY = ''
 SAMURAI_MERCHANT_PASSWORD = ''
 SAMURAI_PROCESSOR_TOKEN = ''
+
+#OGONE Settings
+SHA_PRE_SECRET = 'test1234'
+SHA_POST_SECRET = 'test12345'
+HASH_METHOD = 'sha512'
+PRODUCTION = False
+PSPID = 'mypspid'
+
+OGONE_TEST_URL = 'https://secure.ogone.com/ncol/test/orderstandard.asp'
+OGONE_PROD_URL = 'https://secure.ogone.com/ncol/prod/orderstandard.asp'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
