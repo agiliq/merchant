@@ -1,14 +1,10 @@
 # -*- coding: utf-8 *-*
 from billing import Integration
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-#from django_ogone import settings as ogone_settings
-from django.conf import settings
 from django_ogone.ogone import Ogone
-#from django_ogone import alternative_signing as altsign
 
 class OgonePaymentsIntegration(Integration):
     def __init__(self, options=None):
