@@ -3,6 +3,8 @@ Template tags for google checkout offsite payments
 '''
 from django import template
 from django.template.loader import render_to_string
+register = template.Library()
+
 
 class GoogleCheckoutNode(template.Node):
     def __init__(self, integration):
@@ -15,6 +17,7 @@ class GoogleCheckoutNode(template.Node):
                                     context)
         return form_str
 
+@register.tag
 def google_checkout(parser, token):
     try:
         tag, int_obj = token.split_contents()
