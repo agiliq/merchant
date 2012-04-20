@@ -10,9 +10,7 @@ Samurai Payment Integration
    This integration makes use of the official `samurai`_ python package offered
    by Samurai  Payments. Please install it before you use this integration.
 
-Settings attributes required for this integration are:
-
-
+Refer to the :doc:`Samurai Payment <gateways/samurai_gateway>` Gateway for the settings attributes.
 
 Here are the methods and attributes implemented on the ``SamuraiIntegration`` class:
 
@@ -74,7 +72,7 @@ Example:
       
    In the template::
 
-      {% load billing_tags %}
+      {% load samurai_payment from samurai_tags %}
 
       {% samurai_payment samurai_obj %}
 

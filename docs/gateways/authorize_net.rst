@@ -11,8 +11,13 @@ Usage
 * Add the following attributes to your `settings.py`::
 
     MERCHANT_TEST_MODE = True         # Toggle for live transactions
-    AUTHORIZE_LOGIN_ID = "???"
-    AUTHORIZE_TRANSACTION_KEY = "???"
+    MERCHANT_SETTINGS = {
+        "authorize_net": {
+            "LOGIN_ID" : "???",
+            "TRANSACTION_KEY" : "???"
+	}
+        ...
+    }
 
 * Use the gateway instance::
 
