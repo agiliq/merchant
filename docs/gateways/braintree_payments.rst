@@ -11,7 +11,26 @@ any redirects and only Server to Server calls happen in the background.
    You will require the official `braintree`_ python package offered by Braintree
    for this gateway to work.
 
-Refer to the :doc:`Braintree Payments Server to Server <gateways/braintree_payments>` Gateway for the settings attributes.
+Settings attributes required for this integration are:
+
+* ``MERCHANT_ACCOUNT_ID``: The merchant account id provided by Braintree.
+  Can be obtained from the account dashboard.
+* ``PUBLIC_KEY``: The public key provided by Braintree through their account
+  dashboard.
+* ``PRIVATE_KEY``: The private key provided by Braintree through their account
+  dashboard.
+
+Settings attributes::
+
+    MERCHANT_TEST_MODE = True # Toggle for live
+    MERCHANT_SETTINGS = {
+        "braintree_payments": {
+            "MERCHANT_ACCOUNT_ID": "???",
+            "PUBLIC_KEY": "???",
+            "PRIVATE_KEY": "???"
+        }
+        ...
+    }
 
 Example:
 ---------
