@@ -3,54 +3,71 @@ DEBUG = True
 
 # MERCHANT SETTINGS
 MERCHANT_TEST_MODE = True
+MERCHANT_SETTINGS = {
+    # AUTHORIZE.NET SETTINGS
+    "authorize_net": {
+        "LOGIN_ID" : '',
+        "TRANSACTION_KEY" : ''
+        },
 
-# AUTHORIZE.NET SETTINGS
-AUTHORIZE_LOGIN_ID = ''
-AUTHORIZE_TRANSACTION_KEY = ''
+    # PAYPAL SETTINGS
+    "pay_pal": {
+        "WPP_USER" : '',
+        "WPP_PASSWORD" : '',
+        "WPP_SIGNATURE" : '',
+        "RECEIVER_EMAIL" : ''
+        },
 
-# PAYPAL SETTINGS
-PAYPAL_TEST = True
-PAYPAL_WPP_USER = ''
-PAYPAL_WPP_PASSWORD = ''
-PAYPAL_WPP_SIGNATURE = ''
-PAYPAL_RECEIVER_EMAIL = ''
+    # EWAY SETTINGS
+    "eway": {
+        "CUSTOMER_ID" : '',
+        "USERNAME" : '',
+        "PASSWORD" : '',
+        "TEST_CUSTOMER_ID" : ''
+        },
 
-# EWAY SETTINGS
-EWAY_CUSTOMER_ID = ''
-EWAY_USERNAME = ''
-EWAY_PASSWORD = ''
-EWAY_TEST_CUSTOMER_ID = ''
+    # GOOGLE CHECKOUT SETTINGS
+    "google_checkout": {
+        "MERCHANT_ID" : '' ,
+        "MERCHANT_KEY" : ''
+        },
 
-# GOOGLE CHECKOUT SETTINGS
-GOOGLE_CHECKOUT_MERCHANT_ID = '' 
-GOOGLE_CHECKOUT_MERCHANT_KEY = ''
+    # WORLDPAY settings
+    "world_pay": {
+        "HOSTED_URL_TEST" : "https://select-test.wp3.rbsworldpay.com/wcc/purchase",
+        "HOSTED_URL_LIVE" : "https://secure.wp3.rbsworldpay.com/wcc/purchase",
+        "INSTALLATION_ID_TEST" : '',
+        "INSTALLATION_ID_LIVE" : '',
+        "MD5_SECRET_KEY" : ''
+        },
 
-# WORLDPAY settings
-WORLDPAY_HOSTED_URL_TEST = "https://select-test.wp3.rbsworldpay.com/wcc/purchase"
-WORLDPAY_HOSTED_URL_LIVE = "https://secure.wp3.rbsworldpay.com/wcc/purchase"
+    # Amazon FPS settings
+    "amazon_fps": {
+        "AWS_ACCESS_KEY" : '',
+        "AWS_SECRET_ACCESS_KEY" : ''
+        },
 
-WORLDPAY_INSTALLATION_ID_TEST = ''
-WORLDPAY_INSTALLATION_ID_LIVE = ''
+    # Braintree Payment settings
+    "braintree_payments": {
+        "MERCHANT_ACCOUNT_ID" : "",
+        "PUBLIC_KEY" : "",
+        "PRIVATE_KEY" : ""
+        },
 
-WORLDPAY_MD5_SECRET_KEY = ''
+    #Stripe Payment Settings
+    "stripe": {
+        "API_KEY" : '',
+        "PUBLISHABLE_KEY" : ''
+        },
 
-# Amazon FPS settings
-AWS_ACCESS_KEY = ''
-AWS_SECRET_ACCESS_KEY = ''
+    #SAMURAI Settings
+    "samurai": {
+        "MERCHANT_KEY" : '',
+        "MERCHANT_PASSWORD" : '',
+        "PROCESSOR_TOKEN" : ''
+    }
+}
 
-# Braintree Payment settings
-BRAINTREE_MERCHANT_ACCOUNT_ID = ""
-BRAINTREE_PUBLIC_KEY = ""
-BRAINTREE_PRIVATE_KEY = ""
-
-#Stripe Payment Settings
-STRIPE_API_KEY = ''
-STRIPE_PUBLISHABLE_KEY = ''
-
-#SAMURAI Settings
-SAMURAI_MERCHANT_KEY = ''
-SAMURAI_MERCHANT_PASSWORD = ''
-SAMURAI_PROCESSOR_TOKEN = ''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
