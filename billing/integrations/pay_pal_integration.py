@@ -1,4 +1,4 @@
-from billing import Integration
+from billing import Integration, IntegrationNotConfigured
 from django.conf import settings
 from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
 from django.conf.urls.defaults import patterns, include
@@ -6,9 +6,16 @@ from paypal.standard.ipn.signals import payment_was_flagged, payment_was_success
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 
 class PayPalIntegration(Integration):
+    display_name = "PayPal IPN"
+
     def __init__(self):
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("pay_pal"):
+            raise IntegrationNotConfigured("The '%s' integration is not correctly "
+                                       "configured." % self.display_name)
+        pay_pal_settings = merchant_settings["pay_pal"]
         # Required Fields. Just a template for the user
-        self.fields = {"business": settings.PAYPAL_RECEIVER_EMAIL,
+        self.fields = {"business": pay_pal_settings['RECEIVER_EMAIL'],
                        "item_name": "",
                        "invoice": "",
                        "notify_url": "",

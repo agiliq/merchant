@@ -4,8 +4,8 @@ Template tags for paypal offsite payments
 from paypal.standard.forms import PayPalPaymentsForm
 from django import template
 from django.template.loader import render_to_string
-register = template.Library()
 
+register = template.Library()
 
 class PayPalNode(template.Node):
     def __init__(self, integration):

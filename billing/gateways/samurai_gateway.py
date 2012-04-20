@@ -1,4 +1,4 @@
-from billing import Gateway
+from billing import Gateway, GatewayNotConfigured
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
      AmericanExpress, Discover, CreditCard
@@ -18,9 +18,14 @@ class SamuraiGateway(Gateway):
     display_name = "Samurai"
 
     def __init__(self):
-        samurai_config.merchant_key = settings.SAMURAI_MERCHANT_KEY
-        samurai_config.merchant_password = settings.SAMURAI_MERCHANT_PASSWORD
-        samurai_config.processor_token = settings.SAMURAI_PROCESSOR_TOKEN
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("samurai"):
+            raise GatewayNotConfigured("The '%s' gateway is not correctly "
+                                       "configured." % self.display_name)
+        samurai_settings = merchant_settings["samurai"]
+        samurai_config.merchant_key = samurai_settings['MERCHANT_KEY']
+        samurai_config.merchant_password = samurai_settings['MERCHANT_PASSWORD']
+        samurai_config.processor_token = samurai_settings['PROCESSOR_TOKEN']
         self.samurai = samurai
 
     def purchase(self, money, credit_card):

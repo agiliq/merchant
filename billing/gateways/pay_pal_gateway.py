@@ -3,6 +3,8 @@ import datetime
 from paypal.pro.helpers import PayPalWPP
 from paypal.pro.exceptions import PayPalFailure
 
+from django.conf import settings
+
 from billing import Gateway
 from billing.utils.credit_card import Visa, MasterCard, AmericanExpress, Discover
 from billing.signals import *
@@ -15,7 +17,11 @@ class PayPalGateway(Gateway):
     display_name = "PayPal Website Payments Pro"
 
     def __init__(self):
-        pass
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("pay_pal"):
+            raise GatewayNotConfigured("The '%s' gateway is not correctly "
+                                       "configured." % self.display_name)
+        pay_pal_settings = merchant_settings["pay_pal"]
 
     @property
     def service_url(self):

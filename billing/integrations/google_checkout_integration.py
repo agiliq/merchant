@@ -1,4 +1,4 @@
-from billing import Integration, NotConfiguredError
+from billing import Integration, IntegrationNotConfigured
 from billing.models import GCNewOrderNotification
 from django.conf import settings
 from xml.dom.minidom import Document
@@ -20,13 +20,19 @@ csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
 
 class GoogleCheckoutIntegration(Integration):
+    display_name = 'Google Checkout'
+
     def __init__(self, options=None):
         if not options:
             options = {}
         super(GoogleCheckoutIntegration, self).__init__(options=options)
-        if not getattr(settings, "GOOGLE_CHECKOUT_MERCHANT_ID", None):
-            raise NotConfiguredError("Could not locate the 'GOOGLE_CHECKOUT_MERCHANT_ID' setting")
-        self.merchant_id = settings.GOOGLE_CHECKOUT_MERCHANT_ID
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("google_checkout"):
+            raise IntegrationNotConfigured("The '%s' integration is not correctly "
+                                       "configured." % self.display_name)
+        google_checkout_settings = merchant_settings["google_checkout"]
+        self.merchant_id = google_checkout_settings['MERCHANT_ID']
+        self.merchant_key = google_checkout_settings['MERCHANT_KEY']
         self._signature = None
 
     @property
@@ -91,9 +97,7 @@ class GoogleCheckoutIntegration(Integration):
         merchant_checkout_flow.appendChild(return_url)
 
         cart_xml = doc.toxml(encoding="utf-8")
-        hmac_signature = hmac.new(settings.GOOGLE_CHECKOUT_MERCHANT_KEY, 
-                                  cart_xml, 
-                                  hashlib.sha1).digest()
+        hmac_signature = hmac.new(self.merchant_key, cart_xml, hashlib.sha1).digest()
         self._signature = base64.b64encode(hmac_signature)
         return base64.b64encode(cart_xml)
 

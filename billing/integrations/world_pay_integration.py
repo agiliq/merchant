@@ -23,6 +23,8 @@ class WorldPayIntegration(Integration):
     amount: Amount to be charged
     currency: ISO 3-character currency
     """
+    display_name = "RBS World Pay"
+
     def __init__(self, options=None):
         if not options:
             options = {}

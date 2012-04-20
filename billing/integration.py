@@ -17,6 +17,9 @@ class Integration(object):
     # defaults to True
     test_mode = getattr(settings, "MERCHANT_TEST_MODE", True)
 
+    # Name of the integration.
+    display_name = 'Base Integration'
+
     def __init__(self, options=None):
         if not options:
             options = {}

@@ -1,14 +1,21 @@
-from billing import Integration, get_gateway
+from billing import Integration, get_gateway, IntegrationNotConfigured
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 from billing.forms.stripe_forms  import StripeForm
 
 
 class StripeIntegration(Integration):
+    display_name = "Stripe"
+
     def __init__(self):
         super(StripeIntegration, self).__init__()
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("stripe"):
+            raise IntegrationNotConfigured("The '%s' integration is not correctly "
+                                       "configured." % self.display_name)
+        stripe_settings = merchant_settings["stripe"]
         self.gateway = get_gateway("stripe")
-        self.publishable_key = settings.STRIPE_PUBLISHABLE_KEY
+        self.publishable_key = stripe_settings['PUBLISHABLE_KEY']
 
     def generate_form(self):
         initial_data = self.fields

@@ -1,5 +1,6 @@
 from django.utils.importlib import import_module
 from django.conf import settings
+from .utils.credit_card import CardNotSupported
 
 gateway_cache = {}
 
@@ -7,9 +8,6 @@ class GatewayModuleNotFound(Exception):
     pass
 
 class GatewayNotConfigured(Exception):
-    pass
-
-class CardNotSupported(Exception):
     pass
 
 class InvalidData(Exception):

@@ -1,4 +1,4 @@
-from billing import Gateway
+from billing import Gateway, GatewayNotConfigured
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
      AmericanExpress, Discover, CreditCard
@@ -14,7 +14,12 @@ class StripeGateway(Gateway):
     display_name = "Stripe"
 
     def __init__(self):
-        stripe.api_key = settings.STRIPE_API_KEY
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("stripe"):
+            raise GatewayNotConfigured("The '%s' gateway is not correctly "
+                                       "configured." % self.display_name)
+        stripe_settings = merchant_settings["stripe"]
+        stripe.api_key = stripe_settings['API_KEY']
         self.stripe = stripe
 
     def purchase(self, amount, credit_card, options=None):

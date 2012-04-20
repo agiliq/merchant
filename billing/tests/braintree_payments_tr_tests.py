@@ -37,14 +37,14 @@ class BraintreePaymentsIntegrationTestCase(TestCase):
     # Need to think about the tests below because they are dynamic because
     # of the hashes and the timestamps.
     # def testFormGen(self):
-    #     tmpl = Template("{% load billing_tags %}{% braintree_payments obj %}")
+    #     tmpl = Template("{% load braintree_payments from braintree_payments_tags %}{% braintree_payments obj %}")
     #     form = tmpl.render(Context({"obj": self.bp}))
     #     print self.bp.generate_form()
     #     pregen_form = """""" %(settings.BRAINTREE_MERCHANT_ACCOUNT_ID)
     #     self.assertEquals(pregen_form, strip_spaces_between_tags(form).strip())
 
     # def testFormGen2(self):
-    #     tmpl = Template("{% load billing_tags %}{% braintree_payments obj %}")
+    #     tmpl = Template("{% load braintree_payments from braintree_payments_tags %}{% braintree_payments obj %}")
     #     form = tmpl.render(Context({"obj": self.bp}))
     #     pregen_form = u"""%s""" %(settings.BRAINTREE_MERCHANT_ACCOUNT_ID)
     #     self.assertEquals(pregen_form, strip_spaces_between_tags(form).strip())
