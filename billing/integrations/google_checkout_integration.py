@@ -1,4 +1,4 @@
-from billing import Integration
+from billing import Integration, NotConfiguredError
 from billing.models import GCNewOrderNotification
 from django.conf import settings
 from xml.dom.minidom import Document
@@ -18,9 +18,6 @@ BUTTON_URL = 'http://checkout.google.com/checkout/buttons/checkout.gif?merchant_
 
 csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
-
-class NotConfiguredError(Exception):
-    pass
 
 class GoogleCheckoutIntegration(Integration):
     def __init__(self, options=None):
