@@ -6,7 +6,7 @@ import hmac, hashlib, base64
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
-from billing.signals import transaction_was_successful, transaction_was_unsuccessful
+from billing import signals
 from django.conf.urls.defaults import patterns
 from django.utils.decorators import method_decorator
 
@@ -67,6 +67,11 @@ class GoogleCheckoutIntegration(Integration):
         items = doc.createElement('items')
         cart.appendChild(items)
 
+        merchant_private_data = doc.createElement('merchant-private-data')
+        cart.appendChild(merchant_private_data)
+        private_data = unicode(self.fields.get("private_data", ""))
+        merchant_private_data.appendChild(doc.createTextNode(private_data))
+
         ip_items = self.fields.get("items", [])
         for item in ip_items:
             it = doc.createElement("item")
@@ -96,6 +101,7 @@ class GoogleCheckoutIntegration(Integration):
         return_url.appendChild(doc.createTextNode(self.fields["return_url"]))
         merchant_checkout_flow.appendChild(return_url)
 
+
         cart_xml = doc.toxml(encoding="utf-8")
         hmac_signature = hmac.new(self.merchant_key, cart_xml, hashlib.sha1).digest()
         self._signature = base64.b64encode(hmac_signature)
@@ -113,6 +119,10 @@ class GoogleCheckoutIntegration(Integration):
             self.gc_new_order_notification(request)
         elif request.POST['_type'] == 'order-state-change-notification':
             self.gc_order_state_change_notification(request)
+        elif request.POST['_type'] == 'charge-amount-notification':
+            # TODO add support for this later
+            pass
+
         return HttpResponse(request.POST['serial-number'])
 
     def gc_cart_items_blob(self, post_data):
@@ -174,6 +184,7 @@ class GoogleCheckoutIntegration(Integration):
             "financial-order-state" : "financial_order_state",  
             "fulfillment-order-state" : "fulfillment_order_state",
             "timestamp" : "timestamp",
+            "shopping-cart.merchant-private-data": "private_data",
             }
         
         for (key, val) in resp_fields.iteritems():
@@ -182,24 +193,18 @@ class GoogleCheckoutIntegration(Integration):
         data['num_cart_items'] = len(post_data.getlist('shopping-cart.items'))
         data['cart_items']     = self.gc_cart_items_blob(post_data)
     
-        try:
-            resp = GCNewOrderNotification.objects.create(**data)
-            # TODO: Make the type more generic
-            # TODO: The person might have got charged and yet transaction
-            # might have failed here. Need a better way to communicate it
-            transaction_was_successful.send(sender=self.__class__, type="purchase", response=resp)
-            status = "SUCCESS"
-        except:
-            transaction_was_unsuccessful.send(sender=self.__class__, type="purchase", response=post_data)
-            status = "FAILURE"
-        
-        return HttpResponse(status)
-    
+        resp = GCNewOrderNotification.objects.create(**data)
 
     def gc_order_state_change_notification(self, request):
         post_data = request.POST.copy()
         order = GCNewOrderNotification.objects.get(google_order_number=post_data['google-order-number'])
         order.financial_order_state = post_data['new-financial-order-state']
+        # Send success signal when order state is charged
+        if order.financial_order_state == 'CHARGED':
+            signals.transaction_was_successful.send(sender=self.__class__,
+                                                    type="purchase",
+                                                    response=order)
+            
         order.fulfillment_order_state = post_data['new-fulfillment-order-state']
         order.save()
 
