@@ -1,4 +1,4 @@
-from billing import Gateway
+from billing import Gateway, GatewayNotConfigured
 from billing.gateway import InvalidData
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
@@ -21,11 +21,16 @@ class BraintreePaymentsGateway(Gateway):
             env = braintree.Environment.Sandbox
         else:
             env = braintree.Environment.Production
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("braintree_payments"):
+            raise GatewayNotConfigured("The '%s' gateway is not correctly "
+                                       "configured." % self.display_name)
+        braintree_settings = merchant_settings['braintree_payments']
         braintree.Configuration.configure(
             env,
-            settings.BRAINTREE_MERCHANT_ACCOUNT_ID,
-            settings.BRAINTREE_PUBLIC_KEY,
-            settings.BRAINTREE_PRIVATE_KEY
+            braintree_settings['MERCHANT_ACCOUNT_ID'],
+            braintree_settings['PUBLIC_KEY'],
+            braintree_settings['PRIVATE_KEY']
             )
 
     def _cc_expiration_date(self, credit_card):

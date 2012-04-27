@@ -13,12 +13,24 @@ any redirects and only Server to Server calls happen in the background.
 
 Settings attributes required for this integration are:
 
-* ``SAMURAI_MERCHANT_KEY``: The merchant  key  provided by Samurai.
+* ``MERCHANT_KEY``: The merchant  key  provided by Samurai.
   Can be obtained from the account dashboard.
-* ``SAMURAI_MERCHANT_PASSWORD``: The merchant password  provided by Samurai through their account
+* ``MERCHANT_PASSWORD``: The merchant password  provided by Samurai through their account
   dashboard.
-* ``SAMURAI_PROCESSOR_TOKEN``: The processor token  provided by Samurai  through their account
+* ``PROCESSOR_TOKEN``: The processor token  provided by Samurai  through their account
   dashboard.
+
+Settings attributes::
+
+    MERCHANT_TEST_MODE = True # Toggle for live
+    MERCHANT_SETTINGS = {
+        "samurai": {
+            "MERCHANT_KEY": "???",
+            "MERCHANT_PASSWORD": "???",
+            "PROCESSOR_TOKEN": "???"
+        }
+        ...
+    }
 
 Example:
 ---------

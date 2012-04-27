@@ -10,9 +10,7 @@ Stripe Payment Integration
    This integration makes use of the official `stripe`_ python package offered
    by Stripe Payments. Please install it before you use this integration.
 
-Settings attributes required for this integration are:
-
-
+Refer to the :doc:`Stripe Payments  <gateways/stripe_payment>` Gateway for the settings attributes.
 
 Here are the methods and attributes implemented on the ``StripeIntegration`` class:
 
@@ -76,7 +74,7 @@ Example:
       
    In the template::
 
-      {% load billing_tags %}
+      {% load stripe_payment from stripe_tags %}
 
       {% stripe_payment stripe_obj %}
 

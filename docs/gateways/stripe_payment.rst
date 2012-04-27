@@ -13,8 +13,19 @@ any redirects and only Server to Server calls happen in the background.
 
 Settings attributes required for this integration are:
 
-* ``STRIPE_API_KEY``: The merchant api key is provided by Stripe.
+* ``API_KEY``: The merchant api key is provided by Stripe.
   Can be obtained from the account dashboard.
+
+Settings attributes::
+
+    MERCHANT_TEST_MODE = True # Toggle for live
+    MERCHANT_SETTINGS = {
+        "stripe": {
+            "API_KEY": "???",
+            "PUBLISHABLE_KEY": "???", # Used for stripe integration
+        }
+        ...
+    }
 
 
 Example:

@@ -35,6 +35,8 @@ Attributes
 * **test_mode**: Signifies if the integration is in a test mode or 
   production. The default value for this is taken from the `MERCHANT_TEST_MODE`
   setting attribute.
+* **display_name**: A human readable name that is generally used to tag the 
+  errors when the integration is not correctly configured.
 
 Methods
 +++++++

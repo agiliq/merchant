@@ -19,10 +19,21 @@ Usage
 * Also add the following attributes to your `settings.py`::
 
     MERCHANT_TEST_MODE = True    # Toggle for live transactions
+    MERCHANT_SETTINGS = {
+        "pay_pal": {
+            "WPP_USER" : "???",
+            "WPP_PASSWORD" : "???",
+            "WPP_SIGNATURE" : "???"
+        }
+    }
+
+    # Since merchant relies on django-paypal
+    # you have to additionally provide the
+    # below attributes
     PAYPAL_TEST = MERCHANT_TEST_MODE
-    PAYPAL_WPP_USER = "???"
-    PAYPAL_WPP_PASSWORD = "???"
-    PAYPAL_WPP_SIGNATURE = "???"
+    PAYPAL_WPP_USER = MERCHANT_SETTINGS["pay_pal"]["WPP_USER"]
+    PAYPAL_WPP_PASSWORD = MERCHANT_SETTINGS["pay_pal"]["WPP_PASSWORD"]
+    PAYPAL_WPP_SIGNATURE = MERCHANT_SETTINGS["pay_pal"]["WPP_SIGNATURE"]
 
 * Run `python manage.py syncdb` to get the response tables.
 * Use the gateway instance::

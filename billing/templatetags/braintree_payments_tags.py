@@ -5,6 +5,8 @@ from django import template
 from django.template.loader import render_to_string
 from billing.forms.braintree_payments_forms import BraintreePaymentsForm
 
+register = template.Library()
+
 class BraintreePaymentsNode(template.Node):
     def __init__(self, integration):
         self.integration = template.Variable(integration)
@@ -16,6 +18,7 @@ class BraintreePaymentsNode(template.Node):
                                      "integration": int_obj}, context)
         return form_str
 
+@register.tag
 def braintree_payments(parser, token):
     try:
         tag, int_obj = token.split_contents()

@@ -13,7 +13,7 @@ class StripeGatewayTestCase(TestCase):
                                       month=10, year=2012,
                                       number="4242424242424242",
                                       verification_value="100")
-        stripe.api_key = settings.STRIPE_API_KEY
+        stripe.api_key = self.merchant.stripe.api_key
         self.stripe = stripe
 
     def testCardSupported(self):

@@ -5,6 +5,8 @@ from django import template
 from django.template.loader import render_to_string
 from billing.forms.samurai_forms import SamuraiForm
 
+register = template.Library()
+
 class SamuraiNode(template.Node):
     def __init__(self, integration):
         self.integration = template.Variable(integration)
@@ -16,6 +18,7 @@ class SamuraiNode(template.Node):
                                      "integration": int_obj}, context)
         return form_str
 
+@register.tag
 def samurai_payment(parser, token):
     try:
         tag, int_obj = token.split_contents()

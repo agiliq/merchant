@@ -10,14 +10,7 @@ Braintree Payments Transparent Redirect
    This integration makes use of the official `braintree`_ python package offered
    by Braintree Payments. Please install it before you use this integration.
 
-Settings attributes required for this integration are:
-
-* ``BRAINTREE_MERCHANT_ACCOUNT_ID``: The merchant account id provided by Braintree.
-  Can be obtained from the account dashboard.
-* ``BRAINTREE_PUBLIC_KEY``: The public key provided by Braintree through their account
-  dashboard.
-* ``BRAINTREE_PRIVATE_KEY``: The private key provided by Braintree through their account
-  dashboard.
+Refer to the :doc:`Braintree Payments Server to Server <gateways/braintree_payments>` Gateway for the settings attributes.
 
 Here are the methods and attributes implemented on the ``BraintreePaymentsIntegration`` class:
 
@@ -89,7 +82,7 @@ Example:
       
    In the template::
 
-      {% load billing_tags %}
+      {% load braintree_payments from braintree_payments_tags %}
 
       {% braintree_payments bp %}
 

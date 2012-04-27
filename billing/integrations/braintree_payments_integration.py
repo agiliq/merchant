@@ -1,4 +1,4 @@
-from billing import Integration
+from billing import Integration, IntegrationNotConfigured
 from django.conf import settings
 from django.views.decorators.http import require_GET
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
@@ -10,11 +10,18 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 class BraintreePaymentsIntegration(Integration):
+    display_name = "Braintree Transparent Redirect"
+
     def __init__(self, options=None):
         if not options:
             options = {}
         super(BraintreePaymentsIntegration, self).__init__(options=options)
 
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("braintree_payments"):
+            raise IntegrationNotConfigured("The '%s' integration is not correctly "
+                                       "configured." % self.display_name)
+        braintree_payments_settings = merchant_settings["braintree_payments"]
         test_mode = getattr(settings, "MERCHANT_TEST_MODE", True)
         if test_mode:
             env = braintree.Environment.Sandbox
@@ -22,9 +29,9 @@ class BraintreePaymentsIntegration(Integration):
             env = braintree.Environment.Production
         braintree.Configuration.configure(
             env,
-            settings.BRAINTREE_MERCHANT_ACCOUNT_ID,
-            settings.BRAINTREE_PUBLIC_KEY,
-            settings.BRAINTREE_PRIVATE_KEY
+            braintree_payments_settings['MERCHANT_ACCOUNT_ID'],
+            braintree_payments_settings['PUBLIC_KEY'],
+            braintree_payments_settings['PRIVATE_KEY']
             )
 
     @property

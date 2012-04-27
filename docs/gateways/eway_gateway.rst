@@ -16,10 +16,14 @@ Usage
 * Add the following attributes to your `settings.py`::
 
     MERCHANT_TEST_MODE = True
-    EWAY_CUSTOMER_ID = "???"  # Only used for live transactions
-    EWAY_USERAME = "???"
-    EWAY_PASSWORD = "???"
-    EWAY_TEST_CUSTOMER_ID = "???"  # Used for testing
+    MERCHANT_SETTINGS = {
+        "eway": {
+            "CUSTOMER_ID": "???", # Only used for live transactions
+            "USERNAME": "???",
+            "PASSWORD": "???",
+            "TEST_CUSTOMER_ID": "???" # Used for testing
+        }
+    }
     
 * Use the gateway instance::
 

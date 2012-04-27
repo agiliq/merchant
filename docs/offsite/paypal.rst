@@ -51,7 +51,7 @@ In views.py::
 
 In some_template.html::
 
-  {% load billing_tags %}
+  {% load paypal from paypal_tags %}
   {% paypal obj %}
 
 

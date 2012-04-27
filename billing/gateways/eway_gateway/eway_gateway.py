@@ -1,7 +1,7 @@
 
 from django.conf import settings
 from eway_api.client import RebillEwayClient, HOSTED_TEST_URL, HOSTED_LIVE_URL
-from billing import Gateway
+from billing import Gateway, GatewayNotConfigured
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import Visa, MasterCard, DinersClub, JCB, AmericanExpress
 
@@ -14,10 +14,19 @@ class EwayGateway(Gateway):
 
     def __init__(self):
         self.test_mode = getattr(settings, 'MERCHANT_TEST_MODE', True)
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("eway"):
+            raise GatewayNotConfigured("The '%s' gateway is not correctly "
+                                       "configured." % self.display_name)
+        eway_settings = merchant_settings["eway"]
+        if self.test_mode:
+            customer_id = eway_settings['TEST_CUSTOMER_ID']
+        else:
+            customer_id = eway_settings['CUSTOMER_ID']
         self.client = RebillEwayClient(test_mode=self.test_mode,
-                                      customer_id=settings.EWAY_CUSTOMER_ID,
-                                      username=settings.EWAY_USERNAME,
-                                      password=settings.EWAY_PASSWORD,
+                                      customer_id=customer_id,
+                                      username=eway_settings['USERNAME'],
+                                      password=eway_settings['PASSWORD'],
                                       url=self.service_url,
                                       )
         self.hosted_customer = self.client.client.factory.create("CreditCard")
@@ -69,8 +78,6 @@ class EwayGateway(Gateway):
         self.add_address(options)
         
         customer_id = self.client.create_hosted_customer(self.hosted_customer)
-        if self.test_mode:
-            customer_id = getattr(settings, 'EWAY_TEST_CUSTOMER_ID')
         pymt_response = self.client.process_payment(customer_id, 
                                                     money, 
                                                     options.get("invoice", 'test'),

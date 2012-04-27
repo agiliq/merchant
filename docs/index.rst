@@ -18,12 +18,12 @@ Contents:
 
   * :doc:`On-site Processing <onsite_processing>`
 
-    * :doc:`PayPal <gateways/paypal_gateway>`
     * :doc:`Authorize.Net <gateways/authorize_net>`
-    * :doc:`eWay <gateways/eway_gateway>`
     * :doc:`Braintree Payments Server to Server <gateways/braintree_payments>`
-    * :doc:`Stripe Payments  <gateways/stripe_payment>`
+    * :doc:`eWay <gateways/eway_gateway>`
+    * :doc:`PayPal <gateways/paypal_gateway>`
     * :doc:`Samurai Payment <gateways/samurai_gateway>`
+    * :doc:`Stripe Payments  <gateways/stripe_payment>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 

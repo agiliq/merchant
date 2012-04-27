@@ -12,10 +12,21 @@ can be viewed from the django admin.
 
 The setting attributes required for this integration are:
 
-* **GOOGLE_CHECKOUT_MERCHANT_ID**: The merchant id assigned by Google after
+* **MERCHANT_ID**: The merchant id assigned by Google after
   signing up for the service.
-* **GOOGLE_CHECKOUT_MERCHANT_KEY**: A secret key assigned by Google after 
+* **MERCHANT_KEY**: A secret key assigned by Google after 
   signing up for the service.
+
+Settings attributes::
+
+    MERCHANT_TEST_MODE = True # Toggle for live
+    MERCHANT_SETTINGS = {
+        "google_checkout": {
+            "MERCHANT_ID": "???",
+            "MERCHANT_KEY": "???"
+        }
+        ...
+    }
 
 Example
 -------
@@ -49,7 +60,7 @@ In views.py::
 
 In some_template.html::
 
-  {% load billing_tags %}
+  {% load google_checkout from google_checkout_tags %}
   {% google_checkout obj %}
 
 Template renders to something like below::

@@ -12,8 +12,18 @@ viewed from the django admin.
 
 The settings attribute required for this integration are:
 
-* **WORLDPAY_MD5_SECRET_KEY**: The MD5 secret key chosen by the user
+* **MD5_SECRET_KEY**: The MD5 secret key chosen by the user
   while signing up for the WorldPay Hosted Payments Service.
+
+Settings Attributes::
+
+    MERCHANT_TEST_MODE = True # Toggle for live
+    MERCHANT_SETTINGS = {
+        "world_pay": {
+            "MD5_SECRET_KEY": "???"
+        }
+        ...
+    }
 
 Example
 --------

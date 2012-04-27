@@ -5,6 +5,8 @@ from django import template
 from django.template.loader import render_to_string
 from billing.forms.world_pay_forms import WPHostedPaymentForm
 
+register = template.Library()
+
 class WorldPayNode(template.Node):
     def __init__(self, integration):
         self.integration = template.Variable(integration)
@@ -16,6 +18,7 @@ class WorldPayNode(template.Node):
                                      "integration": int_obj}, context)
         return form_str
 
+@register.tag
 def world_pay(parser, token):
     try:
         tag, int_obj = token.split_contents()

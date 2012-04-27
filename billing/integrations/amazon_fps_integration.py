@@ -1,4 +1,4 @@
-from billing.integration import Integration
+from billing.integration import Integration, IntegrationNotConfigured
 from django.conf import settings
 from boto.fps.connection import FPSConnection
 from django.conf.urls.defaults import patterns, url
@@ -27,11 +27,19 @@ class AmazonFpsIntegration(Integration):
     paymentReason: Description of the transaction
     paymentPage: Page to direct the user on completion/failure of transaction
     """
+
+    display_name = "Amazon Flexible Payment Service"
+
     def __init__(self, options=None):
         if not options:
             options = {}
-        self.aws_access_key = options.get("aws_access_key", None) or settings.AWS_ACCESS_KEY
-        self.aws_secret_access_key = options.get("aws_secret_access_key", None) or settings.AWS_SECRET_ACCESS_KEY
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("amazon_fps"):
+            raise IntegrationNotConfigured("The '%s' integration is not correctly "
+                                       "configured." % self.display_name)
+        amazon_fps_settings = merchant_settings["amazon_fps"]
+        self.aws_access_key = options.get("aws_access_key", None) or amazon_fps_settings['AWS_ACCESS_KEY']
+        self.aws_secret_access_key = options.get("aws_secret_access_key", None) or amazon_fps_settings['AWS_SECRET_ACCESS_KEY']
         super(AmazonFpsIntegration, self).__init__(options=options)
         self.fps_connection = FPSConnection(self.aws_access_key, self.aws_secret_access_key, **options)
 

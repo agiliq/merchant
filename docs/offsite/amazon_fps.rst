@@ -26,6 +26,16 @@ Settings attributes required for this integration are:
 * ``AWS_SECRET_ACCESS_KEY``: The Amazon AWS secret access key also available from the
   user's dashboard. Shouldn't be distributed to anyone.
 
+Settings attributes::
+
+    MERCHANT_TEST_MODE = True
+    MERCHANT_SETTINGS = {
+        "amazon_fps": {
+            "AWS_ACCESS_KEY": "???",
+            "AWS_SECRET_ACCESS_KEY": "???"
+        }
+    }
+
 Here are the methods and attributes implemented on the ``AmazonFpsIntegration`` class:
 
 * ``__init__(options = {})``: The constructor takes a dictionary of options that are
@@ -116,7 +126,7 @@ In views.py::
 
 In some_template.html::
 
-    {% load billing_tags %}
+    {% load amazon_fps from amazon_fps_tags %}
     {% amazon_fps fps %}
 
 The above template renders the following code::

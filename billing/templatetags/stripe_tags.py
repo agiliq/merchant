@@ -5,6 +5,8 @@ from django import template
 from django.template.loader import render_to_string
 from billing.forms.stripe_forms import StripeForm
 
+register = template.Library()
+
 class StripeNode(template.Node):
     def __init__(self, integration):
         self.integration = template.Variable(integration)
@@ -16,6 +18,7 @@ class StripeNode(template.Node):
                                      "integration": int_obj}, context)
         return form_str
 
+@register.tag
 def stripe_payment(parser, token):
     try:
         tag, int_obj = token.split_contents()

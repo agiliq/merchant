@@ -7,7 +7,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from billing.models import AuthorizeAIMResponse
-from billing import Gateway
+from billing import Gateway, GatewayNotConfigured
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, \
     MasterCard, Discover, AmericanExpress
@@ -76,8 +76,13 @@ class AuthorizeNetGateway(Gateway):
     display_name = "Authorize.Net"
 
     def __init__(self):
-        self.login = settings.AUTHORIZE_LOGIN_ID
-        self.password = settings.AUTHORIZE_TRANSACTION_KEY
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("authorize_net"):
+            raise GatewayNotConfigured("The '%s' gateway is not correctly "
+                                       "configured." % self.display_name)
+        authorize_net_settings = merchant_settings["authorize_net"]
+        self.login = authorize_net_settings["LOGIN_ID"]
+        self.password = authorize_net_settings["TRANSACTION_KEY"]
     
     def add_invoice(self, post, options):
         """add invoice details to the request parameters"""
