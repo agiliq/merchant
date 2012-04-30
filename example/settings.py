@@ -96,11 +96,12 @@ INSTALLED_APPS = (
 
     'app',
     'billing',
-    'paypal.standard', 
+    'paypal.standard',
     'paypal.pro',
     'paypal.standard.ipn',
     'stripe',
-    'samurai'
+    'samurai',
+    'django_ogone'
 )
 
 STATIC_URL = "http://merchant.agiliq.com/"
