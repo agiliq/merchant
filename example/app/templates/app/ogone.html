@@ -1,14 +1,14 @@
-{% extends "app/base.html" %}
+{% extends 'app/base.html' %}
+{% load ogone_payments_tags %}
 
 {% block content %}
-
-<html>
-	<body>
-	<form action='{{action}}' method="post">
-	{{ form.as_p }} {% csrf_token %}
-	<input type="submit" value="checkout!">
-	</form>
-	</body>
-</html>
+    Required Parameters from the view
+    <ul>
+        <li> language </li>
+        <li> order id </li>
+        <li> amount </li>
+        <li> currency </li>
+    </ul>
+    {% ogone_payments og_obj %}
 
 {% endblock %}

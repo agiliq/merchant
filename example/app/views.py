@@ -3,26 +3,29 @@ import datetime
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponse
 
 from billing import CreditCard, get_gateway
 from billing.gateway import CardNotSupported
 
 from app.forms import CreditCardForm
-#import django_ogone as ogone
+
 
 from app.urls import (google_checkout_obj, world_pay_obj,
                       pay_pal_obj, amazon_fps_obj,
                       fps_recur_obj, braintree_obj,
-                      stripe_obj,samurai_obj, ogone_obj)
+                      stripe_obj, samurai_obj, ogone_obj)
+
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
+
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
 
+
 def index(request, gateway=None):
     return authorize(request)
+
 
 def authorize(request):
     amount = 1
@@ -106,7 +109,7 @@ def eway(request):
                                }
             response = merchant.purchase(amount, credit_card, options={'request': request, 'billing_address': billing_address})
     else:
-        form = CreditCardForm(initial={'number':'4444333322221111',
+        form = CreditCardForm(initial={'number': '4444333322221111',
                                        'verification_value': '000',
                                        'month': 7,
                                        'year': 2012})
@@ -114,6 +117,7 @@ def eway(request):
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Eway'})
+
 
 def braintree(request):
     amount = 1
@@ -130,45 +134,47 @@ def braintree(request):
                 response = "Credit Card Not Supported"
             response = merchant.purchase(amount, credit_card)
     else:
-        form = CreditCardForm(initial={'number':'4111111111111111'})
+        form = CreditCardForm(initial={'number': '4111111111111111'})
     return render(request, 'app/index.html', {'form': form,
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Braintree Payments (S2S)'})
+
+
 def stripe(request):
     amount = 1
-    response= None
+    response = None
     if request.method == 'POST':
         form = CreditCardForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             credit_card = CreditCard(**data)
             merchant = get_gateway("stripe")
-            response = merchant.purchase(amount,credit_card)
+            response = merchant.purchase(amount, credit_card)
     else:
-        form = CreditCardForm(initial={'number':'4242424242424242'})
-    return render(request, 'app/index.html',{'form': form,
-                                             'amount':amount,
-                                             'response':response,
-                                             'title':'Stripe Payment'})
+        form = CreditCardForm(initial={'number': '4242424242424242'})
+    return render(request, 'app/index.html', {'form': form,
+                                             'amount': amount,
+                                             'response': response,
+                                             'title': 'Stripe Payment'})
+
+
 def samurai(request):
     amount = 1
-    response= None
+    response = None
     if request.method == 'POST':
         form = CreditCardForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             credit_card = CreditCard(**data)
             merchant = get_gateway("samurai")
-            response = merchant.purchase(amount,credit_card)
+            response = merchant.purchase(amount, credit_card)
     else:
-        form = CreditCardForm(initial={'number':'4111111111111111'})
-    return render(request, 'app/index.html',{'form': form,
-                                             'amount':amount,
-                                             'response':response,
-                                             'title':'Samurai'})
-
-
+        form = CreditCardForm(initial={'number': '4111111111111111'})
+    return render(request, 'app/index.html', {'form': form,
+                                             'amount': amount,
+                                             'response': response,
+                                             'title': 'Samurai'})
 
 
 def offsite_paypal(request):
@@ -188,6 +194,7 @@ def offsite_paypal(request):
     template_vars = {"obj": pay_pal_obj, 'title': 'PayPal Offsite'}
     return render(request, 'app/offsite_paypal.html', template_vars)
 
+
 def offsite_google_checkout(request):
     return_url = request.build_absolute_uri(reverse('app_offsite_google_checkout_done'))
     fields = {'items': [{'amount': 1,
@@ -197,21 +204,23 @@ def offsite_google_checkout(request):
                          'currency': 'USD',
                          'quantity': 1,
                         }],
-              'return_url': return_url,}
+              'return_url': return_url, }
     google_checkout_obj.add_fields(fields)
     template_vars = {'title': 'Google Checkout', "gc_obj": google_checkout_obj}
 
     return render(request, 'app/google_checkout.html', template_vars)
+
 
 def offsite_world_pay(request):
     fields = {"instId": settings.WORLDPAY_INSTALLATION_ID_TEST,
               "cartId": "TEST123",
               "currency": "USD",
               "amount": 1,
-              "desc": "Test Item",}
+              "desc": "Test Item", }
     world_pay_obj.add_fields(fields)
     template_vars = {'title': 'WorldPay', "wp_obj": world_pay_obj}
     return render(request, 'app/world_pay.html', template_vars)
+
 
 def offsite_amazon_fps(request):
     url_scheme = "http"
@@ -241,6 +250,7 @@ def offsite_amazon_fps(request):
                      "fps_obj": amazon_fps_obj}
     return render(request, 'app/amazon_fps.html', template_vars)
 
+
 def offsite_braintree(request):
     fields = {"transaction": {
             "order_id": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
@@ -249,13 +259,14 @@ def offsite_braintree(request):
                 "submit_for_settlement": True
                 },
             },
-              "site": "%s://%s" %("https" if request.is_secure() else "http",
+              "site": "%s://%s" % ("https" if request.is_secure() else "http",
                                   RequestSite(request).domain)
               }
     braintree_obj.add_fields(fields)
     template_vars = {'title': 'Braintree Payments Transparent Redirect',
                      "bp_obj": braintree_obj}
     return render(request, "app/braintree_tr.html", template_vars)
+
 
 def offsite_stripe(request):
     status = request.GET.get("status")
@@ -265,15 +276,15 @@ def offsite_stripe(request):
                      "status": status}
     return render(request, "app/stripe.html", template_vars)
 
+
 def offsite_samurai(request):
     template_vars = {'title': 'Samurai Integration',
                      "samurai_obj": samurai_obj}
     return render(request, "app/samurai.html", template_vars)
 
+
 def offsite_ogone(request):
-    context = {}
-    action = ogone_obj.service_url
-    form = ogone_obj.generate_form()
-    context['form'] = form
-    return render_to_response('app/ogone.html', context, \
-    context_instance=RequestContext(request, {'action': action}))
+    template_vars = {'title': 'Ogone Integration',
+                     'og_obj': ogone_obj}
+    print ogone_obj.generate_form
+    return render(request, "app/ogone.html", template_vars)
