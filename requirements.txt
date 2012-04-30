@@ -1,1 +1,1 @@
--e git://github.com/dokterbob/django-ogone.git#egg=django-ogone
+-e git://github.com/arjunc77/django-ogone.git#egg=django-ogone
