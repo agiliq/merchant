@@ -9,10 +9,9 @@ from billing import CreditCard, get_gateway
 from billing.gateway import CardNotSupported
 
 from app.forms import CreditCardForm
-from app.urls import (google_checkout_obj, world_pay_obj,
-                      pay_pal_obj, amazon_fps_obj,
-                      fps_recur_obj, braintree_obj,
-                      stripe_obj,samurai_obj)
+from app.urls import (google_checkout_obj, world_pay_obj, pay_pal_obj,
+                      amazon_fps_obj, fps_recur_obj, braintree_obj,
+                      stripe_obj, samurai_obj)
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
 
@@ -66,7 +65,7 @@ def paypal(request):
                                        'month': 1,
                                        'year': 2019,
                                        'card_type': 'visa'})
-    return render(request, 'app/index.html', {'form': form, 
+    return render(request, 'app/index.html', {'form': form,
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Paypal'})
@@ -86,7 +85,7 @@ def eway(request):
             except CardNotSupported:
                 response = "Credit Card Not Supported"
             billing_address = {'salutation': 'Mr.',
-                               'address1': 'test', 
+                               'address1': 'test',
                                'address2': ' street',
                                'city': 'Sydney',
                                'state': 'NSW',
@@ -104,11 +103,11 @@ def eway(request):
                                }
             response = merchant.purchase(amount, credit_card, options={'request': request, 'billing_address': billing_address})
     else:
-        form = CreditCardForm(initial={'number':'4444333322221111', 
+        form = CreditCardForm(initial={'number':'4444333322221111',
                                        'verification_value': '000',
                                        'month': 7,
                                        'year': 2012})
-    return render(request, 'app/index.html', {'form': form, 
+    return render(request, 'app/index.html', {'form': form,
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Eway'})
@@ -129,7 +128,7 @@ def braintree(request):
             response = merchant.purchase(amount, credit_card)
     else:
         form = CreditCardForm(initial={'number':'4111111111111111'})
-    return render(request, 'app/index.html', {'form': form, 
+    return render(request, 'app/index.html', {'form': form,
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Braintree Payments (S2S)'})
@@ -148,7 +147,7 @@ def stripe(request):
     return render(request, 'app/index.html',{'form': form,
                                              'amount':amount,
                                              'response':response,
-                                             'title':'Stripe Payment'})   
+                                             'title':'Stripe Payment'})
 def samurai(request):
     amount = 1
     response= None
@@ -166,7 +165,7 @@ def samurai(request):
                                              'response':response,
                                              'title':'Samurai'})
 
-   
+
 
 
 def offsite_paypal(request):
@@ -174,7 +173,7 @@ def offsite_paypal(request):
     return_url = request.build_absolute_uri(reverse('app_offsite_paypal_done'))
     cancel_return = request.build_absolute_uri(request.META['PATH_INFO'])
     notify_url = request.build_absolute_uri(reverse('paypal-ipn'))
-    
+
     paypal_params = {'amount': 1,
                      'item_name': "name of the item",
                      'invoice': invoice_id,
@@ -198,7 +197,7 @@ def offsite_google_checkout(request):
               'return_url': return_url,}
     google_checkout_obj.add_fields(fields)
     template_vars = {'title': 'Google Checkout', "gc_obj": google_checkout_obj}
-    
+
     return render(request, 'app/google_checkout.html', template_vars)
 
 def offsite_world_pay(request):
@@ -234,8 +233,8 @@ def offsite_amazon_fps(request):
                    "recurringPeriod": "1 Hour",
                    })
     fps_recur_obj.add_fields(fields)
-    template_vars = {'title': 'Amazon Flexible Payment Service', 
-                     "fps_recur_obj": fps_recur_obj, 
+    template_vars = {'title': 'Amazon Flexible Payment Service',
+                     "fps_recur_obj": fps_recur_obj,
                      "fps_obj": amazon_fps_obj}
     return render(request, 'app/amazon_fps.html', template_vars)
 
@@ -247,24 +246,43 @@ def offsite_braintree(request):
                 "submit_for_settlement": True
                 },
             },
-              "site": "%s://%s" %("https" if request.is_secure() else "http",
-                                  RequestSite(request).domain)
-              }
+            "site": "%s://%s" % ("https" if request.is_secure() else "http",
+                                RequestSite(request).domain)
+            }
     braintree_obj.add_fields(fields)
-    template_vars = {'title': 'Braintree Payments Transparent Redirect', 
+    template_vars = {'title': 'Braintree Payments Transparent Redirect',
                      "bp_obj": braintree_obj}
     return render(request, "app/braintree_tr.html", template_vars)
 
 def offsite_stripe(request):
     status = request.GET.get("status")
     stripe_obj.add_field("amount", 100)
-    template_vars = {'title': 'Stripe.js', 
+    template_vars = {'title': 'Stripe.js',
                      "stripe_obj": stripe_obj,
                      "status": status}
     return render(request, "app/stripe.html", template_vars)
 
 def offsite_samurai(request):
-    template_vars = {'title': 'Samurai Integration', 
+    template_vars = {'title': 'Samurai Integration',
                      "samurai_obj": samurai_obj}
     return render(request, "app/samurai.html", template_vars)
 
+
+def offsite_eway(request):
+    return_url = request.build_absolute_uri(reverse(offsite_eway_done))
+    eway_obj = get_integration("eway_au")
+    customer = eway_obj.request_access_code(
+            request, return_url=return_url, customer={},
+            payment={"total_amount": 100})
+    request.session["eway_access_code"] = eway_obj.access_code
+    template_vars = {"title": "eWAY",
+                     "eway_obj": eway_obj}
+    return render(request, "app/eway.html", template_vars)
+
+
+def offsite_eway_done(request):
+    access_code = request.session["eway_access_code"]
+    eway_obj = get_integration("eway_au", access_code=access_code)
+    result = eway_obj.check_transaction(access_code)
+
+    return render(request, "app/eway_done.html", {"result": result})

@@ -34,6 +34,7 @@ Contents:
     * :doc:`Braintree Payments Transparent Redirect <offsite/braintree_payments>`
     * :doc:`Stripe  <offsite/stripe_integration>`
     * :doc:`Samurai  <offsite/samurai_integration>`
+    * :doc:`eWAY <offsite/eway>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`

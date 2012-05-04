@@ -10,20 +10,21 @@
   Card:
     <a href='{% url app_authorize %}'>Authorize</a>
     <a href='{% url app_eway %}'>Eway</a>
-    <a href='{% url app_paypal %}'>Paypal</a> 
+    <a href='{% url app_paypal %}'>Paypal</a>
     <a href='{% url app_braintree %}'>Braintree Payments (S2S)</a>
     <a href='{% url app_stripe %}'>Stripe Payment</a>
     <a href='{% url app_samurai %}'>Samurai</a>
   <br/><br/>
   Offsite:
-    <a href='{% url app_offsite_paypal %}'>Paypal</a> 
-    <a href='{% url app_offsite_google_checkout %}'>Google Checkout</a> 
-    <a href='{% url app_offsite_world_pay %}'>WorldPay</a> 
-    <a href='{% url app_offsite_amazon_fps %}'>Amazon FPS</a> 
-    <a href='{% url app_offsite_braintree %}'>Braintree Payments (TR)</a> 
+    <a href='{% url app_offsite_paypal %}'>Paypal</a>
+    <a href='{% url app_offsite_google_checkout %}'>Google Checkout</a>
+    <a href='{% url app_offsite_world_pay %}'>WorldPay</a>
+    <a href='{% url app_offsite_amazon_fps %}'>Amazon FPS</a>
+    <a href='{% url app_offsite_braintree %}'>Braintree Payments (TR)</a>
     <a href='{% url app_offsite_stripe %}'>Stripe</a>
     <a href='{% url app_offsite_samurai %}'>Samurai</a>
-  
+    <a href='{% url eway %}'>eWAY</a>
+
   <h1>{{ title }} </h1>
   {% block content %}
 
