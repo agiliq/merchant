@@ -96,9 +96,6 @@ INSTALLED_APPS = (
 
     'app',
     'billing',
-    'paypal.standard', 
-    'paypal.pro',
-    'paypal.standard.ipn',
     'stripe',
     'samurai'
 )

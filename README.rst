@@ -27,6 +27,7 @@ Off-Site Processing
 * Braintree Payments (Transparent Redirect)
 * Stripe.js
 * Samurai
+* eWAY
 
 Documentation
 --------------

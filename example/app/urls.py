@@ -30,6 +30,10 @@ urlpatterns += patterns('app.views',
     url(r'offsite/braintree/$', 'offsite_braintree', name='app_offsite_braintree'),
     url(r'offsite/stripe/$', 'offsite_stripe', name='app_offsite_stripe'),
     url(r'offsite/samurai/$', 'offsite_samurai', name='app_offsite_samurai'),
+    url(r'offsite/eway/$', 'offsite_eway', name='app_offsite_eway'),
+
+    # redirect handler
+    url(r'offsite/eway/done/$', 'offsite_eway_done'),
 )
 
 # paypal payment notification handler
@@ -64,3 +68,5 @@ urlpatterns += patterns('django.views.generic.simple',
         {'template': 'app/payment_done.html'},
         name='app_offsite_google_checkout_done'),
 )
+
+
