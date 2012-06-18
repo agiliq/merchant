@@ -96,7 +96,7 @@ class GoogleCheckoutIntegration(Integration):
         checkout_flow = doc.createElement('checkout-flow-support')
         root.appendChild(checkout_flow)
         merchant_checkout_flow = doc.createElement('merchant-checkout-flow-support')
-        checkout_flow.appendChild(checkout_flow)
+        checkout_flow.appendChild(merchant_checkout_flow)
         return_url = doc.createElement('continue-shopping-url')
         return_url.appendChild(doc.createTextNode(self.fields["return_url"]))
         merchant_checkout_flow.appendChild(return_url)
