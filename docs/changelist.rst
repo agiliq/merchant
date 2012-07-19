@@ -2,6 +2,11 @@
 Changes
 ========
 
+0.05
+-----
+
+* Added Paylane gateway support.
+
 0.04
 -----
 
