@@ -5,6 +5,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 
 * Ashok Raavi <ashok.raavi@gmail.com>
 * Bradley Ayers <bradley.ayers@gmail.com>
+* Celso Pinto <https://github.com/cpinto>
 * Chen Zhe <https://github.com/fruitschen>
 * Chris Glass <https://github.com/chrisglass>
 * Daniel Sokolowski <https://github.com/danols>
