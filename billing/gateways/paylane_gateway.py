@@ -25,14 +25,15 @@ class PaylaneGateway(Gateway):
     display_name = 'Paylane'
     
     def __init__(self):
-        wsdl = getattr(settings,'PAYLANE_WSDL','https://direct.paylane.com/wsdl/production/Direct.wsdl')
-        wsdl_cache = getattr(settings,'SUDS_CACHE_DIR','/tmp/suds')
-        if self.test_mode:
-            username = getattr(settings, 'PAYLANE_USERNAME', '')
-            password = getattr(settings, 'PAYLANE_PASSWORD', '')
-        else:
-            username = settings.PAYLANE_USERNAME
-            password = settings.PAYLANE_PASSWORD
+        merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
+        if not merchant_settings or not merchant_settings.get("paylane"):
+            raise GatewayNotConfigured("The '%s' gateway is not correctly "
+                                       "configured." % self.display_name)
+        paylane_settings = merchant_settings["paylane"]
+        wsdl = paylane_settings.get('WSDL', 'https://direct.paylane.com/wsdl/production/Direct.wsdl')
+        wsdl_cache = paylane_settings.get('SUDS_CACHE_DIR', '/tmp/suds')
+        username = paylane_settings.get('USERNAME', '')
+        password = paylane_settings.get('PASSWORD', '')
             
         self.client = Client(wsdl, username=username, password=password,cache = ObjectCache(location=wsdl_cache,days=15))
 

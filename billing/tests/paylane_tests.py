@@ -45,7 +45,7 @@ class PaylaneTestCase(TestCase):
         credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4012888888881881',verification_value=435)
         options = {}
         options['customer'] = self.customer
-        options['product'] = self.product
+        options['product'] = {}
         res = self.merchant.purchase(1.0,credit_card,options=options)
         self.assertEqual(res['status'],'SUCCESS',unicode(res['response']))
         self.assertTrue('transaction' in res['response'])
@@ -55,7 +55,7 @@ class PaylaneTestCase(TestCase):
         credit_card = Visa(first_name='Celso',last_name='Pinto',month=10,year=2012,number='4929966723331981',verification_value=435)
         options = {}
         options['customer'] = self.customer
-        options['product'] = self.product
+        options['product'] = {}
         res = self.merchant.purchase(float(PaylaneError.ERR_CARD_EXPIRED),credit_card,options=options)
         self.assertEqual(res['status'],'FAILURE',unicode(res['response']))
         self.assertTrue('transaction' in res['response'])
