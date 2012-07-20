@@ -3,6 +3,7 @@ from billing.forms.authorize_net_forms import AuthorizeNetDPMForm
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 from hashlib import md5
+import hmac
 
 class AuthorizeNetDpmIntegration(Integration):
     display_name = "Authorize.Net Direct Post Method"
@@ -21,11 +22,13 @@ class AuthorizeNetDpmIntegration(Integration):
         login_id = authorize_net_settings["LOGIN_ID"]
 
         initial_data = self.fields 
-        initial_data.update({'x_login': login_id, 
-                             'x_fp_hash': md5("%s^%s^%s^%s^" %(login_id, 
+        x_fp_hash = hmac.new(transaction_key, "%s^%s^%s^%s^" %(login_id, 
                                                                initial_data['x_fp_sequence'], 
                                                                initial_data['x_fp_timestamp'], 
-                                                               initial_data['x_amount'])).hexdigest()})
+                                                               initial_data['x_amount']),
+                             hashlib.md5)
+        initial_data.update({'x_login': login_id, 
+                             'x_fp_hash': x_fp_hash.hexdigest()})
         form = AuthorizeNetDPMForm(initial=initial_data)
         return form
 
