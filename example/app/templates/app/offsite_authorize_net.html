@@ -1,0 +1,6 @@
+{% extends 'app/base.html' %}
+{% load authorize_net_dpm from authorize_net_dpm_tags %}
+
+{% block content %}
+    {% authorize_net_dpm obj %}
+{% endblock %}
