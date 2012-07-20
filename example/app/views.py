@@ -14,6 +14,8 @@ from app.urls import (google_checkout_obj, world_pay_obj, pay_pal_obj,
                       stripe_obj, samurai_obj)
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
+from billing.utils.paylane import PaylanePaymentCustomer, \
+    PaylanePaymentCustomerAddress
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
@@ -148,6 +150,7 @@ def stripe(request):
                                              'amount':amount,
                                              'response':response,
                                              'title':'Stripe Payment'})
+
 def samurai(request):
     amount = 1
     response= None
@@ -165,6 +168,36 @@ def samurai(request):
                                              'response':response,
                                              'title':'Samurai'})
 
+
+def paylane(request):
+    amount = 1
+    response= None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("paylane")
+            customer = PaylanePaymentCustomer()
+            customer.name = "%s %s" %(data['first_name'], data['last_name'])
+            customer.email = "testuser@example.com"
+            customer.ip_address = "127.0.0.1"
+            options = {}
+            address = PaylanePaymentCustomerAddress()
+            address.street_house = 'Av. 24 de Julho, 1117'
+            address.city = 'Lisbon'
+            address.zip_code = '1700-000'
+            address.country_code = 'PT'
+            customer.address = address
+            options['customer'] = customer
+            options['product'] = {}
+            response = merchant.purchase(amount, credit_card, options = options)
+    else:
+        form = CreditCardForm(initial={'number':'4111111111111111'})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount':amount,
+                                             'response':response,
+                                             'title':'Paylane Gateway'})
 
 
 
