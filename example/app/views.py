@@ -5,11 +5,11 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
 
-from billing import CreditCard, get_gateway
+from billing import CreditCard, get_gateway, get_integration
 from billing.gateway import CardNotSupported
 
 from app.forms import CreditCardForm
-from app.urls import (google_checkout_obj, world_pay_obj, pay_pal_obj,
+from app.urls import (authorize_net_obj, google_checkout_obj, world_pay_obj, pay_pal_obj,
                       amazon_fps_obj, fps_recur_obj, braintree_obj,
                       stripe_obj, samurai_obj)
 from django.conf import settings
@@ -201,6 +201,17 @@ def paylane(request):
 
 
 
+def offsite_authorize_net(request):
+    params = {'x_amount': 1,
+              'x_fp_sequence': datetime.datetime.now().strftime('%Y%m%d%H%M%S'),
+              'x_fp_timestamp': datetime.datetime.utcnow().strftime('%s'),
+              'x_recurring_bill': 'F',
+              }
+    authorize_net_obj.add_fields(params)
+    template_vars = {"obj": authorize_net_obj, 'title': authorize_net_obj.display_name}
+    return render(request, 'app/offsite_authorize_net.html', template_vars)
+    
+
 def offsite_paypal(request):
     invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     return_url = request.build_absolute_uri(reverse('app_offsite_paypal_done'))
@@ -234,7 +245,7 @@ def offsite_google_checkout(request):
     return render(request, 'app/google_checkout.html', template_vars)
 
 def offsite_world_pay(request):
-    fields = {"instId": settings.WORLDPAY_INSTALLATION_ID_TEST,
+    fields = {"instId": settings.MERCHANT_SETTINGS["world_pay"]["INSTALLATION_ID_TEST"],
               "cartId": "TEST123",
               "currency": "USD",
               "amount": 1,

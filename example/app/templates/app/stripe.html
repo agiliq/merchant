@@ -1,5 +1,5 @@
 {% extends "app/base.html" %}
-{% load billing_tags %}
+{% load stripe_payment from stripe_tags %}
 
 {% block content %}
 {% if status %}<h2>{{ status }}</h2>{% endif %}

@@ -14,7 +14,7 @@ class WPHostedPaymentForm(forms.Form):
                 hash_str += "%s" % self.initial[field]
                 if not signature_fields.index(field) == len(signature_fields) - 1:
                     hash_str += ":"
-            md5_hash = md5("%s:%s" %(settings.WORLDPAY_MD5_SECRET_KEY, 
+            md5_hash = md5("%s:%s" %(settings.MERCHANT_SETTINGS["world_pay"]["MD5_SECRET_KEY"], 
                                      hash_str)).hexdigest()
             self.initial["signature"] = self.initial.get("signature") or md5_hash
     

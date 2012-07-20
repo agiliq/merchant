@@ -3,6 +3,7 @@ from django.conf.urls.defaults import *
 from billing import get_integration
 
 google_checkout_obj = get_integration("google_checkout")
+authorize_net_obj = get_integration("authorize_net_dpm")
 pay_pal_obj = get_integration("pay_pal")
 amazon_fps_obj = get_integration("fps")
 fps_recur_obj = get_integration("fps")
@@ -24,6 +25,7 @@ urlpatterns = patterns('app.views',
 
 # offsite payments
 urlpatterns += patterns('app.views',
+    url(r'offsite/authorize_net/$', 'offsite_authorize_net', name='app_offsite_authorize_net'),
     url(r'offsite/paypal/$', 'offsite_paypal', name='app_offsite_paypal'),
     url(r'offsite/google-checkout/$', 'offsite_google_checkout', name='app_offsite_google_checkout'),
     url(r'offsite/world_pay/$', 'offsite_world_pay', name='app_offsite_world_pay'),
@@ -35,6 +37,10 @@ urlpatterns += patterns('app.views',
 
     # redirect handler
     url(r'offsite/eway/done/$', 'offsite_eway_done'),
+)
+
+urlpatterns += patterns('',
+    (r'^authorize_net-handler/', include(authorize_net_obj.urls)),
 )
 
 # paypal payment notification handler
