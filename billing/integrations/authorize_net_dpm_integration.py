@@ -2,7 +2,7 @@ from billing import Integration, IntegrationNotConfigured
 from billing.forms.authorize_net_forms import AuthorizeNetDPMForm
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
-from hashlib import md5
+import hashlib
 import hmac
 
 class AuthorizeNetDpmIntegration(Integration):
