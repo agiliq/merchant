@@ -24,6 +24,7 @@ Contents:
     * :doc:`PayPal <gateways/paypal_gateway>`
     * :doc:`Samurai Payment <gateways/samurai_gateway>`
     * :doc:`Stripe Payments  <gateways/stripe_payment>`
+    * :doc:`Paylane  <gateways/paylane_gateway>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 
