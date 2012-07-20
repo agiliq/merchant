@@ -16,9 +16,7 @@ The documentation for the service is available at `Amazon FPS Docs`_.
 
 .. note::
 
-   This integration has a dependency on ``boto``, a popular AWS library for python. But
-   because of support lacking for FPS, there is a fork available for it here_ with the
-   required features.
+   This integration has a dependency on ``boto``, a popular AWS library for python.
 
 Settings attributes required for this integration are:
 
