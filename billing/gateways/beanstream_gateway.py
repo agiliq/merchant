@@ -1,6 +1,7 @@
 import urllib
 import urllib2
 import datetime
+import hashlib
 
 from django.conf import settings
 
@@ -68,6 +69,11 @@ class BeanstreamGateway(Gateway):
         post['trnExpYear']  = str(credit_card.year)[2:]
         post['trnCardOwner'] = credit_card.first_name + " " + credit_card.last_name
 
+    def add_hash(self, data, key):
+        data2 = data + key
+        h = hashlib.sha1()
+        h.update(data2)
+        return data + "&hashValue=" + h.hexdigest()
 
     def _base_purchase(self, money, credit_card, post, options=None):
         if not options:
@@ -82,6 +88,13 @@ class BeanstreamGateway(Gateway):
         #self.add_address(post, options)
 
         data=urllib.urlencode(dict(('%s' % (k), v) for k, v in post.iteritems()))
+
+        key = "dine-otestkey"
+        data = self.add_hash(data, key)
+
+        import eat
+        eat.gaebp(True)
+
         conn = urllib2.Request(url=self.txnurl, data=data)
 
         try:
@@ -99,6 +112,9 @@ class BeanstreamGateway(Gateway):
             status = "SUCCESS"
         else:
             response = urllib.unquote_plus(fields.get('messageText'))
+        
+        eat.gaebp(True)
+        return {"status": status, "response": response}
 
     def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
