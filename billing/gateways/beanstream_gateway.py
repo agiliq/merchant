@@ -2,11 +2,14 @@ import urllib
 import urllib2
 import datetime
 import hashlib
+from beanstream.gateway import Beanstream
+from beanstream.billing import CreditCard
 
 from django.conf import settings
 
 from billing.models import AuthorizeAIMResponse
 from billing import Gateway, GatewayNotConfigured
+from billing.gateway import CardNotSupported
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, \
     MasterCard, Discover, AmericanExpress
@@ -58,16 +61,31 @@ class BeanstreamGateway(Gateway):
                                        "configured." % self.display_name)
         beanstream_settings = merchant_settings["beanstream"] # Not used right now
 
-        self.merchant_id = kwargs["merchant_id"] 
         self.supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
 
-    def add_creditcard(self, post, credit_card):
-        """add credit card details to the request parameters"""
-        post['trnCardNumber'] = credit_card.number
-        post['trnCardCvd']  = credit_card.verification_value
-        post['trnExpMonth'] = '%(m)02d' % {'m': credit_card.month}
-        post['trnExpYear']  = str(credit_card.year)[2:]
-        post['trnCardOwner'] = credit_card.first_name + " " + credit_card.last_name
+        hash_validation = True if kwargs.get("hashValue", 0) else False
+
+        self.beangw = Beanstream(
+            hash_validation=True, # hash_validation,
+            require_billing_address=False,
+            require_cvd=True)
+        self.beangw.configure(
+            kwargs["merchant_id"],
+            None,
+            None,
+            None,
+            hashcode=kwargs.get("hashValue", None),
+            hash_algorithm=kwargs.get("hashAlgo", None),
+            payment_profile_passcode=None,
+            recurring_billing_passcode=None)
+
+    def convert_cc(self, credit_card):
+        """Convert merchant.billing.utils.CreditCard to beanstream.billing.CreditCard"""
+        return CreditCard(
+            credit_card.first_name + " " + credit_card.last_name,
+            credit_card.number,
+            credit_card.month, credit_card.year,
+            credit_card.verification_value)
 
     def add_hash(self, data, key):
         data2 = data + key
@@ -118,30 +136,118 @@ class BeanstreamGateway(Gateway):
 
     def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
-        post = {}     
-        return self._base_purchase(money, credit_card, post, options)
+        card = self.convert_cc(credit_card)
+        txn = self.beangw.purchase(money, card, None)
+        txn.set_comments('Test')
+        resp = txn.commit()
+
+        status = "FAILURE"
+        response = ""
+        txnid = None
+        if resp.approved():
+            status = "SUCCESS"
+            txnid = resp.transaction_id()
+        else:
+            if resp.resp["messageId"][0] == '52':
+                raise CardNotSupported
+            response = resp.get_merchant_message()
+
+        return {"status": status, "response": response, "txnid": txnid}
+
 
     def authorize(self, money, credit_card, options=None):
         """Authorization for a future capture transaction"""
         # TODO: Need to add check for trnAmount 
         # For Beanstream Canada and TD Visa & MasterCard merchant accounts this value may be $0 or $1 or more. 
         # For all other scenarios, this value must be $0.50 or greater.
-        post = { 'trnType' : 'PA' }
-        return self._base_purchase(money, credit_card, post, options)
+        card = self.convert_cc(credit_card)
+        txn = self.beangw.preauth(money, card, None)
+        txn.set_comments('Test')
+        resp = txn.commit()
+
+        status = "FAILURE"
+        response = ""
+        txnid = None
+        if resp.approved():
+            status = "SUCCESS"
+            txnid = resp.transaction_id()
+        else:
+            import eat
+            eat.gaebp(True)
+            response = str(resp)
+
+        return {"status": status, "response": response, "txnid": txnid}
+
+    def unauthorize(self, money, authorization, options=None):
+        """Cancel a previously authorized transaction"""
+        txn = self.beangw.cancel_preauth(authorization)
+        resp = txn.commit()
+
+        status = "FAILURE"
+        response = ""
+
+        if resp.approved():
+            status = "SUCCESS"
+        else:
+            import eat
+            eat.gaebp(True)
+            response = str(resp)
+
+        return {"status": status, "response": response}
+
 
     def capture(self, money, authorization, options=None):
         """Capture funds from a previously authorized transaction"""
-        post = { 'trnType' : 'PAC' }
-        return self._base_purchase(money, credit_card, post, options)
-        raise NotImplementedError
+        txn = self.beangw.preauth_completion(authorization, money)
+        resp = txn.commit()
+
+        status = "FAILURE"
+        response = ""
+
+        if resp.approved():
+            status = "SUCCESS"
+        else:
+            import eat
+            eat.gaebp(True)
+            response = str(resp)
+
+        return {"status": status, "response": response}
 
     def void(self, identification, options=None):
         """Null/Blank/Delete a previous transaction"""
-        raise NotImplementedError
+        """Right now this only handles VOID_PURCHASE"""
+        txn = self.beangw.void_purchase(identification["txnid"], identification["amount"])
+        resp = txn.commit()
+
+        status = "FAILURE"
+        response = ""
+
+        if resp.approved():
+            status = "SUCCESS"
+        else:
+            import eat
+            eat.gaebp(True)
+            response = str(resp)
+
+        return {"status": status, "response": response}
 
     def credit(self, money, identification, options=None):
         """Refund a previously 'settled' transaction"""
-        raise NotImplementedError
+        txn = self.beangw.return_purchase(identification, money)
+        resp = txn.commit()
+
+        status = "FAILURE"
+        response = ""
+        txnid = None
+        if resp.approved():
+            status = "SUCCESS"
+            txnid = resp.transaction_id()
+        else:
+            import eat
+            eat.gaebp(True)
+            response = str(resp)
+
+        return {"status": status, "response": response, "txnid": txnid}
 
     def recurring(self, money, creditcard, options=None):
         """Setup a recurring transaction"""
