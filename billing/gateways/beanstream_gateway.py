@@ -69,15 +69,24 @@ class BeanstreamGateway(Gateway):
             hash_validation=True, # hash_validation,
             require_billing_address=False,
             require_cvd=True)
+
+        merchant_id = kwargs.pop("merchant_id", None)
+        login_company = kwargs.pop("login_company", None)
+        login_user = kwargs.pop("login_user", None)
+        login_password = kwargs.pop("login_password", None)
+
         self.beangw.configure(
-            kwargs["merchant_id"],
-            None,
-            None,
-            None,
-            hashcode=kwargs.get("hashValue", None),
-            hash_algorithm=kwargs.get("hashAlgo", None),
-            payment_profile_passcode=None,
-            recurring_billing_passcode=None)
+            merchant_id,
+            login_company,
+            login_user,
+            login_password,
+            **kwargs)
+        '''
+        hashcode=kwargs.get("hashValue", None),
+        hash_algorithm=kwargs.get("hashAlgo", None),
+        payment_profile_passcode=None,
+        recurring_billing_passcode=None)
+        '''
 
     def convert_cc(self, credit_card):
         """Convert merchant.billing.utils.CreditCard to beanstream.billing.CreditCard"""
@@ -109,10 +118,6 @@ class BeanstreamGateway(Gateway):
 
         key = "dine-otestkey"
         data = self.add_hash(data, key)
-
-        import eat
-        eat.gaebp(True)
-
         conn = urllib2.Request(url=self.txnurl, data=data)
 
         try:
@@ -136,8 +141,14 @@ class BeanstreamGateway(Gateway):
 
     def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
-        card = self.convert_cc(credit_card)
-        txn = self.beangw.purchase(money, card, None)
+        txn = None
+        if credit_card:
+            card = self.convert_cc(credit_card)
+            txn = self.beangw.purchase(money, card, None)
+        elif options.get("customer_code"):
+            customer_code = options.get("customer_code", None)
+            txn = self.beangw.purchase_with_payment_profile(money, customer_code)
+
         txn.set_comments('Test')
         resp = txn.commit()
 
@@ -172,8 +183,6 @@ class BeanstreamGateway(Gateway):
             status = "SUCCESS"
             txnid = resp.transaction_id()
         else:
-            import eat
-            eat.gaebp(True)
             response = str(resp)
 
         return {"status": status, "response": response, "txnid": txnid}
@@ -189,8 +198,6 @@ class BeanstreamGateway(Gateway):
         if resp.approved():
             status = "SUCCESS"
         else:
-            import eat
-            eat.gaebp(True)
             response = str(resp)
 
         return {"status": status, "response": response}
@@ -207,8 +214,6 @@ class BeanstreamGateway(Gateway):
         if resp.approved():
             status = "SUCCESS"
         else:
-            import eat
-            eat.gaebp(True)
             response = str(resp)
 
         return {"status": status, "response": response}
@@ -225,8 +230,6 @@ class BeanstreamGateway(Gateway):
         if resp.approved():
             status = "SUCCESS"
         else:
-            import eat
-            eat.gaebp(True)
             response = str(resp)
 
         return {"status": status, "response": response}
@@ -243,8 +246,6 @@ class BeanstreamGateway(Gateway):
             status = "SUCCESS"
             txnid = resp.transaction_id()
         else:
-            import eat
-            eat.gaebp(True)
             response = str(resp)
 
         return {"status": status, "response": response, "txnid": txnid}
@@ -253,10 +254,28 @@ class BeanstreamGateway(Gateway):
         """Setup a recurring transaction"""
         raise NotImplementedError
 
-    def store(self, creditcard, options=None):
+    def store(self, credit_card, options=None):
         """Store the credit card and user profile information
         on the gateway for future use"""
-        raise NotImplementedError
+        card = self.convert_cc(credit_card)
+        billing_address = options.get("billing_address")
+        txn = self.beangw.create_payment_profile(card, billing_address)
+
+        resp = txn.commit()
+
+        status = "FAILURE"
+        response = ""
+        customer = None
+        if resp.approved():
+            status = "SUCCESS"
+            customer = resp.customer_code()
+        elif resp.resp["responseCode"] == ["17"]:
+            status = "SUCCESS"
+            customer = resp.resp["matchedCustomerCode"][0]
+        else:
+            response = str(resp)
+
+        return {"status": status, "response": response, "customer": customer}
 
     def unstore(self, identification, options=None):
         """Delete the previously stored credit card and user

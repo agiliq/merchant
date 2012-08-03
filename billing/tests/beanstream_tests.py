@@ -1,9 +1,12 @@
+from datetime import date
 from django.test import TestCase
 from billing import get_gateway, CreditCard
 from billing.signals import *
 from billing.models import AuthorizeAIMResponse
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
+
+from beanstream.billing import Address
 
 class BeanstreamGatewayTestCase(TestCase):
     approved_cards = {'visa': {'number':      '4030000010001234', 'cvd': '123'},
@@ -24,11 +27,12 @@ class BeanstreamGatewayTestCase(TestCase):
 
     def setUp(self):
         self.merchant = get_gateway("beanstream", **{"merchant_id": 267390000,
-                                                     "hashValue"  : "dine-otestkey",
-                                                     "hashAlgo"   : "SHA1"})
+                                                     "hashcode"  : "dine-otestkey",
+                                                     "hash_algorithm"   : "SHA1",
+                                                     "payment_profile_passcode":"BCCE75A688F8497E9CDBC77AA8178581",
+                                                })
         self.merchant.test_mode = True
-        '''
-        self.billing_address = billing.Address(
+        self.billing_address = Address(
             'John Doe',
             'john.doe@example.com',
             '555-555-5555',
@@ -38,12 +42,13 @@ class BeanstreamGatewayTestCase(TestCase):
             'ON',
             'A1A1A1',
             'CA')
-        '''
 
     def ccFactory(self, number, cvd):
-        return CreditCard(first_name="John",
-                          last_name="Doe",
-                          month=12, year=2012, # Use current date time to generate a date in the future
+        today = date.today()
+        return CreditCard(first_name = "John",
+                          last_name = "Doe",
+                          month = str(today.month),
+                          year = str(today.year + 1),
                           number = number,
                           verification_value = cvd)
 
@@ -61,6 +66,15 @@ class BeanstreamGatewayTestCase(TestCase):
         credit_card = self.ccFactory("4222222222222", "100")
         self.merchant.validate_card(credit_card)
         self.assertEquals(credit_card.card_type, Visa)
+
+    def testCreditCardExpired(self):
+        credit_card = CreditCard(first_name="John",
+                          last_name="Doe",
+                          month=12, year=2011, # Use current date time to generate a date in the future
+                          number = self.approved_cards["visa"]["number"],
+                          verification_value = self.approved_cards["visa"]["cvd"])
+        resp = self.merchant.purchase(8, credit_card)
+        self.assertNotEquals(resp["status"], "SUCCESS")
 
     def testPurchase(self):
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
@@ -122,3 +136,16 @@ class BeanstreamGatewayTestCase(TestCase):
         response = self.merchant.unauthorize(None, txnid)
         self.assertEquals(response["status"], "SUCCESS")
 
+    def testCreateProfile(self):
+        credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
+                                     self.approved_cards["visa"]["cvd"])
+        response = self.merchant.store(credit_card, {"billing_address":self.billing_address})
+        self.assertEquals(response["status"], "SUCCESS")
+
+        customer_code = response["customer"]
+        self.assertIsNotNone(customer_code)
+
+        response = self.merchant.purchase('1.00', None, {"customer_code":customer_code})
+        self.assertEquals(response["status"], "SUCCESS")
+        txnid = response["txnid"]
+        self.assertIsNotNone(txnid)
