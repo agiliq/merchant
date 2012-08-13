@@ -55,10 +55,10 @@ class AmazonFpsIntegration(Integration):
         tmp_fields.pop("aws_access_key", None)
         tmp_fields.pop("aws_secret_access_key", None)
         tmp_fields.pop("paymentPage", None)
-        return self.fps_connection.make_url(tmp_fields.pop("returnURL"), 
-                                            tmp_fields.pop("paymentReason"),
-                                            tmp_fields.pop("pipelineName"),
-                                            str(tmp_fields.pop("transactionAmount")),
+        return self.fps_connection.cbui_url(returnURL=tmp_fields.pop("returnURL"),
+                                            paymentReason=tmp_fields.pop("paymentReason"),
+                                            pipelineName=tmp_fields.pop("pipelineName"),
+                                            transactionAmount=str(tmp_fields.pop("transactionAmount")),
                                             **tmp_fields)
 
     def purchase(self, amount, options=None):
