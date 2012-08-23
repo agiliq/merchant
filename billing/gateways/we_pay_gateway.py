@@ -23,6 +23,7 @@ class WePayGateway(Gateway):
         self.we_pay_settings = merchant_settings["we_pay"]
 
     def purchase(self, money, credit_card, options = None):
+        options = options or {}
         params = {}
         params.update({
                 'account_id': self.we_pay_settings.get("ACCOUNT_ID", ""),
@@ -47,6 +48,7 @@ class WePayGateway(Gateway):
         return {'status': 'SUCCESS', 'response': response}
 
     def authorize(self, money, credit_card, options = None):
+        options = options or {}
         resp = self.store(credit_card, options)
         if resp["status"] == "FAILURE":
             transaction_was_unsuccessful.send(sender=self,
@@ -55,7 +57,7 @@ class WePayGateway(Gateway):
             return resp
         token = options.pop("access_token", self.we_pay_settings["ACCESS_TOKEN"])
         try:
-            response = self.we_pay.call('/credit_card/authorize', {
+            resp = self.we_pay.call('/credit_card/authorize', {
                     'client_id': self.we_pay_settings["CLIENT_ID"],
                     'client_secret': self.we_pay_settings["CLIENT_SECRET"],
                     'credit_card_id': resp['response']['credit_card_id']
@@ -65,12 +67,23 @@ class WePayGateway(Gateway):
                                               type="authorize",
                                               response=error)
             return {'status': 'FAILURE', 'response': error}
+        params = {
+            "auto_capture": False
+            }
+        params.update(options)
+        response = self.purchase(money, resp["credit_card_id"], params)
+        if response["status"] == "FAILURE":
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="authorize",
+                                              response=response["response"])
+            return response
         transaction_was_successful.send(sender=self,
                                         type="authorize",
-                                        response=response)
-        return {'status': 'SUCCESS', 'response': response}
+                                        response=response["response"])
+        return response
 
     def capture(self, money, authorization, options = None):
+        options = options or {}
         params = {
             'checkout_id': authorization,
             }
@@ -88,6 +101,7 @@ class WePayGateway(Gateway):
         return {'status': 'SUCCESS', 'response': response}
 
     def void(self, identification, options = None): 
+        options = options or {}
         params = {
             'checkout_id': identification,
             'cancel_reason': options.pop("description", "")
@@ -106,6 +120,7 @@ class WePayGateway(Gateway):
         return {'status': 'SUCCESS', 'response': response}
 
     def credit(self, money, identification, options = None):
+        options = options or {}
         params = {
             'checkout_id': identification,
             'refund_reason': options.pop("description", ""),
@@ -126,7 +141,9 @@ class WePayGateway(Gateway):
         return {'status': 'SUCCESS', 'response': response}
 
     def recurring(self, money, credit_card, options = None):
+        options = options or {}
         params = {
+            'account_id': self.we_pay_settings.get("ACCOUNT_ID", ""),
             "short_description": options.pop("description", ""),
             "amount": money,
             }
@@ -145,6 +162,7 @@ class WePayGateway(Gateway):
         return {'status': 'SUCCESS', 'response': response}
 
     def store(self, credit_card, options = None):
+        options = options or {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
         token = options.pop("access_token", self.we_pay_settings["ACCESS_TOKEN"])
@@ -152,12 +170,12 @@ class WePayGateway(Gateway):
             response = self.we_pay.call('/credit_card/create', {
                     'client_id': self.we_pay_settings["CLIENT_ID"],
                     'user_name': credit_card.name,
-                    'email': options["customer"]["email"],
+                    'email': options.pop("customer")["email"],
                     'cc_number': credit_card.number,
                     'cvv': credit_card.verification_value,
                     'expiration_month': credit_card.month,
                     'expiration_year': credit_card.year,
-                    'address': options["billing_address"]
+                    'address': options.pop("billing_address")
                     }, token=token)
         except WePayError, error:
             transaction_was_unsuccessful.send(sender=self, 
