@@ -39,3 +39,4 @@ then you might wish to run only that apps test suite. For example, to run the
     python manage.py test billing.GoogleCheckoutTestCase
 
 .. _Merchant: http://github.com/agiliq/merchant
+.. _PyPi: http://pypi.python.org/pypi/django-merchant
