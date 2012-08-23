@@ -25,6 +25,7 @@ Contents:
     * :doc:`Samurai Payment <gateways/samurai_gateway>`
     * :doc:`Stripe Payments  <gateways/stripe_payment>`
     * :doc:`Paylane  <gateways/paylane_gateway>`
+    * :doc:`WePay  <gateways/wepay_gateway>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 

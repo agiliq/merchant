@@ -206,7 +206,7 @@ def we_pay(request):
     amount = 10
     response = wp.purchase(10, None, {
             "description": "Test Merchant Description", 
-            "type": "service",
+            "type": "SERVICE",
             "redirect_uri": request.build_absolute_uri(reverse('app_we_pay_redirect'))
             })
     if response["status"] == "SUCCESS":
