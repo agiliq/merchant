@@ -2,7 +2,7 @@
 WePay Payments
 ---------------
 
-`WePay`_ is a service that lets you accept payments not just from 
+`WePay.com`_ is a service that lets you accept payments not just from 
 credit cards but also from bank accounts.
 
 WePay works slightly differently and is a hybrid between a :doc:`Gateway <gateways>`
@@ -22,7 +22,7 @@ Settings attributes required for this integration are:
   other users (say in a marketplace setup), then it is optional in the ``settings.py``
   file but has to be passed in the options dictionary (with the key ``account_id``) 
   in the views.
-** ``ACCESS_TOKEN``: The OAuth2 access token acquired from the user after the 
+* ``ACCESS_TOKEN``: The OAuth2 access token acquired from the user after the 
   installation of the WePay application. If you are accepting payments for yourself,
   then this attribute is compulsory. If you are accepting payments for other users
   (say in a marketplace setup), then it is optional in the ``settings.py`` file but
@@ -104,5 +104,5 @@ Example:
 	    return HttpResponseRedirect(resp["response"]["preapproval_uri"])
 	...
 
-.. _`WePay`: https://www.wepay.com/
+.. _`WePay.com`: https://www.wepay.com/
 .. _`wepay`: http://pypi.python.org/pypi/wepay/
