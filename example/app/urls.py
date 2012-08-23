@@ -76,4 +76,8 @@ urlpatterns += patterns('django.views.generic.simple',
         name='app_offsite_google_checkout_done'),
 )
 
-
+urlpatterns += patterns('app.views',
+    url(r'^we_pay/$', 'we_pay', name="app_we_pay"),
+    url(r'we_pay_redirect/$', 'we_pay_redirect', name="app_we_pay_redirect"),
+    url(r'^we_pay_ipn/$', 'we_pay_ipn', name="app_we_pay_ipn"),
+)

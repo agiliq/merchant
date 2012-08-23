@@ -3,7 +3,7 @@ import datetime
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 from billing import CreditCard, get_gateway, get_integration
 from billing.gateway import CardNotSupported
@@ -194,11 +194,36 @@ def paylane(request):
             response = merchant.purchase(amount, credit_card, options = options)
     else:
         form = CreditCardForm(initial={'number':'4111111111111111'})
-    return render(request, 'app/index.html',{'form': form,
-                                             'amount':amount,
-                                             'response':response,
-                                             'title':'Paylane Gateway'})
+    return render(request, 'app/index.html', {'form': form,
+                                              'amount':amount,
+                                              'response':response,
+                                              'title':'Paylane Gateway'})
 
+
+def we_pay(request):
+    wp = get_gateway("we_pay")
+    form = None
+    amount = 10
+    response = wp.purchase(10, None, {
+            "description": "Test Merchant Description", 
+            "type": "service",
+            "redirect_uri": request.build_absolute_uri(reverse('app_we_pay_redirect'))
+            })
+    if response["status"] == "SUCCESS":
+        return HttpResponseRedirect(response["response"]["checkout_uri"])
+    return render(request, 'app/index.html', {'form': form,
+                                              'amount':amount,
+                                              'response':response,
+                                              'title':'WePay Payment'})
+
+def we_pay_redirect(request):
+    checkout_id = request.GET.get("checkout_id", None)
+    return render(request, 'app/we_pay_success.html', {"checkout_id": checkout_id})
+
+
+def we_pay_ipn(request):
+    # Just a dummy view for now.
+    return render(request, 'app/index.html', {})
 
 
 def offsite_authorize_net(request):

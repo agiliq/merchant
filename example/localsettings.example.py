@@ -54,18 +54,34 @@ MERCHANT_SETTINGS = {
         "PRIVATE_KEY" : ""
         },
 
-    #Stripe Payment Settings
+    # Stripe Payment Settings
     "stripe": {
         "API_KEY" : '',
         "PUBLISHABLE_KEY" : ''
         },
 
-    #SAMURAI Settings
+    # SAMURAI Settings
     "samurai": {
         "MERCHANT_KEY" : '',
         "MERCHANT_PASSWORD" : '',
         "PROCESSOR_TOKEN" : ''
-    }
+    },
+
+    # Paylane Settings
+    "paylane": {
+        "USERNAME": "",
+        "PASSWORD": ""
+        },
+
+    # WePay Settings
+    "we_pay": {
+        "CLIENT_ID": "",
+        "CLIENT_SECRET": "",
+        # Below two are optional if are passed as 
+        # extra option items. Useful for marketplace
+        "ACCOUNT_ID": "",
+        "ACCESS_TOKEN": "",
+        }
 }
 
 # Special case for PayPal because we rely on django-paypal
