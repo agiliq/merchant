@@ -16,6 +16,8 @@ Following gateways are supported:
 * Braintree Payments (Server to Server)
 * Stripe
 * Samurai from Fee Fighters
+* Paylane
+* WePay
 
 Off-Site Processing
 --------------------
