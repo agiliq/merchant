@@ -58,7 +58,7 @@ class WePayGateway(Gateway):
             response = self.we_pay.call('/credit_card/authorize', {
                     'client_id': self.we_pay_settings["CLIENT_ID"],
                     'client_secret': self.we_pay_settings["CLIENT_SECRET"],
-                    'credit_card_id': resp['credit_card_id']
+                    'credit_card_id': resp['response']['credit_card_id']
                     }, token=token)
         except WePayError, error:
             transaction_was_unsuccessful.send(sender=self,
