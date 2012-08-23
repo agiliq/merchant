@@ -46,9 +46,15 @@ Usage
     ...                number="4222222222222",
     ...                verification_value="100")
     >>>
-    >>> response1 = g1.purchase(100, cc, options = {...})
+    >>> response1 = g1.purchase(100, cc, options = {"request": request, ...})
     >>> response1
     {"status": "SUCCESS", "response": <PayPalNVP object>}
+
+.. note::
+
+    The PayPal gateway expects you pass the `request` object as a part of
+    the `options` dictionary because the client's IP address may be used for
+    fraud detection.
 
 .. _django-paypal: http://github.com/dcramer/django-paypal/
 .. _`PayPal Website Payments Pro`: https://merchant.paypal.com/cgi-bin/marketingweb?cmd=_render-content&content_ID=merchant/wp_pro
