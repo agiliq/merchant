@@ -2,6 +2,12 @@
 Changes
 ========
 
+0.06
+----
+
+* Added WePay gateway
+* Added Authorize.Net Direct Post Method integration
+
 0.05
 -----
 

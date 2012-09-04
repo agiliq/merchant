@@ -37,6 +37,7 @@ Contents:
     * :doc:`Stripe  <offsite/stripe_integration>`
     * :doc:`Samurai  <offsite/samurai_integration>`
     * :doc:`eWAY <offsite/eway_au>`
+    * :doc:`Authorize.Net Direct Post Method <offsite/authorize_net_dpm>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
