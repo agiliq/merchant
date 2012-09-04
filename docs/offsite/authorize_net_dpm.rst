@@ -44,7 +44,7 @@ Here are the methods and attributes implemented on the ``AuthorizeNetDpmIntegrat
   snippet to Authorize.Net.
 * ``authorize_net_success_handler(self, request)``: The method that renders the
   `billing/authorize_net_success.html`.
-* ``braintree_failure_handler(self, request)``: The method that renders the 
+* ``authorize_net_failure_handler(self, request)``: The method that renders the 
   `billing/authorize_net_failure.html`.
 
 
