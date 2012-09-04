@@ -7,7 +7,8 @@ MERCHANT_SETTINGS = {
     # AUTHORIZE.NET SETTINGS
     "authorize_net": {
         "LOGIN_ID" : '',
-        "TRANSACTION_KEY" : ''
+        "TRANSACTION_KEY" : '',
+        "MD5_HASH": ''
         },
 
     # PAYPAL SETTINGS

@@ -3,7 +3,6 @@ Template tags for Authorize.net Direct Post Method
 '''
 from django import template
 from django.template.loader import render_to_string
-from billing.forms.authorize_net_forms import AuthorizeNetDPMForm
 
 register = template.Library()
 
@@ -14,7 +13,7 @@ class AuthorizeNetDPMNode(template.Node):
     def render(self, context):
         int_obj = self.integration.resolve(context)
         form_str = render_to_string("billing/authorize_net_dpm.html", 
-                                    {"form": AuthorizeNetDPMForm(int_obj),
+                                    {"form": int_obj.generate_form(),
                                      "integration": int_obj}, context)
         return form_str
 
