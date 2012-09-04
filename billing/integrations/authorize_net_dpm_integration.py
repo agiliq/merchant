@@ -27,7 +27,7 @@ class AuthorizeNetDpmIntegration(Integration):
                                            "configured." % self.display_name)
         self.authorize_net_settings = merchant_settings["authorize_net"]
 
-    def get_form_class(self):
+    def form_class(self):
         return AuthorizeNetDPMForm
 
     def generate_form(self):
@@ -42,7 +42,7 @@ class AuthorizeNetDpmIntegration(Integration):
                              hashlib.md5)
         initial_data.update({'x_login': login_id, 
                              'x_fp_hash': x_fp_hash.hexdigest()})
-        form = self.get_form_class()(initial=initial_data)
+        form = self.form_class()(initial=initial_data)
         return form
 
     @property

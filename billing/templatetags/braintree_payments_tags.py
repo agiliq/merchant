@@ -3,7 +3,6 @@ Template tags for Braintree Payments Transparent Redirect
 '''
 from django import template
 from django.template.loader import render_to_string
-from billing.forms.braintree_payments_forms import BraintreePaymentsForm
 
 register = template.Library()
 
@@ -14,7 +13,7 @@ class BraintreePaymentsNode(template.Node):
     def render(self, context):
         int_obj = self.integration.resolve(context)
         form_str = render_to_string("billing/braintree_payments.html", 
-                                    {"form": BraintreePaymentsForm(int_obj),
+                                    {"form": int_obj.generate_form(),
                                      "integration": int_obj}, context)
         return form_str
 

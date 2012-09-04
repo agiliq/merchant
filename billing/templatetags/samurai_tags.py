@@ -3,7 +3,6 @@ Template tags for Samurai Non PCI Complaince
 '''
 from django import template
 from django.template.loader import render_to_string
-from billing.forms.samurai_forms import SamuraiForm
 
 register = template.Library()
 
@@ -14,7 +13,7 @@ class SamuraiNode(template.Node):
     def render(self, context):
         int_obj = self.integration.resolve(context)
         form_str = render_to_string("billing/samurai.html", 
-                                    {"form":SamuraiForm(int_obj),
+                                    {"form": int_obj.generate_form(),
                                      "integration": int_obj}, context)
         return form_str
 

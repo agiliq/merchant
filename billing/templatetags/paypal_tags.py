@@ -1,7 +1,6 @@
 '''
 Template tags for paypal offsite payments
 '''
-from paypal.standard.forms import PayPalPaymentsForm, PayPalEncryptedPaymentsForm
 from django import template
 from django.template.loader import render_to_string
 
@@ -14,12 +13,8 @@ class PayPalNode(template.Node):
 
     def render(self, context):
         int_obj = self.integration.resolve(context)
-        if self.encrypted:
-            form_class = PayPalEncryptedPaymentsForm
-        else:
-            form_class = PayPalPaymentsForm
         form_str = render_to_string("billing/paypal.html", 
-                                    {"form": form_class(initial=int_obj.fields),
+                                    {"form": int_obj.generate_form(),
                                      "integration": int_obj}, context)
         return form_str
 

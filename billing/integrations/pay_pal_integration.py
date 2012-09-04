@@ -4,6 +4,7 @@ from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
 from django.conf.urls.defaults import patterns, include
 from paypal.standard.ipn.signals import payment_was_flagged, payment_was_successful
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
+from paypal.standard.forms import PayPalPaymentsForm, PayPalEncryptedPaymentsForm
 
 class PayPalIntegration(Integration):
     display_name = "PayPal IPN"
@@ -35,6 +36,14 @@ class PayPalIntegration(Integration):
            (r'^', include('paypal.standard.ipn.urls')),
             )
         return urlpatterns
+
+    def form_class(self):
+        if self.encrypted:
+            return PayPalEncryptedPaymentsForm
+        return PayPalPaymentsForm
+
+    def generate_form(self):
+        return self.form_class()(initial=self.fields)
 
 def unsuccessful_txn_handler(sender, **kwargs):
     transaction_was_unsuccessful.send(sender=sender.__class__,

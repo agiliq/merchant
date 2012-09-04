@@ -18,9 +18,12 @@ class SamuraiIntegration(Integration):
         self.merchant_key = samurai_settings['MERCHANT_KEY']
         self.gateway = get_gateway("samurai")
 
+    def form_class(self):
+        return SamuraiForm
+
     def generate_form(self):
         initial_data = self.fields
-        form = SamuraiForm(initial=initial_data)
+        form = self.form_class()(initial=initial_data)
         return form
         
     @csrf_exempt

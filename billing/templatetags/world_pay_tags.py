@@ -3,7 +3,6 @@ Template tags for WorldPay offsite payments
 '''
 from django import template
 from django.template.loader import render_to_string
-from billing.forms.world_pay_forms import WPHostedPaymentForm
 
 register = template.Library()
 
@@ -14,7 +13,7 @@ class WorldPayNode(template.Node):
     def render(self, context):
         int_obj = self.integration.resolve(context)
         form_str = render_to_string("billing/world_pay.html", 
-                                    {"form": WPHostedPaymentForm(initial=int_obj.fields),
+                                    {"form": int_obj.generate_form(),
                                      "integration": int_obj}, context)
         return form_str
 

@@ -97,8 +97,11 @@ class BraintreePaymentsIntegration(Integration):
         tr_data = braintree.Transaction.tr_data_for_sale(tr_data_dict, notification_url)
         return tr_data
 
+    def form_class(self):
+        return BraintreePaymentsForm
+
     def generate_form(self):
         initial_data = self.fields
         initial_data.update({"tr_data": self.generate_tr_data()})
-        form = BraintreePaymentsForm(initial=initial_data)
+        form = self.form_class()(initial=initial_data)
         return form
