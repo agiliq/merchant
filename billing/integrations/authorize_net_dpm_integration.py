@@ -12,6 +12,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 import hashlib
 import hmac
+import urllib
 
 csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
@@ -71,10 +72,13 @@ class AuthorizeNetDpmIntegration(Integration):
             transaction_was_successful.send(sender=self,
                                             type="sale",
                                             response=result)
-            redirect_url = request.build_absolute_uri(reverse("authorize_net_success_handler"))
+            redirect_url = "%s?%s" %(request.build_absolute_uri(reverse("authorize_net_success_handler")),
+                                     urllib.urlencode({"response": result,
+                                                       "transaction_id": request.POST["x_trans_id"]}))
             return render_to_response("billing/authorize_net_relay_snippet.html",
                                       {"redirect_url" : redirect_url})
-        redirect_url = request.build_absolute_uri(reverse("authorize_net_failure_handler"))
+        redirect_url = "%s?%s" %(request.build_absolute_uri(reverse("authorize_net_failure_handler")),
+                                 urllib.urlencode({"response": result}))
         transaction_was_unsuccessful.send(sender=self,
                                           type="sale",
                                           response=result)
@@ -82,13 +86,15 @@ class AuthorizeNetDpmIntegration(Integration):
                                   {"redirect_url": redirect_url})
 
     def authorize_net_success_handler(self, request):
+        response = request.GET
         return render_to_response("billing/authorize_net_success.html", 
-                                  {"response": "SUCCESS"},
+                                  {"response": response},
                                   context_instance=RequestContext(request))
 
     def authorize_net_failure_handler(self, request):
+        response = request.GET
         return render_to_response("billing/authorize_net_failure.html", 
-                                  {"response": "FAILURE"},
+                                  {"response": response},
                                   context_instance=RequestContext(request))
 
     def get_urls(self):
