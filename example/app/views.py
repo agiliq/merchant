@@ -229,7 +229,7 @@ def we_pay_ipn(request):
 def offsite_authorize_net(request):
     params = {'x_amount': 1,
               'x_fp_sequence': datetime.datetime.now().strftime('%Y%m%d%H%M%S'),
-              'x_fp_timestamp': datetime.datetime.utcnow().strftime('%s'),
+              'x_fp_timestamp': datetime.datetime.now().strftime('%s'),
               'x_recurring_bill': 'F',
               }
     authorize_net_obj.add_fields(params)
