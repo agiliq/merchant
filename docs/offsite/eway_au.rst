@@ -151,13 +151,13 @@ success after the redirect:
 
     :returns: dict
 
-    ====================== ==========================
+    ====================== ======================================
     Key                    Example
-    ---------------------- --------------------------
+    ---------------------- --------------------------------------
     ``access_code``
     ``authorisation_code`` ``"198333"``
     ``response_code``      ``"00"``
-    ``response_message``   ``"Transaction Approved"``
+    ``response_message``   ``"Transaction Approved"`` or ``None``
     ``option_1``           ``"a1b2c3"``
     ``option_2``
     ``option_3``
@@ -169,7 +169,7 @@ success after the redirect:
     ``error_message``
     ``token_customer_id``  ``"1234567890123456"``
     ``beagle_score``       ``10.23``
-    ====================== ==========================
+    ====================== ======================================
 
 
 Example:
