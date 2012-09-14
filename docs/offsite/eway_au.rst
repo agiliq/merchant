@@ -61,6 +61,8 @@ success after the redirect:
 
     The integration is automatically updated with the returned access code.
 
+    For a detailed description of each field, refer to the `Rapid API docs`_.
+
     **Supported keys in** ``customer``:
 
     ===================== ===========================
@@ -151,6 +153,8 @@ success after the redirect:
 
     :returns: dict
 
+    For a detailed description of each field, refer to the `Rapid API docs`_.
+
     ====================== ======================================
     Key                    Example
     ---------------------- --------------------------------------
@@ -227,3 +231,5 @@ For a more configurable form, use the following pattern:
         {{ integration.generate_form.as_p }}
         <input type="submit"/>
     </form>
+
+.. _Rapid API docs: https://dl.dropbox.com/u/33499139/django-merchant/RapidAPIDocumentation_AU.pdf
