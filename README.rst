@@ -30,6 +30,7 @@ Off-Site Processing
 * Stripe.js
 * Samurai
 * eWAY
+* Authorize.net Direct Post Method
 
 Documentation
 --------------
