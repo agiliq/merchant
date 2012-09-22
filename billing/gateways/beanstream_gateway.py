@@ -174,6 +174,7 @@ class BeanstreamGateway(Gateway):
         card = self.convert_cc(credit_card)
         txn = self.beangw.preauth(money, card, None)
         txn.set_comments('Test')
+
         resp = txn.commit()
 
         status = "FAILURE"
@@ -183,7 +184,7 @@ class BeanstreamGateway(Gateway):
             status = "SUCCESS"
             txnid = resp.transaction_id()
         else:
-            response = str(resp)
+            response = resp
 
         return {"status": status, "response": response, "txnid": txnid}
 
@@ -198,7 +199,7 @@ class BeanstreamGateway(Gateway):
         if resp.approved():
             status = "SUCCESS"
         else:
-            response = str(resp)
+            response = resp
 
         return {"status": status, "response": response}
 
@@ -210,13 +211,14 @@ class BeanstreamGateway(Gateway):
 
         status = "FAILURE"
         response = ""
-
+        txnid = None
         if resp.approved():
             status = "SUCCESS"
+            txnid = resp.transaction_id()
         else:
-            response = str(resp)
+            response = resp
 
-        return {"status": status, "response": response}
+        return {"status": status, "response": response, "txnid": txnid}
 
     def void(self, identification, options=None):
         """Null/Blank/Delete a previous transaction"""
@@ -230,7 +232,7 @@ class BeanstreamGateway(Gateway):
         if resp.approved():
             status = "SUCCESS"
         else:
-            response = str(resp)
+            response = resp
 
         return {"status": status, "response": response}
 
@@ -246,7 +248,7 @@ class BeanstreamGateway(Gateway):
             status = "SUCCESS"
             txnid = resp.transaction_id()
         else:
-            response = str(resp)
+            response = resp
 
         return {"status": status, "response": response, "txnid": txnid}
 
@@ -273,7 +275,7 @@ class BeanstreamGateway(Gateway):
             status = "SUCCESS"
             customer = resp.resp["matchedCustomerCode"][0]
         else:
-            response = str(resp)
+            response = resp
 
         return {"status": status, "response": response, "customer": customer}
 
