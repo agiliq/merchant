@@ -2,7 +2,9 @@ from billing import Integration, IntegrationNotConfigured
 from billing.models import GCNewOrderNotification
 from django.conf import settings
 from xml.dom.minidom import Document
-import hmac, hashlib, base64
+import hmac
+import hashlib
+import base64
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
@@ -10,7 +12,7 @@ from billing import signals
 from django.conf.urls.defaults import patterns
 from django.utils.decorators import method_decorator
 
-SANDBOX_URL = 'https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%s' 
+SANDBOX_URL = 'https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%s'
 PROD_URL = 'https://checkout.google.com/api/checkout/v2/checkout/Merchant/%s'
 
 BUTTON_SANDBOX_URL = 'http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%(merchant_id)s&w=%(width)s&h=%(height)s&style=white&variant=text&loc=en_US'
@@ -18,6 +20,7 @@ BUTTON_URL = 'http://checkout.google.com/checkout/buttons/checkout.gif?merchant_
 
 csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
+
 
 class GoogleCheckoutIntegration(Integration):
     display_name = 'Google Checkout'
@@ -42,7 +45,7 @@ class GoogleCheckoutIntegration(Integration):
         return PROD_URL % self.merchant_id
 
     def button_image_url(self):
-        params = {"merchant_id": self.merchant_id, 
+        params = {"merchant_id": self.merchant_id,
                   "width": self.button_width,
                   "height": self.button_height}
         if self.test_mode:
@@ -101,7 +104,6 @@ class GoogleCheckoutIntegration(Integration):
         return_url.appendChild(doc.createTextNode(self.fields["return_url"]))
         merchant_checkout_flow.appendChild(return_url)
 
-
         cart_xml = doc.toxml(encoding="utf-8")
         hmac_signature = hmac.new(self.merchant_key, cart_xml, hashlib.sha1).digest()
         self._signature = base64.b64encode(hmac_signature)
@@ -140,7 +142,8 @@ class GoogleCheckoutIntegration(Integration):
                                                                                                                                          "item_desc": item_desc,
                                                                                                                                          "item_price": item_price,
                                                                                                                                          "item_price_currency": item_price_currency,
-                                                                                                                                         "item_quantity": item_quantity,})
+                                                                                                                                         "item_quantity": item_quantity,
+                                                                                                                                         })
         return cart_blob
 
     def gc_new_order_notification(self, request):
@@ -149,50 +152,50 @@ class GoogleCheckoutIntegration(Integration):
 
         resp_fields = {
             "_type": "notify_type",
-            "serial-number" : "serial_number",      
-            "google-order-number" : "google_order_number",
-            "buyer-id" : "buyer_id",           
-            "buyer-shipping-address.contact-name" : "shipping_contact_name",
-            "buyer-shipping-address.address1" : "shipping_address1",    
-            "buyer-shipping-address.address2" : "shipping_address2",    
-            "buyer-shipping-address.city" : "shipping_city",        
-            "buyer-shipping-address.postal-code" : "shipping_postal_code", 
-            "buyer-shipping-address.region" : "shipping_region",      
-            "buyer-shipping-address.country-code" : "shipping_country_code",
-            "buyer-shipping-address.email" : "shipping_email",       
-            "buyer-shipping-address.company-name" : "shipping_company_name",
-            "buyer-shipping-address.fax" : "shipping_fax",         
-            "buyer-shipping-address.phone" : "shipping_phone",       
-            "buyer-billing-address.contact-name" : "billing_contact_name",
-            "buyer-billing-address.address1" : "billing_address1",    
-            "buyer-billing-address.address2" : "billing_address2",    
-            "buyer-billing-address.city" : "billing_city",        
-            "buyer-billing-address.postal-code" : "billing_postal_code", 
-            "buyer-billing-address.region" : "billing_region",      
-            "buyer-billing-address.country-code" : "billing_country_code",
-            "buyer-billing-address.email" : "billing_email",       
-            "buyer-billing-address.company-name" : "billing_company_name",
-            "buyer-billing-address.fax" : "billing_fax",         
-            "buyer-billing-address.phone" : "billing_phone",       
-            "buyer-marketing-preferences.email-allowed" : "marketing_email_allowed",
-            "order-adjustment.total-tax" : "total_tax",                
-            "order-adjustment.total-tax.currency" : "total_tax_currency",       
-            "order-adjustment.adjustment-total" : "adjustment_total",         
-            "order-adjustment.adjustment-total.currency" : "adjustment_total_currency",
-            "order-total" : "order_total",
-            "order-total.currency" : "order_total_currency",
-            "financial-order-state" : "financial_order_state",  
-            "fulfillment-order-state" : "fulfillment_order_state",
-            "timestamp" : "timestamp",
+            "serial-number": "serial_number",
+            "google-order-number": "google_order_number",
+            "buyer-id": "buyer_id",
+            "buyer-shipping-address.contact-name": "shipping_contact_name",
+            "buyer-shipping-address.address1": "shipping_address1",
+            "buyer-shipping-address.address2": "shipping_address2",
+            "buyer-shipping-address.city": "shipping_city",
+            "buyer-shipping-address.postal-code": "shipping_postal_code",
+            "buyer-shipping-address.region": "shipping_region",
+            "buyer-shipping-address.country-code": "shipping_country_code",
+            "buyer-shipping-address.email": "shipping_email",
+            "buyer-shipping-address.company-name": "shipping_company_name",
+            "buyer-shipping-address.fax": "shipping_fax",
+            "buyer-shipping-address.phone": "shipping_phone",
+            "buyer-billing-address.contact-name": "billing_contact_name",
+            "buyer-billing-address.address1": "billing_address1",
+            "buyer-billing-address.address2": "billing_address2",
+            "buyer-billing-address.city": "billing_city",
+            "buyer-billing-address.postal-code": "billing_postal_code",
+            "buyer-billing-address.region": "billing_region",
+            "buyer-billing-address.country-code": "billing_country_code",
+            "buyer-billing-address.email": "billing_email",
+            "buyer-billing-address.company-name": "billing_company_name",
+            "buyer-billing-address.fax": "billing_fax",
+            "buyer-billing-address.phone": "billing_phone",
+            "buyer-marketing-preferences.email-allowed": "marketing_email_allowed",
+            "order-adjustment.total-tax": "total_tax",
+            "order-adjustment.total-tax.currency": "total_tax_currency",
+            "order-adjustment.adjustment-total": "adjustment_total",
+            "order-adjustment.adjustment-total.currency": "adjustment_total_currency",
+            "order-total": "order_total",
+            "order-total.currency": "order_total_currency",
+            "financial-order-state": "financial_order_state",
+            "fulfillment-order-state": "fulfillment_order_state",
+            "timestamp": "timestamp",
             "shopping-cart.merchant-private-data": "private_data",
             }
-        
+
         for (key, val) in resp_fields.iteritems():
             data[val] = post_data.get(key, '')
 
         data['num_cart_items'] = len(post_data.getlist('shopping-cart.items'))
-        data['cart_items']     = self.gc_cart_items_blob(post_data)
-    
+        data['cart_items'] = self.gc_cart_items_blob(post_data)
+
         resp = GCNewOrderNotification.objects.create(**data)
 
     def gc_order_state_change_notification(self, request):
@@ -204,7 +207,7 @@ class GoogleCheckoutIntegration(Integration):
             signals.transaction_was_successful.send(sender=self.__class__,
                                                     type="purchase",
                                                     response=order)
-            
+
         order.fulfillment_order_state = post_data['new-fulfillment-order-state']
         order.save()
 

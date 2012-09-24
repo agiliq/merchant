@@ -1,9 +1,9 @@
-
 from django.conf import settings
 from eway_api.client import RebillEwayClient, HOSTED_TEST_URL, HOSTED_LIVE_URL
 from billing import Gateway, GatewayNotConfigured
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import Visa, MasterCard, DinersClub, JCB, AmericanExpress
+
 
 class EwayGateway(Gateway):
     default_currency = "AUD"
@@ -30,7 +30,7 @@ class EwayGateway(Gateway):
                                       url=self.service_url,
                                       )
         self.hosted_customer = self.client.client.factory.create("CreditCard")
-    
+
     def add_creditcard(self, credit_card):
         """add credit card details to the request parameters"""
         self.hosted_customer.CCNumber = credit_card.number
@@ -39,7 +39,7 @@ class EwayGateway(Gateway):
         self.hosted_customer.CCExpiryYear = str(credit_card.year)[-2:]
         self.hosted_customer.FirstName = credit_card.first_name
         self.hosted_customer.LastName = credit_card.last_name
-    
+
     def add_address(self, options=None):
         """add address details to the request parameters"""
         if not options:
@@ -76,13 +76,13 @@ class EwayGateway(Gateway):
             raise InvalidCard("Invalid Card")
         self.add_creditcard(credit_card)
         self.add_address(options)
-        
+
         customer_id = self.client.create_hosted_customer(self.hosted_customer)
-        pymt_response = self.client.process_payment(customer_id, 
-                                                    money, 
+        pymt_response = self.client.process_payment(customer_id,
+                                                    money,
                                                     options.get("invoice", 'test'),
                                                     options.get("description", 'test'))
-        
+
         if not hasattr(pymt_response, "ewayTrxnStatus"):
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
@@ -99,25 +99,24 @@ class EwayGateway(Gateway):
                                         type="purchase",
                                         response=pymt_response)
         return {"status": "SUCCESS", "response": pymt_response}
-    
-    def authorize(self, money, credit_card, options = None):
+
+    def authorize(self, money, credit_card, options=None):
         raise NotImplementedError
 
-    def capture(self, money, authorization, options = None):
+    def capture(self, money, authorization, options=None):
         raise NotImplementedError
 
-    def void(self, identification, options = None):
+    def void(self, identification, options=None):
         raise NotImplementedError
 
-    def credit(self, money, identification, options = None):
+    def credit(self, money, identification, options=None):
         raise NotImplementedError
 
-    def recurring(self, money, creditcard, options = None):
+    def recurring(self, money, creditcard, options=None):
         raise NotImplementedError
 
-    def store(self, creditcard, options = None):
+    def store(self, creditcard, options=None):
         raise NotImplementedError
 
-    def unstore(self, identification, options = None):
+    def unstore(self, identification, options=None):
         raise NotImplementedError
-

@@ -10,31 +10,37 @@ customer_address = PaylanePaymentCustomerAddress(street_house='',city='',state='
 customer = PaylanePaymentCustomer(name='',email='',ip_address='127.0.0.1',address=customer_address)
 pp = PaylanePayment(credit_card=Visa(),customer=customer,amount=0.01,product=product)
 """
+
+
 class PaylanePaymentCustomerAddress(object):
-    def __init__(self,street_house=None,city=None,state=None,zip_code=None,country_code=None):
+    def __init__(self, street_house=None, city=None, state=None, zip_code=None, country_code=None):
         self.street_house = street_house
         self.city = city
         self.state = state
         self.zip_code = zip_code
         self.country_code = country_code
-    
+
+
 class PaylanePaymentCustomer(object):
-    def __init__(self,name=None,email=None,ip_address=None,address=None):
+    def __init__(self, name=None, email=None, ip_address=None, address=None):
         self.name = name
         self.email = email
         self.ip_address = ip_address
         self.address = address
-    
+
+
 class PaylanePaymentProduct(object):
-    def __init__(self,description=None):
+    def __init__(self, description=None):
         self.description = description
-    
+
+
 class PaylanePayment(object):
-    def __init__(self,credit_card=None,customer=None,amount=0.0,product=None):
+    def __init__(self, credit_card=None, customer=None, amount=0.0, product=None):
         self.credit_card = credit_card
         self.customer = customer
         self.amount = amount
         self.product = product
+
 
 class PaylaneError(object):
     ERR_INVALID_ACCOUNT_HOLDER_NAME = 312
@@ -84,8 +90,6 @@ class PaylaneError(object):
     ERR_INVALID_SALE_ID = 441
     ERR_SALE_AUTHORIZATION_NOT_FOUND = 442
     ERR_CAPTURE_EXCEEDS_AUTHORIZATION_AMOUNT = 443
-    
-    
     ERR_TRANSACTION_LOCK = 401
     ERR_GATEWAY_PROBLEM = 402
     ERR_CARD_DECLINED = 403
@@ -102,13 +106,11 @@ class PaylaneError(object):
     ERR_CANNOT_RESALE_SALE = 478
     ERR_RESALE_CARD_EXPIRED = 479
     ERR_RESALE_WITH_REVERSAL = 480
-    
-    ERR_CANNOT_REFUND_SALE = 488    
+    ERR_CANNOT_REFUND_SALE = 488
     ERR_INTERNAL_ERROR = 501
     ERR_GATEWAY_ERROR = 502
     ERR_METHOD_NOT_ALLOWED = 503
     ERR_INACTIVE_MERCHANT = 505
-    
     ERR_FRAUD_DETECTED = 601
     ERR_BLACKLISTED_NUMBER = 611
     ERR_BLACKLISTED_COUNTRY = 612
@@ -116,10 +118,10 @@ class PaylaneError(object):
     ERR_BLACKLISTED_CUSTOMER_COUNTRY = 614
     ERR_BLACKLISTED_CUSTOMER_EMAIL = 615
     ERR_BLACKLISTED_CUSTOMER_IP = 616
-                            
-    def __init__(self,error_code,description,acquirer_error=None,acquirer_description=None):
-        self.FRAUD_ERRORS = [self.ERR_FRAUD_DETECTED,self.ERR_BLACKLISTED_NUMBER,
-                            self.ERR_BLACKLISTED_COUNTRY,self.ERR_BLACKLISTED_CARD_NUMBER,
+
+    def __init__(self, error_code, description, acquirer_error=None, acquirer_description=None):
+        self.FRAUD_ERRORS = [self.ERR_FRAUD_DETECTED, self.ERR_BLACKLISTED_NUMBER,
+                            self.ERR_BLACKLISTED_COUNTRY, self.ERR_BLACKLISTED_CARD_NUMBER,
                             self.ERR_BLACKLISTED_CUSTOMER_COUNTRY,
                             self.ERR_BLACKLISTED_CUSTOMER_EMAIL,
                             self.ERR_BLACKLISTED_CUSTOMER_IP]
@@ -127,16 +129,19 @@ class PaylaneError(object):
         self.description = description
         self.acquirer_error = acquirer_error
         self.acquirer_description = acquirer_description
-    
+
     def __repr__(self):
         return str(self)
 
     def __str__(self):
-        return 'Error Code: %s (%s). Acquirer Error: %s (%s)' % (self.error_code,self.description,self.acquirer_error,self.acquirer_description)
+        return 'Error Code: %s (%s). Acquirer Error: %s (%s)' % (self.error_code,
+            self.description,
+            self.acquirer_error,
+            self.acquirer_description)
 
     def __unicode__(self):
         return unicode(str(self))
-        
+
     @property
     def is_customer_data_error(self):
         """True if error is related to the card/account data the customer provided."""
@@ -161,7 +166,7 @@ class PaylaneError(object):
                 self.ERR_INVALID_CARDHOLDER_STATE,
                 self.ERR_INVALID_CARDHOLDER_COUNTRY,
             ]
-        
+
     @property
     def is_card_data_error(self):
         """True if error is related to the card data the customer provided."""
@@ -169,14 +174,14 @@ class PaylaneError(object):
                 self.ERR_UNKNOWN_CARD_TYPE_NUMBER,
                 self.ERR_INVALID_CARD_ISSUE_NUMBER,
             ]
-    
+
     @property
     def was_card_declined(self):
         """True if this error is related to the card being declined for some reason."""
         return self.error_code in [
-                self.ERR_CARD_DECLINED,        
+                self.ERR_CARD_DECLINED,
             ] or self.is_card_expired
-            
+
     @property
     def is_card_expired(self):
         """True if this error is related to card expiration."""
@@ -184,7 +189,7 @@ class PaylaneError(object):
                 self.ERR_CARD_EXPIRED,
                 self.ERR_RESALE_CARD_EXPIRED,
             ]
-        
+
     @property
     def is_recurring_impossible(self):
         """Whether this error should nullify a recurring transaction."""
@@ -201,17 +206,17 @@ class PaylaneError(object):
                 self.ERR_RESALE_CARD_EXPIRED,
                 self.ERR_RESALE_WITH_REVERSAL,
             ]
-        
+
     @property
     def is_fatal(self):
         """Whether this is a fatal error that, in principle, cannot be retried."""
         return self.error_code == self.ERR_CANNOT_REFUND_SALE or self.error_code >= 500
-        
-    @property        
+
+    @property
     def is_fraud(self):
         """Whether this is a fraud fatal error."""
         return self.error_code in self.FRAUD_ERRORS
-        
+
     @property
     def can_retry_later(self):
         """Whether this resale fatal error can disappear in the future."""
@@ -219,4 +224,3 @@ class PaylaneError(object):
                 self.ERR_INTERNAL_ERROR,
                 self.ERR_GATEWAY_ERROR,
             ]
-    

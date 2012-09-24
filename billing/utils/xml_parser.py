@@ -1,9 +1,10 @@
-
 from xml.dom.minidom import parse, parseString
 import os
 
+
 class NotTextNodeError:
     pass
+
 
 def getTextFromNode(node):
     """
@@ -18,6 +19,7 @@ def getTextFromNode(node):
         else:
             raise NotTextNodeError
     return t
+
 
 def nodeToDic(node):
     """
@@ -34,7 +36,7 @@ def nodeToDic(node):
     the dictionary).
     """
     dic = {}
-    multlist = {} # holds temporary lists where there are multiple children
+    multlist = {}  # holds temporary lists where there are multiple children
     multiple = False
     for n in node.childNodes:
         if n.nodeType != n.ELEMENT_NODE:
@@ -54,19 +56,20 @@ def nodeToDic(node):
             if multiple:
                 # append to our list
                 multlist[n.nodeName].append(nodeToDic(n))
-                dic.update({n.nodeName:multlist[n.nodeName]})
+                dic.update({n.nodeName: multlist[n.nodeName]})
                 continue
             else:
                 # 'normal' node
-                dic.update({n.nodeName:nodeToDic(n)})
+                dic.update({n.nodeName: nodeToDic(n)})
                 continue
         # text node
         if multiple:
             multlist[n.nodeName].append(text)
-            dic.update({n.nodeName:multlist[n.nodeName]})
+            dic.update({n.nodeName: multlist[n.nodeName]})
         else:
-            dic.update({n.nodeName:text})
-    return dic 
+            dic.update({n.nodeName: text})
+    return dic
+
 
 def readConfig(filename):
     dom = parseString(open(filename).read())

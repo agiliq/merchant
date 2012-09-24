@@ -6,6 +6,7 @@ from paypal.standard.ipn.signals import payment_was_flagged, payment_was_success
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from paypal.standard.forms import PayPalPaymentsForm, PayPalEncryptedPaymentsForm
 
+
 class PayPalIntegration(Integration):
     display_name = "PayPal IPN"
 
@@ -45,10 +46,12 @@ class PayPalIntegration(Integration):
     def generate_form(self):
         return self.form_class()(initial=self.fields)
 
+
 def unsuccessful_txn_handler(sender, **kwargs):
     transaction_was_unsuccessful.send(sender=sender.__class__,
                                       type="purchase",
                                       response=sender)
+
 
 def successful_txn_handler(sender, **kwargs):
     transaction_was_successful.send(sender=sender.__class__,

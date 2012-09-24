@@ -5,19 +5,20 @@ from billing.gateway import CardNotSupported, InvalidData
 from billing.utils.credit_card import Visa
 import braintree
 
+
 class BraintreePaymentsGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("braintree_payments")
         self.merchant.test_mode = True
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2011, 
-                                      number="4111111111111111", 
+                                      month=10, year=2011,
+                                      number="4111111111111111",
                                       verification_value="100")
 
     def testCardSupported(self):
         self.credit_card.number = "5019222222222222"
-        self.assertRaises(CardNotSupported, 
-                          lambda : self.merchant.purchase(1000, self.credit_card))
+        self.assertRaises(CardNotSupported,
+                          lambda: self.merchant.purchase(1000, self.credit_card))
 
     def testCardType(self):
         self.merchant.validate_card(self.credit_card)
@@ -59,8 +60,8 @@ class BraintreePaymentsGatewayTestCase(TestCase):
 
     def testCreditCardExpired(self):
         credit_card = CreditCard(first_name="Test", last_name="User",
-                                 month=10, year=2011, 
-                                 number="4000111111111115", 
+                                 month=10, year=2011,
+                                 number="4000111111111115",
                                  verification_value="100")
         resp = self.merchant.purchase(2004, credit_card)
         self.assertNotEquals(resp["status"], "SUCCESS")
@@ -86,8 +87,8 @@ class BraintreePaymentsGatewayTestCase(TestCase):
         self.assertEquals(response["status"], "SUCCESS")
 
     def testStoreMissingCustomer(self):
-        self.assertRaises(InvalidData, 
-                          lambda : self.merchant.store(self.credit_card, {}))
+        self.assertRaises(InvalidData,
+                          lambda: self.merchant.store(self.credit_card, {}))
 
     def testStoreWithoutBillingAddress(self):
         options = {
@@ -96,10 +97,10 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 "email": "john.doe@example.com",
                 },
             }
-        resp = self.merchant.store(self.credit_card, options = options)
+        resp = self.merchant.store(self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
-        self.assertEquals(resp["response"].customer.credit_cards[0].expiration_date, 
-                          "%s/%s" %(self.credit_card.month,
+        self.assertEquals(resp["response"].customer.credit_cards[0].expiration_date,
+                          "%s/%s" % (self.credit_card.month,
                                     self.credit_card.year))
         self.assertTrue(getattr(resp["response"].customer.credit_cards[0], "customer_id"))
         self.assertTrue(getattr(resp["response"].customer.credit_cards[0], "token"))
@@ -121,7 +122,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 "zip": "110011"
                 }
             }
-        resp = self.merchant.store(self.credit_card, options = options)
+        resp = self.merchant.store(self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
         self.assertTrue(getattr(resp["response"].customer.credit_cards[0], "billing_address"))
         # The tests below don't seem to work.
@@ -139,12 +140,12 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 "email": "john.doe@example.com",
                 },
             }
-        resp = self.merchant.store(self.credit_card, options = options)
+        resp = self.merchant.store(self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
         response = self.merchant.unstore(resp["response"].customer.credit_cards[0].token)
         self.assertEquals(response["status"], "SUCCESS")
 
-    # The below tests require 'test_plan' to be created in the sandbox 
+    # The below tests require 'test_plan' to be created in the sandbox
     # console panel. This cannot be created by API at the moment
     def testRecurring1(self):
         options = {
@@ -156,7 +157,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 "plan_id": "test_plan"
                 },
             }
-        resp = self.merchant.recurring(10, self.credit_card, options = options)
+        resp = self.merchant.recurring(10, self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
         subscription = resp["response"].subscription
         self.assertEquals(subscription.status,
@@ -173,7 +174,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 "price": 15
                 },
             }
-        resp = self.merchant.recurring(10, self.credit_card, options = options)
+        resp = self.merchant.recurring(10, self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
         subscription = resp["response"].subscription
         self.assertEquals(subscription.price, 15)
@@ -191,7 +192,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 "number_of_billing_cycles": 12,
                 },
             }
-        resp = self.merchant.recurring(10, self.credit_card, options = options)
+        resp = self.merchant.recurring(10, self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
         subscription = resp["response"].subscription
         self.assertEquals(subscription.number_of_billing_cycles, 12)
