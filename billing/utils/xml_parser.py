@@ -43,7 +43,7 @@ def nodeToDic(node):
         if len(node.getElementsByTagName(n.nodeName)) > 1:
             multiple = True
             # and set up the list to hold the values
-            if not multlist.has_key(n.nodeName):
+            if not n.nodeName in multlist:
                 multlist[n.nodeName] = []
         else:
             multiple = False

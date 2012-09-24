@@ -125,14 +125,14 @@ class AuthorizeNetGateway(Gateway):
     
     def add_customer_data(self, post, options):
         """add customer details to the request parameters"""
-        if options.has_key('email'):
+        if 'email' in options:
             post['email'] = options['email']
             post['email_customer'] = True
-        
-        if options.has_key('customer'):
+
+        if 'customer' in options:
             post['cust_id'] = options['customer']
 
-        if options.has_key('ip'):
+        if 'ip' in options:
             post['customer_ip'] = options['ip']
 
     @property
