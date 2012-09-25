@@ -25,7 +25,7 @@ class SamuraiIntegration(Integration):
         initial_data = self.fields
         form = self.form_class()(initial=initial_data)
         return form
-        
+
     @csrf_exempt
     def transaction(self, request):
         raise NotImplementedError

@@ -6,13 +6,14 @@ REBILL_LIVE_URL = "https://www.eway.com.au/gateway/rebill/manageRebill.asmx?WSDL
 HOSTED_TEST_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/test/managedCreditCardPayment.asmx?WSDL"
 HOSTED_LIVE_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/managedCreditCardPayment.asmx?WSDL"
 
+
 class RebillEwayClient(object):
     """
     Wrapper for eway payment gateway's managed and rebill webservices
-    
+
     To create a empty object from the webservice types, call self.client.factory.create('type_name')
-    
-    Useful types are 
+
+    Useful types are
         CustomerDetails: rebill customer
         RebillEventDetails: rebill event
         CreditCard: hosted customer
@@ -29,11 +30,11 @@ class RebillEwayClient(object):
             self.gateway_url = url
         self.client = Client(self.gateway_url)
         self.set_eway_header()
-        
+
     def set_eway_header(self):
         """
         creates eway header containing login credentials
-        
+
         required for all api calls
         """
         eway_header = self.client.factory.create("eWAYHeader")
@@ -41,11 +42,11 @@ class RebillEwayClient(object):
         eway_header.Username = self.username
         eway_header.Password = self.password
         self.client.set_options(soapheaders=eway_header)
-        
+
     def create_rebill_customer(self, rebill_customer=None, **kwargs):
         """
         creates rebill customer with CustomerDetails type from the webservice
-        
+
         also accepts keyword arguments if CustomerDetails object is not passed
         return CustomerDetails.RebillCustomerID and CustomerDetails.Result if successfull
         """
@@ -71,7 +72,7 @@ class RebillEwayClient(object):
                                                              )
         else:
             return self.client.service.CreateRebillCustomer(**kwargs)
-    
+
     def update_rebill_customer(self, **kwargs):
         """
         same as create, takes CustomerDetails.RebillCustomerID
@@ -81,10 +82,9 @@ class RebillEwayClient(object):
     def delete_rebill_customer(self, rebill_customer_id):
         """
         deletes a rebill customer based on id
-        """ 
+        """
         return self.client.service.DeleteRebillCustomer(rebill_customer_id)
-         
-    
+
     def create_rebill_event(self, rebill_event=None, **kwargs):
         """
         creates a rebill event based on RebillEventDetails object
@@ -121,27 +121,27 @@ class RebillEwayClient(object):
         delete a rebill event based on rebill customer id and event id
         """
         return self.client.service.DeleteRebillEvent(rebill_customer_id, rebill_event_id)
-    
+
     def query_next_transaction(self, RebillCustomerID, RebillID):
         return self.client.service.QueryNextTransaction(RebillCustomerID, RebillID)
-    
+
     def query_rebill_customer(self, RebillCustomerID):
         return self.client.service.QueryRebillCustomer(RebillCustomerID)
-    
+
     def query_rebill_event(self, RebillCustomerID, RebillID):
-        return self.client.service.QueryRebillEvent(RebillCustomerID, RebillID)        
-    
+        return self.client.service.QueryRebillEvent(RebillCustomerID, RebillID)
+
     def query_transactions(self, RebillCustomerID, RebillID, startDate=None, endDate=None, status=None):
         try:
             return self.client.service.QueryTransactions(RebillCustomerID, RebillID, startDate, endDate, status)
         except WebFault as wf:
             return wf
-    
+
     def create_hosted_customer(self, hosted_customer=None, **kwargs):
         """
         creates hosted customer based on CreditCard type details or kwargs
-        
-        returns id of newly created customer (112233445566 in test mode) 
+
+        returns id of newly created customer (112233445566 in test mode)
         """
         try:
             if hosted_customer:
@@ -172,39 +172,39 @@ class RebillEwayClient(object):
                 return self.client.service.CreateCustomer(**kwargs)
         except WebFault as wf:
             return wf
-    
+
     def update_hosted_customer(self, **kwargs):
         """
         Update hosted customer based on kwargs
-        
+
         returns True or False
         """
         try:
             return self.client.service.UpdateCustomer(**kwargs)
         except WebFault as wf:
-            return wf        
-    
+            return wf
+
     def process_payment(self, managedCustomerID, amount, invoiceReference, invoiceDescription):
         """
         makes a transaction based on customer id and amount
-        
+
         returns CCPaymentResponse type object with ewayTrxnStatus, ewayTrxnNumber, ewayAuthCode
         """
         try:
             return self.client.service.ProcessPayment(managedCustomerID, amount, invoiceReference, invoiceDescription)
         except WebFault as wf:
             return wf
-    
+
     def query_customer(self, managedCustomerID):
         return self.client.service.QueryCustomer(managedCustomerID)
-    
+
     def query_customer_by_reference(self, CustomerReference):
         """
         returns customer details based on reference
-        
+
         not working with test data
         """
         return self.client.service.QueryCustomerByReference(CustomerReference)
-    
+
     def query_payment(self, managedCustomerID):
         return self.client.service.QueryPayment(managedCustomerID)

@@ -1,8 +1,9 @@
-
 from django.db import models
 
 # Response Codes
 # APPROVED, DECLINED, ERROR, FRAUD_REVIEW = 1, 2, 3, 4
+
+
 class AuthorizeAIMResponse(models.Model):
     RESPONSE_CODES = [
         (1, 'Approved'),
@@ -66,7 +67,7 @@ class AuthorizeAIMResponse(models.Model):
     shipping_state = models.CharField(max_length=64, blank=True)
     shipping_zip_code = models.CharField(max_length=64, blank=True)
     shipping_country = models.CharField(max_length=64, blank=True)
- 
+
     card_code_response = models.CharField(max_length='8', choices=CARD_CODE_RESPONSES, help_text=u'Card Code Verification response')
 
     class Meta:

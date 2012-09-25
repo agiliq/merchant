@@ -27,19 +27,20 @@ fake_options = {
     "description": "Blah Blah!",
 }
 
+
 class EWayGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("eway")
         self.merchant.test_mode = True
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2011, 
-                                      number="4444333322221111", 
+                                      month=10, year=2011,
+                                      number="4444333322221111",
                                       verification_value="100")
 
     def testCardSupported(self):
         self.credit_card.number = "5019222222222222"
-        self.assertRaises(CardNotSupported, 
-                          lambda : self.merchant.purchase(1000, self.credit_card))
+        self.assertRaises(CardNotSupported,
+                          lambda: self.merchant.purchase(1000, self.credit_card))
 
     def testCardValidated(self):
         self.merchant.test_mode = False
@@ -52,14 +53,14 @@ class EWayGatewayTestCase(TestCase):
 
     def testPurchase(self):
         resp = self.merchant.purchase(1, self.credit_card,
-                                      options = fake_options)
+                                      options=fake_options)
         # Eway test gateway sets the transaction status as failure
         # in test mode
         self.assertEquals(resp["status"], "FAILURE")
-        self.assertEquals(resp["response"].ewayTrxnError, 
+        self.assertEquals(resp["response"].ewayTrxnError,
                           "1,Do Not Honour(Test Gateway)")
         self.assertNotEquals(resp["response"].ewayTrxnNumber, "0")
-        self.assertTrue(resp["response"].ewayReturnAmount, "1") 
+        self.assertTrue(resp["response"].ewayReturnAmount, "1")
 
     def testPaymentSuccessfulSignal(self):
         # Since in the test mode, all transactions are
@@ -72,7 +73,7 @@ class EWayGatewayTestCase(TestCase):
         transaction_was_unsuccessful.connect(receive)
 
         resp = self.merchant.purchase(1, self.credit_card,
-                                      options = fake_options)
+                                      options=fake_options)
         self.assertEquals(received_signals, [transaction_was_unsuccessful])
 
     def testPaymentUnSuccessfulSignal(self):
@@ -84,10 +85,10 @@ class EWayGatewayTestCase(TestCase):
         transaction_was_unsuccessful.connect(receive)
 
         resp = self.merchant.purchase(6, self.credit_card,
-                                      options = fake_options)
+                                      options=fake_options)
         self.assertEquals(received_signals, [transaction_was_unsuccessful])
 
     def testCreditCardExpired(self):
         resp = self.merchant.purchase(8, self.credit_card,
-                                      options = fake_options)
+                                      options=fake_options)
         self.assertNotEquals(resp["status"], "SUCCESS")

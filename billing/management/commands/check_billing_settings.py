@@ -1,6 +1,4 @@
-
 from django.conf import settings
-
 from django.core.management.base import BaseCommand, CommandError
 
 PAYPAL_STANDARD_IPN = ['PAYPAL_RECEIVER_EMAIL']
@@ -23,23 +21,24 @@ PAYMENT_GATEWAYS = {
     'rbs_live': RBS_LIVE,
 }
 
+
 class Command(BaseCommand):
     help = 'Check for the required settings of billing app'
     args = PAYMENT_GATEWAYS.keys()
+
     def handle(self, *args, **kwargs):
         check_for_gateway = args or PAYMENT_GATEWAYS.keys()
-        
+
         for gateway in check_for_gateway:
             if gateway not in PAYMENT_GATEWAYS:
                 raise CommandError('Invalid payment gateway option %s, valid gateway options are %s' % (gateway, PAYMENT_GATEWAYS.keys()))
             required_settings = PAYMENT_GATEWAYS[gateway]
-            
+
             if isinstance(required_settings, dict):
                 if 'optional' in required_settings:
-                    print '%s takes optional parameter %s' %(gateway, required_settings['optional'])
+                    print '%s takes optional parameter %s' % (gateway, required_settings['optional'])
                 required_settings = required_settings['required']
-                
-            
+
             for rs in required_settings:
                 try:
                     getattr(settings, rs)
