@@ -102,42 +102,29 @@ class BeanstreamGateway(Gateway):
         h.update(data2)
         return data + "&hashValue=" + h.hexdigest()
 
-    def _base_purchase(self, money, credit_card, post, options=None):
-        if not options:
-            options = {}
-        if not self.validate_card(credit_card):
-            raise InvalidCard("Invalid Card")
-
-        post["requestType"] = "BACKEND"
-        post["merchant_id"] = self.merchant_id
-        post["trnAmount"] = money
-        self.add_creditcard(post, credit_card) 
-        #self.add_address(post, options)
-
-        data=urllib.urlencode(dict(('%s' % (k), v) for k, v in post.iteritems()))
-
-        key = "dine-otestkey"
-        data = self.add_hash(data, key)
-        conn = urllib2.Request(url=self.txnurl, data=data)
-
-        try:
-            open_conn = urllib2.urlopen(conn)
-            response = open_conn.read()
-        except urllib2.URLError:
-            return (5, '1', 'Could not talk to payment gateway.')
-
-        fields = dict([tuple(r.split("=")) for r in response.split('&')])
-
+    def _parse_resp(self, resp):
         status = "FAILURE"
         response = ""
-        if fields.get('trnApproved', '0') == '1':
-            # success if not 0
+        txnid = None
+
+        if resp.approved():
             status = "SUCCESS"
+            txnid = resp.transaction_id()
         else:
-            response = urllib.unquote_plus(fields.get('messageText'))
-        
-        eat.gaebp(True)
-        return {"status": status, "response": response}
+            try:
+                if resp.resp["messageId"][0] == '52':
+                    raise CardNotSupported
+            except:
+                pass
+
+        response = "".join(resp.resp.get("messageText"))
+        if not response:
+            try:
+                response = resp.get_merchant_message()
+            except:
+                response = "Unrecognized response from Beanstream gateway."
+
+        return {"status": status, "response": response, "respdata": resp.resp, "txnid": txnid}
 
     def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
@@ -150,21 +137,8 @@ class BeanstreamGateway(Gateway):
             txn = self.beangw.purchase_with_payment_profile(money, customer_code)
 
         txn.set_comments('Test')
-        resp = txn.commit()
 
-        status = "FAILURE"
-        response = ""
-        txnid = None
-        if resp.approved():
-            status = "SUCCESS"
-            txnid = resp.transaction_id()
-        else:
-            if resp.resp["messageId"][0] == '52':
-                raise CardNotSupported
-            response = resp.get_merchant_message()
-
-        return {"status": status, "response": response, "txnid": txnid}
-
+        return self._parse_resp(txn.commit())
 
     def authorize(self, money, credit_card, options=None):
         """Authorization for a future capture transaction"""
@@ -175,82 +149,29 @@ class BeanstreamGateway(Gateway):
         txn = self.beangw.preauth(money, card, None)
         txn.set_comments('Test')
 
-        resp = txn.commit()
-
-        status = "FAILURE"
-        response = ""
-        txnid = None
-        if resp.approved():
-            status = "SUCCESS"
-            txnid = resp.transaction_id()
-        else:
-            response = resp
-
-        return {"status": status, "response": response, "txnid": txnid}
+        return self._parse_resp(txn.commit())
 
     def unauthorize(self, money, authorization, options=None):
         """Cancel a previously authorized transaction"""
         txn = self.beangw.cancel_preauth(authorization)
-        resp = txn.commit()
 
-        status = "FAILURE"
-        response = ""
-
-        if resp.approved():
-            status = "SUCCESS"
-        else:
-            response = resp
-
-        return {"status": status, "response": response}
-
+        return self._parse_resp(txn.commit())
 
     def capture(self, money, authorization, options=None):
         """Capture funds from a previously authorized transaction"""
         txn = self.beangw.preauth_completion(authorization, money)
-        resp = txn.commit()
-
-        status = "FAILURE"
-        response = ""
-        txnid = None
-        if resp.approved():
-            status = "SUCCESS"
-            txnid = resp.transaction_id()
-        else:
-            response = resp
-
-        return {"status": status, "response": response, "txnid": txnid}
+        return self._parse_resp(txn.commit())
 
     def void(self, identification, options=None):
         """Null/Blank/Delete a previous transaction"""
         """Right now this only handles VOID_PURCHASE"""
         txn = self.beangw.void_purchase(identification["txnid"], identification["amount"])
-        resp = txn.commit()
-
-        status = "FAILURE"
-        response = ""
-
-        if resp.approved():
-            status = "SUCCESS"
-        else:
-            response = resp
-
-        return {"status": status, "response": response}
+        return self._parse_resp(txn.commit())
 
     def credit(self, money, identification, options=None):
         """Refund a previously 'settled' transaction"""
         txn = self.beangw.return_purchase(identification, money)
-        resp = txn.commit()
-
-        status = "FAILURE"
-        response = ""
-        txnid = None
-        if resp.approved():
-            status = "SUCCESS"
-            txnid = resp.transaction_id()
-        else:
-            response = resp
-
-        return {"status": status, "response": response, "txnid": txnid}
+        return self._parse_resp(txn.commit())
 
     def recurring(self, money, creditcard, options=None):
         """Setup a recurring transaction"""
