@@ -38,3 +38,11 @@ Documentation
 Documentation is automatically built and published online at:
 
 http://readthedocs.org/docs/django-merchant/en/latest/
+
+Support
+--------
+
+There is a mailing list where discussion regarding the development
+and usage of merchant happens:
+
+http://groups.google.com/group/django-merchant/
