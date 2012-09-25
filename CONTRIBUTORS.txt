@@ -3,6 +3,7 @@ Contributors to the project:
 
 Thanks go out to all the contributors listed in alphabetical order:
 
+* Andy Zhang <https://github.com/andyiso>
 * Ashok Raavi <ashok.raavi@gmail.com>
 * Bradley Ayers <bradley.ayers@gmail.com>
 * Celso Pinto <https://github.com/cpinto>
