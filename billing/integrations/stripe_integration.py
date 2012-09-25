@@ -1,7 +1,7 @@
 from billing import Integration, get_gateway, IntegrationNotConfigured
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
-from billing.forms.stripe_forms  import StripeForm
+from billing.forms.stripe_forms import StripeForm
 
 
 class StripeIntegration(Integration):

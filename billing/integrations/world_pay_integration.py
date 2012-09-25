@@ -16,6 +16,7 @@ RBS_HOSTED_URL_LIVE = "https://secure.wp3.rbsworldpay.com/wcc/purchase"
 csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
 
+
 class WorldPayIntegration(Integration):
     """
     Fields required:
@@ -98,5 +99,5 @@ class WorldPayIntegration(Integration):
         except:
             transaction_was_unsuccessful.send(sender=self.__class__, type="purchase", response=post_data)
             status = "FAILURE"
-        
+
         return HttpResponse(status)

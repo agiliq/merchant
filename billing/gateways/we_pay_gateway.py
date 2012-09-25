@@ -5,6 +5,7 @@ from django.conf import settings
 from wepay import WePay
 from wepay.exceptions import WePayError
 
+
 class WePayGateway(Gateway):
     display_name = "WePay"
     homepage_url = "https://www.wepay.com/"
@@ -22,7 +23,7 @@ class WePayGateway(Gateway):
         self.we_pay = WePay(production)
         self.we_pay_settings = merchant_settings["we_pay"]
 
-    def purchase(self, money, credit_card, options = None):
+    def purchase(self, money, credit_card, options=None):
         options = options or {}
         params = {}
         params.update({
@@ -38,7 +39,7 @@ class WePayGateway(Gateway):
         try:
             response = self.we_pay.call('/checkout/create', params, token=token)
         except WePayError, error:
-            transaction_was_unsuccessful.send(sender=self, 
+            transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
                                               response=error)
             return {'status': 'FAILURE', 'response': error}
@@ -47,7 +48,7 @@ class WePayGateway(Gateway):
                                         response=response)
         return {'status': 'SUCCESS', 'response': response}
 
-    def authorize(self, money, credit_card, options = None):
+    def authorize(self, money, credit_card, options=None):
         options = options or {}
         resp = self.store(credit_card, options)
         if resp["status"] == "FAILURE":
@@ -82,7 +83,7 @@ class WePayGateway(Gateway):
                                         response=response["response"])
         return response
 
-    def capture(self, money, authorization, options = None):
+    def capture(self, money, authorization, options=None):
         options = options or {}
         params = {
             'checkout_id': authorization,
@@ -100,7 +101,7 @@ class WePayGateway(Gateway):
                                         response=response)
         return {'status': 'SUCCESS', 'response': response}
 
-    def void(self, identification, options = None): 
+    def void(self, identification, options=None):
         options = options or {}
         params = {
             'checkout_id': identification,
@@ -119,7 +120,7 @@ class WePayGateway(Gateway):
                                         response=response)
         return {'status': 'SUCCESS', 'response': response}
 
-    def credit(self, money, identification, options = None):
+    def credit(self, money, identification, options=None):
         options = options or {}
         params = {
             'checkout_id': identification,
@@ -140,7 +141,7 @@ class WePayGateway(Gateway):
                                         response=response)
         return {'status': 'SUCCESS', 'response': response}
 
-    def recurring(self, money, credit_card, options = None):
+    def recurring(self, money, credit_card, options=None):
         options = options or {}
         params = {
             'account_id': self.we_pay_settings.get("ACCOUNT_ID", ""),
@@ -161,7 +162,7 @@ class WePayGateway(Gateway):
                                         response=response)
         return {'status': 'SUCCESS', 'response': response}
 
-    def store(self, credit_card, options = None):
+    def store(self, credit_card, options=None):
         options = options or {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
@@ -178,11 +179,11 @@ class WePayGateway(Gateway):
                     'address': options.pop("billing_address")
                     }, token=token)
         except WePayError, error:
-            transaction_was_unsuccessful.send(sender=self, 
+            transaction_was_unsuccessful.send(sender=self,
                                               type="store",
                                               response=error)
             return {'status': 'FAILURE', 'response': error}
-        transaction_was_successful.send(sender=self, 
+        transaction_was_successful.send(sender=self,
                                         type="store",
                                         response=response)
         return {'status': 'SUCCESS', 'response': response}

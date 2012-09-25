@@ -78,9 +78,8 @@ class StripeGatewayTestCase(TestCase):
         self.assertEquals(response["status"], "SUCCESS")
 
     def testPurchaseWithToken(self):
-        # Somewhat similar to capture but testing for the 
+        # Somewhat similar to capture but testing for the
         # purpose of the stripe integration
         resp = self.merchant.authorize(1, self.credit_card)
         resp = self.merchant.purchase(1, resp["response"].id)
         self.assertEquals(resp["status"], "SUCCESS")
-

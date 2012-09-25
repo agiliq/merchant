@@ -9,6 +9,7 @@ from billing import Gateway
 from billing.utils.credit_card import Visa, MasterCard, AmericanExpress, Discover
 from billing.signals import *
 
+
 class PayPalGateway(Gateway):
     default_currency = "USD"
     supported_countries = ["US"]
@@ -27,7 +28,7 @@ class PayPalGateway(Gateway):
     def service_url(self):
         # Implemented in django-paypal
         raise NotImplementedError
-    
+
     def purchase(self, money, credit_card, options=None):
         """Using PAYPAL DoDirectPayment, charge the given
         credit card for specified money"""
@@ -46,7 +47,7 @@ class PayPalGateway(Gateway):
 
         if options.get("email"):
             params['email'] = options["email"]
-        
+
         address = options.get("billing_address", {})
         first_name = None
         last_name = None
@@ -74,8 +75,8 @@ class PayPalGateway(Gateway):
             params['shiptocountry'] = shipping_address["country"]
             params['shiptozip'] = shipping_address["zip"]
             params['shiptophonenum'] = shipping_address.get("phone", "")
-        
-        wpp = PayPalWPP(options['request']) 
+
+        wpp = PayPalWPP(options['request'])
         try:
             response = wpp.doDirectPayment(params)
             transaction_was_successful.send(sender=self,
@@ -90,23 +91,23 @@ class PayPalGateway(Gateway):
             return {"status": "FAILURE", "response": e}
         return {"status": response.ack.upper(), "response": response}
 
-    def authorize(self, money, credit_card, options = None):
+    def authorize(self, money, credit_card, options=None):
         if not options:
             options = {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
         raise NotImplementedError
 
-    def capture(self, money, authorization, options = None):
+    def capture(self, money, authorization, options=None):
         raise NotImplementedError
 
-    def void(self, identification, options = None):
+    def void(self, identification, options=None):
         raise NotImplementedError
 
-    def credit(self, money, identification, options = None):
+    def credit(self, money, identification, options=None):
         raise NotImplementedError
 
-    def recurring(self, money, creditcard, options = None):
+    def recurring(self, money, creditcard, options=None):
         if not options:
             options = {}
         params = {}
@@ -116,7 +117,7 @@ class PayPalGateway(Gateway):
         params['billingfrequency'] = options.get('billingfrequency') or '1'
         params['amt'] = money
         params['desc'] = 'description of the billing'
-        
+
         params['creditcardtype'] = creditcard.card_type.card_name
         params['acct'] = creditcard.number
         params['expdate'] = '%02d%04d' % (creditcard.month, creditcard.year)
@@ -137,10 +138,9 @@ class PayPalGateway(Gateway):
             # is implemented.
             return {"status": "FAILURE", "response": e}
         return {"status": response.ack.upper(), "response": response}
-       
-        
-    def store(self, creditcard, options = None):
+
+    def store(self, creditcard, options=None):
         raise NotImplementedError
 
-    def unstore(self, identification, options = None):
+    def unstore(self, identification, options=None):
         raise NotImplementedError

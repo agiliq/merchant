@@ -5,19 +5,20 @@ from billing.models import AuthorizeAIMResponse
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
 
+
 class AuthorizeNetAIMGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("authorize_net")
         self.merchant.test_mode = True
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2011, 
-                                      number="4222222222222", 
+                                      month=10, year=2011,
+                                      number="4222222222222",
                                       verification_value="100")
 
     def testCardSupported(self):
         self.credit_card.number = "5019222222222222"
-        self.assertRaises(CardNotSupported, 
-                          lambda : self.merchant.purchase(1000, self.credit_card))
+        self.assertRaises(CardNotSupported,
+                          lambda: self.merchant.purchase(1000, self.credit_card))
 
     def testCardValidated(self):
         self.merchant.test_mode = False
@@ -33,7 +34,7 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
         self.assertEquals(resp["status"], "SUCCESS")
         # In test mode, the transaction ID from Authorize.net is 0
         self.assertEquals(resp["response"].transaction_id, "0")
-        self.assertTrue(isinstance(resp["response"], AuthorizeAIMResponse)) 
+        self.assertTrue(isinstance(resp["response"], AuthorizeAIMResponse))
 
     def testPaymentSuccessfulSignal(self):
         received_signals = []

@@ -5,20 +5,24 @@ from django.conf.urls.defaults import patterns, url
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.http import (HttpResponseForbidden, 
-                         HttpResponseRedirect, 
+from django.http import (HttpResponseForbidden,
+                         HttpResponseRedirect,
                          HttpResponse)
 from billing.signals import (transaction_was_successful,
                              transaction_was_unsuccessful)
 from django.core.urlresolvers import reverse
 from billing.models import AmazonFPSResponse
-import urlparse, urllib, time, datetime
+import urlparse
+import urllib
+import time
+import datetime
 
 FPS_PROD_API_ENDPOINT = "fps.amazonaws.com"
 FPS_SANDBOX_API_ENDPOINT = "fps.sandbox.amazonaws.com"
 
 csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
+
 
 class AmazonFpsIntegration(Integration):
     """
@@ -65,7 +69,7 @@ class AmazonFpsIntegration(Integration):
         if not options:
             options = {}
         tmp_options = options.copy()
-        permissible_options = ["senderTokenId", "recipientTokenId", 
+        permissible_options = ["senderTokenId", "recipientTokenId",
             "chargeFeeTo", "callerReference", "senderReference", "recipientReference",
             "senderDescription", "recipientDescription", "callerDescription",
             "metadata", "transactionDate", "reserve"]
@@ -73,7 +77,7 @@ class AmazonFpsIntegration(Integration):
         for key in options:
             if key not in permissible_options:
                 tmp_options.pop(key)
-        resp = self.fps_connection.pay(amount, tmp_options.pop("senderTokenId"), 
+        resp = self.fps_connection.pay(amount, tmp_options.pop("senderTokenId"),
                                        callerReference=tmp_options.pop("callerReference"),
                                        **tmp_options)
         return {"status": resp[0].TransactionStatus, "response": resp[0]}
@@ -97,7 +101,7 @@ class AmazonFpsIntegration(Integration):
         assert "CallerReference" in options, "Expecting 'CallerReference' in options"
         assert "TransactionId" in options, "Expecting 'TransactionId' in options"
         resp = self.fps_connection.refund(options["CallerReference"],
-                                          options["TransactionId"], 
+                                          options["TransactionId"],
                                           refundAmount=amount,
                                           callerDescription=options.get("description", None))
         return {"status": resp[0].TransactionStatus, "response": resp[0]}
@@ -106,7 +110,7 @@ class AmazonFpsIntegration(Integration):
         if not options:
             options = {}
         # Requires the TransactionID to be passed as 'identification'
-        resp = self.fps_connection.cancel(identification, 
+        resp = self.fps_connection.cancel(identification,
                                           options.get("description", None))
         return {"status": resp[0].TransactionStatus, "response": resp[0]}
 
@@ -122,8 +126,8 @@ class AmazonFpsIntegration(Integration):
     def fps_ipn_handler(self, request):
         uri = request.build_absolute_uri()
         parsed_url = urlparse.urlparse(uri)
-        resp = self.fps_connection.verify_signature("%s://%s%s" %(parsed_url.scheme, 
-                                                                  parsed_url.netloc, 
+        resp = self.fps_connection.verify_signature("%s://%s%s" % (parsed_url.scheme,
+                                                                  parsed_url.netloc,
                                                                   parsed_url.path),
                                                     request.raw_post_data)
         if not resp[0].VerificationStatus == "Success":
@@ -144,13 +148,13 @@ class AmazonFpsIntegration(Integration):
                 setattr(resp, key, val)
         resp.save()
         if resp.statusCode == "Success":
-            transaction_was_successful.send(sender=self.__class__, 
-                                            type=data["operation"], 
+            transaction_was_successful.send(sender=self.__class__,
+                                            type=data["operation"],
                                             response=resp)
         else:
             if not "Pending" in resp.statusCode:
-                transaction_was_unsuccessful.send(sender=self.__class__, 
-                                                  type=data["operation"], 
+                transaction_was_unsuccessful.send(sender=self.__class__,
+                                                  type=data["operation"],
                                                   response=resp)
         # Return a HttpResponse to prevent django from complaining
         return HttpResponse(resp.statusCode)
@@ -158,8 +162,8 @@ class AmazonFpsIntegration(Integration):
     def fps_return_url(self, request):
         uri = request.build_absolute_uri()
         parsed_url = urlparse.urlparse(uri)
-        resp = self.fps_connection.verify_signature("%s://%s%s" %(parsed_url.scheme, 
-                                                                  parsed_url.netloc, 
+        resp = self.fps_connection.verify_signature("%s://%s%s" % (parsed_url.scheme,
+                                                                  parsed_url.netloc,
                                                                   parsed_url.path),
                                                     parsed_url.query)
         if not resp[0].VerificationStatus == "Success":

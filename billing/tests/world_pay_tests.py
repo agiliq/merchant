@@ -4,6 +4,7 @@ from billing import get_integration
 from django.template import Template, Context
 from django.conf import settings
 
+
 class WorldPayTestCase(TestCase):
     def setUp(self):
         self.wp = get_integration("world_pay")

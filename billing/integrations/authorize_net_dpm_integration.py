@@ -17,6 +17,7 @@ import urllib
 csrf_exempt_m = method_decorator(csrf_exempt)
 require_POST_m = method_decorator(require_POST)
 
+
 class AuthorizeNetDpmIntegration(Integration):
     display_name = "Authorize.Net Direct Post Method"
 
@@ -35,13 +36,13 @@ class AuthorizeNetDpmIntegration(Integration):
         transaction_key = self.authorize_net_settings["TRANSACTION_KEY"]
         login_id = self.authorize_net_settings["LOGIN_ID"]
 
-        initial_data = self.fields 
-        x_fp_hash = hmac.new(transaction_key, "%s^%s^%s^%s^" %(login_id, 
-                                                               initial_data['x_fp_sequence'], 
-                                                               initial_data['x_fp_timestamp'], 
+        initial_data = self.fields
+        x_fp_hash = hmac.new(transaction_key, "%s^%s^%s^%s^" % (login_id,
+                                                               initial_data['x_fp_sequence'],
+                                                               initial_data['x_fp_timestamp'],
                                                                initial_data['x_amount']),
                              hashlib.md5)
-        initial_data.update({'x_login': login_id, 
+        initial_data.update({'x_login': login_id,
                              'x_fp_hash': x_fp_hash.hexdigest()})
         form = self.form_class()(initial=initial_data)
         return form
@@ -72,12 +73,12 @@ class AuthorizeNetDpmIntegration(Integration):
             transaction_was_successful.send(sender=self,
                                             type="sale",
                                             response=result)
-            redirect_url = "%s?%s" %(request.build_absolute_uri(reverse("authorize_net_success_handler")),
+            redirect_url = "%s?%s" % (request.build_absolute_uri(reverse("authorize_net_success_handler")),
                                      urllib.urlencode({"response": result,
                                                        "transaction_id": request.POST["x_trans_id"]}))
             return render_to_response("billing/authorize_net_relay_snippet.html",
-                                      {"redirect_url" : redirect_url})
-        redirect_url = "%s?%s" %(request.build_absolute_uri(reverse("authorize_net_failure_handler")),
+                                      {"redirect_url": redirect_url})
+        redirect_url = "%s?%s" % (request.build_absolute_uri(reverse("authorize_net_failure_handler")),
                                  urllib.urlencode({"response": result}))
         transaction_was_unsuccessful.send(sender=self,
                                           type="sale",
@@ -87,13 +88,13 @@ class AuthorizeNetDpmIntegration(Integration):
 
     def authorize_net_success_handler(self, request):
         response = request.GET
-        return render_to_response("billing/authorize_net_success.html", 
+        return render_to_response("billing/authorize_net_success.html",
                                   {"response": response},
                                   context_instance=RequestContext(request))
 
     def authorize_net_failure_handler(self, request):
         response = request.GET
-        return render_to_response("billing/authorize_net_failure.html", 
+        return render_to_response("billing/authorize_net_failure.html",
                                   {"response": response},
                                   context_instance=RequestContext(request))
 
@@ -103,4 +104,3 @@ class AuthorizeNetDpmIntegration(Integration):
            url('^authorize_net-sucess-handler/$', self.authorize_net_success_handler, name="authorize_net_success_handler"),
            url('^authorize_net-failure-handler/$', self.authorize_net_failure_handler, name="authorize_net_failure_handler"),)
         return urlpatterns
-
