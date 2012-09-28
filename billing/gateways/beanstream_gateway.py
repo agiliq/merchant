@@ -129,12 +129,14 @@ class BeanstreamGateway(Gateway):
     def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
         txn = None
+        order_number = options.get("order_number") if options else None
+
         if credit_card:
             card = self.convert_cc(credit_card)
-            txn = self.beangw.purchase(money, card, None)
+            txn = self.beangw.purchase(money, card, None, order_number)
         elif options.get("customer_code"):
             customer_code = options.get("customer_code", None)
-            txn = self.beangw.purchase_with_payment_profile(money, customer_code)
+            txn = self.beangw.purchase_with_payment_profile(money, customer_code, order_number)
 
         txn.set_comments('Test')
 
@@ -145,9 +147,12 @@ class BeanstreamGateway(Gateway):
         # TODO: Need to add check for trnAmount 
         # For Beanstream Canada and TD Visa & MasterCard merchant accounts this value may be $0 or $1 or more. 
         # For all other scenarios, this value must be $0.50 or greater.
+        order_number = options.get("order_number") if options else None
         card = self.convert_cc(credit_card)
-        txn = self.beangw.preauth(money, card, None)
+        txn = self.beangw.preauth(money, card, None, order_number)
         txn.set_comments('Test')
+        if options and "order_number" in options:
+            txn.order_number = options.get("order_number");
 
         return self._parse_resp(txn.commit())
 
@@ -159,7 +164,8 @@ class BeanstreamGateway(Gateway):
 
     def capture(self, money, authorization, options=None):
         """Capture funds from a previously authorized transaction"""
-        txn = self.beangw.preauth_completion(authorization, money)
+        order_number = options.get("order_number") if options else None
+        txn = self.beangw.preauth_completion(authorization, money, order_number)
         return self._parse_resp(txn.commit())
 
     def void(self, identification, options=None):
@@ -170,7 +176,8 @@ class BeanstreamGateway(Gateway):
 
     def credit(self, money, identification, options=None):
         """Refund a previously 'settled' transaction"""
-        txn = self.beangw.return_purchase(identification, money)
+        order_number = options.get("order_number") if options else None
+        txn = self.beangw.return_purchase(identification, money, order_number)
         return self._parse_resp(txn.commit())
 
     def recurring(self, money, creditcard, options=None):
