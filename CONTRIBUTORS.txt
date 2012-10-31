@@ -9,6 +9,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Celso Pinto <https://github.com/cpinto>
 * Chen Zhe <https://github.com/fruitschen>
 * Chris Glass <https://github.com/chrisglass>
+* Dragonx <https://github.com/dragonx>
 * Daniel Sokolowski <https://github.com/danols>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
