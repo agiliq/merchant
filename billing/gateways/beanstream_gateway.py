@@ -1,19 +1,13 @@
-import urllib
-import urllib2
-import datetime
-import hashlib
 from beanstream.gateway import Beanstream
 from beanstream.billing import CreditCard
 
 from django.conf import settings
 
-from billing.models import AuthorizeAIMResponse
 from billing import Gateway, GatewayNotConfigured
 from billing.gateway import CardNotSupported
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, \
     MasterCard, Discover, AmericanExpress
-from billing.utils.xml_parser import parseString, nodeToDic
 
 class BeanstreamGateway(Gateway):
     txnurl = "https://www.beanstream.com/scripts/process_transaction.asp"
@@ -105,7 +99,6 @@ class BeanstreamGateway(Gateway):
     def _parse_resp(self, resp):
         status = "FAILURE"
         response = resp
-        txnid = None
 
         if resp.approved():
             status = "SUCCESS"
