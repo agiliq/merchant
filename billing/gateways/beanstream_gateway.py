@@ -54,12 +54,12 @@ class BeanstreamGateway(Gateway):
         if not merchant_settings or not merchant_settings.get("beanstream"):
             raise GatewayNotConfigured("The '%s' gateway is not correctly "
                                        "configured." % self.display_name)
-        beanstream_settings = merchant_settings["beanstream"] # Not used right now
+        beanstream_settings = merchant_settings["beanstream"]
 
         self.supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
 
         hash_validation = False
-        if kwargs.get("hash_algorithm", beanstream_settings.get("hash_algorithm", None)):
+        if kwargs.get("hash_algorithm", beanstream_settings.get("HASH_ALGORITHM", None)):
             hash_validation = True
 
         self.beangw = Beanstream(
@@ -67,16 +67,16 @@ class BeanstreamGateway(Gateway):
             require_billing_address=kwargs.get("require_billing_address", False),
             require_cvd=kwargs.get("require_cvd", False))
 
-        merchant_id = kwargs.pop("merchant_id", beanstream_settings["merchant_id"])
-        login_company = kwargs.pop("login_company", beanstream_settings["login_company"])
-        login_user = kwargs.pop("login_user", beanstream_settings["login_user"])
-        login_password = kwargs.pop("login_password", beanstream_settings["login_password"])
+        merchant_id = kwargs.pop("merchant_id", beanstream_settings["MERCHANT_ID"])
+        login_company = kwargs.pop("login_company", beanstream_settings["LOGIN_COMPANY"])
+        login_user = kwargs.pop("login_user", beanstream_settings["LOGIN_USER"])
+        login_password = kwargs.pop("login_password", beanstream_settings["LOGIN_PASSWORD"])
 
         if hash_validation:
             if not kwargs.get("hash_algorithm"):
-                kwargs["hash_algorithm"] = beanstream_settings["hash_algorithm"]
+                kwargs["hash_algorithm"] = beanstream_settings["HASH_ALGORITHM"]
             if not kwargs.get("hashcode"):
-                kwargs["hashcode"] = beanstream_settings["hashcode"]
+                kwargs["hashcode"] = beanstream_settings["HASHCODE"]
 
         self.beangw.configure(
             merchant_id,
