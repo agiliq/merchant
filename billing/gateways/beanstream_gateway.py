@@ -91,37 +91,26 @@ class BeanstreamGateway(Gateway):
             login_password,
             **kwargs)
 
-    def convert_cc(self, credit_card):
+    def convert_cc(self, credit_card, validate=True):
         """Convert merchant.billing.utils.CreditCard to beanstream.billing.CreditCard"""
-        return CreditCard(
+        card = CreditCard(
             credit_card.first_name + " " + credit_card.last_name,
             credit_card.number,
             credit_card.month, credit_card.year,
             credit_card.verification_value)
+        if validate:
+            self.validate_card(card)
+        return card
 
     def _parse_resp(self, resp):
         status = "FAILURE"
-        response = ""
+        response = resp
         txnid = None
 
         if resp.approved():
             status = "SUCCESS"
-            txnid = resp.transaction_id()
-        else:
-            try:
-                if resp.resp["messageId"][0] == '52':
-                    raise CardNotSupported
-            except:
-                pass
 
-        response = "".join(resp.resp.get("messageText"))
-        if not response:
-            try:
-                response = resp.get_merchant_message()
-            except:
-                response = "Unrecognized response from Beanstream gateway."
-
-        return {"status": status, "response": response, "respdata": resp.resp, "txnid": txnid}
+        return {"status": status, "response": response}
 
     def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
@@ -154,13 +143,24 @@ class BeanstreamGateway(Gateway):
         # TODO: Need to add check for trnAmount 
         # For Beanstream Canada and TD Visa & MasterCard merchant accounts this value may be $0 or $1 or more. 
         # For all other scenarios, this value must be $0.50 or greater.
+        options = options or {}
         order_number = options.get("order_number") if options else None
         card = self.convert_cc(credit_card)
         txn = self.beangw.preauth(money, card, None, order_number)
-        txn.set_comments('Test')
+        billing_address = options.get("billing_address")
+        if billing_address:
+            txn.params.update({"ordName": billing_address["name"],
+                               "ordEmailAddress": billing_address["email"],
+                               "ordPhoneNumber": billing_address["phone"],
+                               "ordAddress1": billing_address["address1"],
+                               "ordAddress2": billing_address.get("address2", ""),
+                               "ordCity": billing_address["city"],
+                               "ordProvince": billing_address["state"],
+                               "ordCountry": billing_address["country"]})
         if options and "order_number" in options:
             txn.order_number = options.get("order_number");
 
+        txn.validate()
         return self._parse_resp(txn.commit())
 
     def unauthorize(self, money, authorization, options=None):

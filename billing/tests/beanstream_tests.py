@@ -50,8 +50,8 @@ class BeanstreamGatewayTestCase(TestCase):
 
     def testCardSupported(self):
         credit_card = self.ccFactory("5019222222222222", "100")
-        self.assertRaises(CardNotSupported, 
-                          lambda : self.merchant.purchase(1000, credit_card))
+        self.assertRaises(CardNotSupported, self.merchant.purchase,
+                          1000, credit_card)
 
     def testCardValidated(self):
         self.merchant.test_mode = False
@@ -77,7 +77,7 @@ class BeanstreamGatewayTestCase(TestCase):
                                      self.approved_cards["visa"]["cvd"])
         response = self.merchant.purchase('1.00', credit_card)
         self.assertEquals(response["status"], "FAILURE")
-        self.assertTrue(len(response["respdata"]["errorFields"]) > 0)
+        self.assertTrue(len(response["response"].resp["errorFields"]) > 0)
         response = self.merchant.purchase('1.00', credit_card, {"billing_address": {
                     "name": "Test user",
                     "email": "test@example.com",
@@ -87,15 +87,34 @@ class BeanstreamGatewayTestCase(TestCase):
                     "country": "IN",
                     "address1": "ABCD"}})
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["txnid"]
+        txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
+        declined_card = self.ccFactory("4003050500040005", 123)
+        response = self.merchant.purchase('1.00', declined_card, {"billing_address": {
+                    "name": "Test user",
+                    "email": "test@example.com",
+                    "phone": "123456789",
+                    "city": "Hyd",
+                    "state": "AP",
+                    "country": "IN",
+                    "address1": "ABCD"}})
+        self.assertEquals(response["status"], "FAILURE")
+        self.assertEquals(response["response"].approved(), False)
+        self.assertEquals(response["response"].resp["messageId"], ["7"])
 
     def testPurchaseVoid(self):
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
                                      self.approved_cards["visa"]["cvd"])
-        response = self.merchant.purchase('1.00', credit_card)
+        response = self.merchant.purchase('1.00', credit_card, {"billing_address": {
+                    "name": "Test user",
+                    "email": "test@example.com",
+                    "phone": "123456789",
+                    "city": "Hyd",
+                    "state": "AP",
+                    "country": "IN",
+                    "address1": "ABCD"}})
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["txnid"]
+        txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
         response = self.merchant.void({"txnid": txnid, "amount":'1.00'})
         self.assertEquals(response["status"], "SUCCESS")
@@ -103,30 +122,51 @@ class BeanstreamGatewayTestCase(TestCase):
     def testPurchaseReturn(self):
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
                                      self.approved_cards["visa"]["cvd"])
-        response = self.merchant.purchase('5.00', credit_card)
+        response = self.merchant.purchase('5.00', credit_card, {"billing_address": {
+                    "name": "Test user",
+                    "email": "test@example.com",
+                    "phone": "123456789",
+                    "city": "Hyd",
+                    "state": "AP",
+                    "country": "IN",
+                    "address1": "ABCD"}})
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["txnid"]
+        txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
         response = self.merchant.credit('4.00', txnid)
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["txnid"]
+        txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
 
     def testAuthorize(self):
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
                                      self.approved_cards["visa"]["cvd"])
-        response = self.merchant.authorize('1.00', credit_card)
+        response = self.merchant.authorize('1.00', credit_card, {"billing_address": {
+                    "name": "Test user",
+                    "email": "test@example.com",
+                    "phone": "123456789",
+                    "city": "Hyd",
+                    "state": "AP",
+                    "country": "IN",
+                    "address1": "ABCD"}})
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["txnid"]
+        txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
 
     def testAuthorizeComplete(self):
         ''' Preauth and complete '''
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
                                      self.approved_cards["visa"]["cvd"])
-        response = self.merchant.authorize('1.00', credit_card)
+        response = self.merchant.authorize('1.00', credit_card, {"billing_address": {
+                    "name": "Test user",
+                    "email": "test@example.com",
+                    "phone": "123456789",
+                    "city": "Hyd",
+                    "state": "AP",
+                    "country": "IN",
+                    "address1": "ABCD"}})
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["txnid"]
+        txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
         response = self.merchant.capture('1.00', txnid)
         self.assertEquals(response["status"], "SUCCESS")
@@ -135,9 +175,16 @@ class BeanstreamGatewayTestCase(TestCase):
         ''' Preauth and cancel '''
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
                                      self.approved_cards["visa"]["cvd"])
-        response = self.merchant.authorize('1.00', credit_card)
+        response = self.merchant.authorize('1.00', credit_card, {"billing_address": {
+                    "name": "Test user",
+                    "email": "test@example.com",
+                    "phone": "123456789",
+                    "city": "Hyd",
+                    "state": "AP",
+                    "country": "IN",
+                    "address1": "ABCD"}})
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["txnid"]
+        txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
         response = self.merchant.unauthorize(None, txnid)
         self.assertEquals(response["status"], "SUCCESS")
@@ -148,10 +195,10 @@ class BeanstreamGatewayTestCase(TestCase):
         response = self.merchant.store(credit_card, {"billing_address":self.billing_address})
         self.assertEquals(response["status"], "SUCCESS")
 
-        customer_code = response["customer"]
+        customer_code = response["response"].resp["customer"]
         self.assertIsNotNone(customer_code)
 
         response = self.merchant.purchase('1.00', None, {"customer_code":customer_code})
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["txnid"]
+        txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
