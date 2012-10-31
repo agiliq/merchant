@@ -1,6 +1,6 @@
------------------------------
-Beanstream Server to Server
------------------------------
+-----------
+Beanstream
+-----------
 
 `Beanstream`_ is a gateway headquartered in Canada and offering payment processing
 across North America.
