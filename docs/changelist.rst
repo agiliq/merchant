@@ -2,6 +2,11 @@
 Changes
 ========
 
+0.07
+-----
+
+* Added Beanstream gateway
+
 0.06
 ----
 
