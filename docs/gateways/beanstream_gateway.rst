@@ -7,7 +7,7 @@ across North America.
 
 .. note::
 
-   You will require the python package `beanstream`_ maintained by the community.
+   You will require the `beanstream python package`_ maintained by the community.
 
 Settings attributes required (optional if you are passing them while initializing 
 the gateway) for this integration are:
@@ -67,4 +67,4 @@ Example:
     >>> beanstream.void(resp["response"].resp["trnId"])
 
 .. _`Beanstream`: http://www.beanstream.com/site/ca/index.html
-.. _`beanstream`: http://github.com/dragonx/beanstream
+.. _`beanstream python package`: http://github.com/dragonx/beanstream
