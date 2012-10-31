@@ -194,18 +194,13 @@ class BeanstreamGateway(Gateway):
         resp = txn.commit()
 
         status = "FAILURE"
-        response = ""
-        customer = None
-        if resp.approved():
-            status = "SUCCESS"
-            customer = resp.customer_code()
-        elif resp.resp["responseCode"] == ["17"]:
-            status = "SUCCESS"
-            customer = resp.resp["matchedCustomerCode"][0]
+        response = None
+        if resp.approved() or resp.resp["responseCode"] == ["17"]:
+            status = "SUCCESS" 
         else:
             response = resp
 
-        return {"status": status, "response": response, "customer": customer}
+        return {"status": status, "response": response}
 
     def unstore(self, identification, options=None):
         """Delete the previously stored credit card and user

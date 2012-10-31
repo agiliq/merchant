@@ -192,13 +192,13 @@ class BeanstreamGatewayTestCase(TestCase):
     def testCreateProfile(self):
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
                                      self.approved_cards["visa"]["cvd"])
-        response = self.merchant.store(credit_card, {"billing_address":self.billing_address})
+        response = self.merchant.store(credit_card, {"billing_address": self.billing_address})
         self.assertEquals(response["status"], "SUCCESS")
 
-        customer_code = response["response"].resp["customer"]
+        customer_code = response["response"].resp.customer_code()
         self.assertIsNotNone(customer_code)
 
-        response = self.merchant.purchase('1.00', None, {"customer_code":customer_code})
+        response = self.merchant.purchase('1.00', None, {"customer_code": customer_code})
         self.assertEquals(response["status"], "SUCCESS")
         txnid = response["response"].resp["trnId"]
         self.assertIsNotNone(txnid)
