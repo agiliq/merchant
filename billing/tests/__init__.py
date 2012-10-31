@@ -31,6 +31,12 @@ try:
     from samurai_tests import *
 except ImportError:
     pass
+
+try:
+    import beanstream
+    from beanstream_tests import *
+except ImportError:
+    pass
     
 from paylane_tests import *
 
