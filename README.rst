@@ -18,6 +18,7 @@ Following gateways are supported:
 * Samurai from Fee Fighters
 * Paylane
 * WePay
+* Beanstream
 
 Off-Site Processing
 --------------------
