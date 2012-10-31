@@ -26,11 +26,7 @@ class BeanstreamGatewayTestCase(TestCase):
                       }
 
     def setUp(self):
-        self.merchant = get_gateway("beanstream", **{"merchant_id": 267390000,
-                                                     "hashcode"  : "dine-otestkey",
-                                                     "hash_algorithm"   : "SHA1",
-                                                     "payment_profile_passcode":"BCCE75A688F8497E9CDBC77AA8178581",
-                                                })
+        self.merchant = get_gateway("beanstream")
         self.merchant.test_mode = True
         self.billing_address = Address(
             'John Doe',
@@ -80,6 +76,16 @@ class BeanstreamGatewayTestCase(TestCase):
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
                                      self.approved_cards["visa"]["cvd"])
         response = self.merchant.purchase('1.00', credit_card)
+        self.assertEquals(response["status"], "FAILURE")
+        self.assertTrue(len(response["respdata"]["errorFields"]) > 0)
+        response = self.merchant.purchase('1.00', credit_card, {"billing_address": {
+                    "name": "Test user",
+                    "email": "test@example.com",
+                    "phone": "123456789",
+                    "city": "Hyd",
+                    "state": "AP",
+                    "country": "IN",
+                    "address1": "ABCD"}})
         self.assertEquals(response["status"], "SUCCESS")
         txnid = response["txnid"]
         self.assertIsNotNone(txnid)

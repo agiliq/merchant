@@ -18,6 +18,7 @@ from billing.utils.xml_parser import parseString, nodeToDic
 class BeanstreamGateway(Gateway):
     txnurl = "https://www.beanstream.com/scripts/process_transaction.asp"
     profileurl = "https://www.beanstream.com/scripts/payment_profile.asp"
+    display_name = "Beanstream"
 
     # A list of all the valid parameters, and which ones are required.
     params = [
@@ -63,17 +64,25 @@ class BeanstreamGateway(Gateway):
 
         self.supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
 
-        hash_validation = True if kwargs.get("hashValue", 0) else False
+        hash_validation = False
+        if kwargs.get("hash_algorithm", beanstream_settings.get("hash_algorithm", None)):
+            hash_validation = True
 
         self.beangw = Beanstream(
-            hash_validation=True, # hash_validation,
-            require_billing_address=False,
-            require_cvd=True)
+            hash_validation=hash_validation,
+            require_billing_address=kwargs.get("require_billing_address", False),
+            require_cvd=kwargs.get("require_cvd", False))
 
-        merchant_id = kwargs.pop("merchant_id", None)
-        login_company = kwargs.pop("login_company", None)
-        login_user = kwargs.pop("login_user", None)
-        login_password = kwargs.pop("login_password", None)
+        merchant_id = kwargs.pop("merchant_id", beanstream_settings["merchant_id"])
+        login_company = kwargs.pop("login_company", beanstream_settings["login_company"])
+        login_user = kwargs.pop("login_user", beanstream_settings["login_user"])
+        login_password = kwargs.pop("login_password", beanstream_settings["login_password"])
+
+        if hash_validation:
+            if not kwargs.get("hash_algorithm"):
+                kwargs["hash_algorithm"] = beanstream_settings["hash_algorithm"]
+            if not kwargs.get("hashcode"):
+                kwargs["hashcode"] = beanstream_settings["hashcode"]
 
         self.beangw.configure(
             merchant_id,
@@ -81,12 +90,6 @@ class BeanstreamGateway(Gateway):
             login_user,
             login_password,
             **kwargs)
-        '''
-        hashcode=kwargs.get("hashValue", None),
-        hash_algorithm=kwargs.get("hashAlgo", None),
-        payment_profile_passcode=None,
-        recurring_billing_passcode=None)
-        '''
 
     def convert_cc(self, credit_card):
         """Convert merchant.billing.utils.CreditCard to beanstream.billing.CreditCard"""
@@ -95,12 +98,6 @@ class BeanstreamGateway(Gateway):
             credit_card.number,
             credit_card.month, credit_card.year,
             credit_card.verification_value)
-
-    def add_hash(self, data, key):
-        data2 = data + key
-        h = hashlib.sha1()
-        h.update(data2)
-        return data + "&hashValue=" + h.hexdigest()
 
     def _parse_resp(self, resp):
         status = "FAILURE"
@@ -128,18 +125,28 @@ class BeanstreamGateway(Gateway):
 
     def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
+        options = options or {}
         txn = None
         order_number = options.get("order_number") if options else None
 
         if credit_card:
             card = self.convert_cc(credit_card)
             txn = self.beangw.purchase(money, card, None, order_number)
+            billing_address = options.get("billing_address")
+            if billing_address:
+                txn.params.update({"ordName": billing_address["name"],
+                                   "ordEmailAddress": billing_address["email"],
+                                   "ordPhoneNumber": billing_address["phone"],
+                                   "ordAddress1": billing_address["address1"],
+                                   "ordAddress2": billing_address.get("address2", ""),
+                                   "ordCity": billing_address["city"],
+                                   "ordProvince": billing_address["state"],
+                                   "ordCountry": billing_address["country"]})
         elif options.get("customer_code"):
             customer_code = options.get("customer_code", None)
             txn = self.beangw.purchase_with_payment_profile(money, customer_code, order_number)
 
-        txn.set_comments('Test')
-
+        txn.validate()
         return self._parse_resp(txn.commit())
 
     def authorize(self, money, credit_card, options=None):
@@ -211,4 +218,3 @@ class BeanstreamGateway(Gateway):
         """Delete the previously stored credit card and user
         profile information on the gateway"""
         raise NotImplementedError
-
