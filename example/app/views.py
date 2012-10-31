@@ -226,6 +226,40 @@ def we_pay_ipn(request):
     return render(request, 'app/index.html', {})
 
 
+def beanstream(request):
+    amount = 1
+    response = None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("beanstream")
+            response = merchant.purchase(amount, credit_card,
+                                         {"billing_address": {
+                        "name": "%s %s" % (data["first_name"], data["last_name"]),
+                        # below are hardcoded just for the sake of the example
+                        # you can make these optional by toggling the customer name
+                        # and address in the account dashboard.
+                        "email": "test@example.com",
+                        "phone": "555-555-555-555",
+                        "address1": "Addr1",
+                        "address2": "Addr2",
+                        "city": "Hyd",
+                        "state": "AP",
+                        "country": "IN"
+                        }
+                                          })
+    else:
+        form = CreditCardForm(initial={'number':'4030000010001234',
+                                       'card_type': 'visa',
+                                       'verification_value': 123})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount': amount,
+                                             'response': response,
+                                             'title': 'Beanstream'})
+
+
 def offsite_authorize_net(request):
     params = {'x_amount': 1,
               'x_fp_sequence': datetime.datetime.now().strftime('%Y%m%d%H%M%S'),
@@ -354,4 +388,4 @@ def offsite_eway_done(request):
     eway_obj = get_integration("eway_au", access_code=access_code)
     result = eway_obj.check_transaction(access_code)
 
-    return render(request, "app/eway_done.html", {"result": result})
+    return render(request, "app/eway_done.html", {"result": result}) 
