@@ -21,7 +21,7 @@ urlpatterns = patterns('app.views',
     url(r'^stripe/$', 'stripe', name='app_stripe'),
     url(r'^samurai/$', 'samurai', name='app_samurai'),
     url(r'^paylane/$', 'paylane', name='app_paylane'),
-    url(r'^beanstram/$', 'beanstream', name='app_beanstream'),
+    url(r'^beanstream/$', 'beanstream', name='app_beanstream'),
 )
 
 # offsite payments
