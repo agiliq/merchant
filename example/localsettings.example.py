@@ -82,7 +82,17 @@ MERCHANT_SETTINGS = {
         # extra option items. Useful for marketplace
         "ACCOUNT_ID": "",
         "ACCESS_TOKEN": "",
-        }
+        },
+
+    "beanstream": {
+        "MERCHANT_ID": "",
+        "LOGIN_COMPANY": "",
+        "LOGIN_USER": "",
+        "LOGIN_PASSWORD": "",
+        # Below two are optional
+        "HASH_ALGORITHM"   : "",
+        "HASHCODE"  : ""
+    }
 }
 
 # Special case for PayPal because we rely on django-paypal
