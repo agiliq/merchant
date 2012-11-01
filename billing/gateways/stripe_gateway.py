@@ -41,7 +41,7 @@ class StripeGateway(Gateway):
         except self.stripe.CardError, error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
-                                              response=response)
+                                              response=error)
             return {'status': 'FAILURE', 'response': error}
         transaction_was_successful.send(sender=self,
                                         type="purchase",
