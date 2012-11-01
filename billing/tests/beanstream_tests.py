@@ -102,6 +102,40 @@ class BeanstreamGatewayTestCase(TestCase):
         self.assertEquals(response["response"].approved(), False)
         self.assertEquals(response["response"].resp["messageId"], ["7"])
 
+    def testPaymentSuccessfulSignal(self):
+        credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
+                                     self.approved_cards["visa"]["cvd"])
+
+        received_signals = []
+
+        def receive(sender, **kwargs):
+            received_signals.append(kwargs.get("signal"))
+
+        transaction_was_successful.connect(receive)
+
+        resp = self.merchant.purchase(10, credit_card, {"billing_address": {
+                    "name": "Test user",
+                    "email": "test@example.com",
+                    "phone": "123456789",
+                    "city": "Hyd",
+                    "state": "AP",
+                    "country": "IN",
+                    "address1": "ABCD"}})
+        self.assertEquals(received_signals, [transaction_was_successful])
+
+    def testPaymentUnSuccessfulSignal(self):
+        credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
+                                     self.approved_cards["visa"]["cvd"])
+        received_signals = []
+
+        def receive(sender, **kwargs):
+            received_signals.append(kwargs.get("signal"))
+
+        transaction_was_unsuccessful.connect(receive)
+
+        resp = self.merchant.purchase(10, credit_card)
+        self.assertEquals(received_signals, [transaction_was_unsuccessful])
+
     def testPurchaseVoid(self):
         credit_card = self.ccFactory(self.approved_cards["visa"]["number"],
                                      self.approved_cards["visa"]["cvd"])

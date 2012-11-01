@@ -5,7 +5,8 @@ from django.conf import settings
 
 from billing import Gateway, GatewayNotConfigured
 from billing.gateway import CardNotSupported
-from billing.signals import *
+from billing.signals import transaction_was_successful, \
+    transaction_was_unsuccessful
 from billing.utils.credit_card import InvalidCard, Visa, \
     MasterCard, Discover, AmericanExpress
 
@@ -129,7 +130,16 @@ class BeanstreamGateway(Gateway):
             txn = self.beangw.purchase_with_payment_profile(money, customer_code, order_number)
 
         txn.validate()
-        return self._parse_resp(txn.commit())
+        resp = self._parse_resp(txn.commit())
+        if resp["status"] == "SUCCESS":
+            transaction_was_successful.send(sender=self,
+                                            type="purchase",
+                                            response=resp["response"])
+        else:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="purchase",
+                                              response=resp["response"])
+        return resp
 
     def authorize(self, money, credit_card, options=None):
         """Authorization for a future capture transaction"""
@@ -154,31 +164,76 @@ class BeanstreamGateway(Gateway):
             txn.order_number = options.get("order_number");
 
         txn.validate()
-        return self._parse_resp(txn.commit())
+        resp = self._parse_resp(txn.commit())
+        if resp["status"] == "SUCCESS":
+            transaction_was_successful.send(sender=self,
+                                            type="authorize",
+                                            response=resp["response"])
+        else:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="authorize",
+                                              response=resp["response"])
+        return resp
 
     def unauthorize(self, money, authorization, options=None):
         """Cancel a previously authorized transaction"""
         txn = self.beangw.cancel_preauth(authorization)
 
-        return self._parse_resp(txn.commit())
+        resp = self._parse_resp(txn.commit())
+        if resp["status"] == "SUCCESS":
+            transaction_was_successful.send(sender=self,
+                                            type="unauthorize",
+                                            response=resp["response"])
+        else:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="unauthorize",
+                                              response=resp["response"])
+        return resp
 
     def capture(self, money, authorization, options=None):
         """Capture funds from a previously authorized transaction"""
         order_number = options.get("order_number") if options else None
         txn = self.beangw.preauth_completion(authorization, money, order_number)
-        return self._parse_resp(txn.commit())
+        resp = self._parse_resp(txn.commit())
+        if resp["status"] == "SUCCESS":
+            transaction_was_successful.send(sender=self,
+                                            type="capture",
+                                            response=resp["response"])
+        else:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="capture",
+                                              response=resp["response"])
+        return resp
 
     def void(self, identification, options=None):
         """Null/Blank/Delete a previous transaction"""
         """Right now this only handles VOID_PURCHASE"""
         txn = self.beangw.void_purchase(identification["txnid"], identification["amount"])
-        return self._parse_resp(txn.commit())
+        resp = self._parse_resp(txn.commit())
+        if resp["status"] == "SUCCESS":
+            transaction_was_successful.send(sender=self,
+                                            type="void",
+                                            response=resp["response"])
+        else:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="void",
+                                              response=resp["response"])
+        return resp
 
     def credit(self, money, identification, options=None):
         """Refund a previously 'settled' transaction"""
         order_number = options.get("order_number") if options else None
         txn = self.beangw.return_purchase(identification, money, order_number)
-        return self._parse_resp(txn.commit())
+        resp = self._parse_resp(txn.commit())
+        if resp["status"] == "SUCCESS":
+            transaction_was_successful.send(sender=self,
+                                            type="credit",
+                                            response=resp["response"])
+        else:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="credit",
+                                              response=resp["response"])
+        return resp
 
     def recurring(self, money, creditcard, options=None):
         """Setup a recurring transaction"""
@@ -200,6 +255,14 @@ class BeanstreamGateway(Gateway):
         else:
             response = resp
 
+        if status == "SUCCESS":
+            transaction_was_successful.send(sender=self,
+                                            type="recurring",
+                                            response=response)
+        else:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="recurring",
+                                              response=response)
         return {"status": status, "response": response}
 
     def unstore(self, identification, options=None):
