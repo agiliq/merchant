@@ -9,7 +9,7 @@ class SamuraiGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("samurai")
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2012,
+                                      month=10, year=2020,
                                       number="4111111111111111",
                                       verification_value="100")
 

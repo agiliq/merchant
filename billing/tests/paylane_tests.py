@@ -41,7 +41,7 @@ class PaylaneTestCase(TestCase):
             self.merchant.void(authz.sale_authorization_id)
 
     def testOneShotPurchaseOK(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4012888888881881', verification_value=435)
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4012888888881881', verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = {}
@@ -51,7 +51,7 @@ class PaylaneTestCase(TestCase):
         self.assertFalse('authorization' in res['response'])
 
     def testOneShotPurchaseError(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4929966723331981', verification_value=435)
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4929966723331981', verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = {}
@@ -63,7 +63,7 @@ class PaylaneTestCase(TestCase):
         self.assertEqual(res['response']['error'].error_code, PaylaneError.ERR_CARD_EXPIRED)
 
     def testRecurringSetupOK(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4242424242424242', verification_value=435)
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4242424242424242', verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
@@ -74,7 +74,7 @@ class PaylaneTestCase(TestCase):
         self.assertTrue(res['response']['authorization'].sale_authorization_id > 0)
 
     def testRecurringSetupError(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4916437826836305', verification_value=435)
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4916437826836305', verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
@@ -86,7 +86,7 @@ class PaylaneTestCase(TestCase):
         self.assertEqual(res['response']['error'].error_code, PaylaneError.ERR_CARD_EXPIRED)
 
     def testRecurringBillingOK(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4000111111111115', verification_value="100")
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4000111111111115', verification_value="100")
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
@@ -107,7 +107,7 @@ class PaylaneTestCase(TestCase):
         self.assertTrue('authorization' in bill2['response'])
 
     def testRecurringBillingFailWithChargeback(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4111111111111111', verification_value=435)
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4111111111111111', verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
@@ -129,7 +129,7 @@ class PaylaneTestCase(TestCase):
         self.assertEqual(bill2['response']['error'].error_code, PaylaneError.ERR_RESALE_WITH_CHARGEBACK)
 
     def testAuthorizeOK(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4532830407731057', verification_value=435)
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4532830407731057', verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
@@ -140,7 +140,7 @@ class PaylaneTestCase(TestCase):
         self.assertTrue(res['response']['authorization'].sale_authorization_id > 0)
 
     def testAuthorizeError(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4539824967650347', verification_value=435)
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4539824967650347', verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
@@ -152,7 +152,7 @@ class PaylaneTestCase(TestCase):
         self.assertEqual(res['response']['error'].error_code, PaylaneError.ERR_CARD_EXPIRED)
 
     def testCaptureOK(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4278255665174428', verification_value="100")
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4278255665174428', verification_value="100")
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product
@@ -168,7 +168,7 @@ class PaylaneTestCase(TestCase):
         self.assertTrue('authorization' in bill1['response'])
 
     def testCaptureError(self):
-        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2012, number='4556096020428973', verification_value=435)
+        credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4556096020428973', verification_value=435)
         options = {}
         options['customer'] = self.customer
         options['product'] = self.product

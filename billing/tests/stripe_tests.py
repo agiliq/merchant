@@ -10,7 +10,7 @@ class StripeGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("stripe")
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2012,
+                                      month=10, year=2020,
                                       number="4242424242424242",
                                       verification_value="100")
         stripe.api_key = self.merchant.stripe.api_key
