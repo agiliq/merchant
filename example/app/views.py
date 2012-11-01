@@ -259,6 +259,26 @@ def beanstream(request):
                                              'response': response,
                                              'title': 'Beanstream'})
 
+def chargebee(request):
+    amount = 1
+    response = None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("chargebee")
+            response = merchant.purchase(amount, credit_card,
+                                         {"plan_id": "professional",
+                                          "description": "Quick Purchase"})
+    else:
+        form = CreditCardForm(initial={'number':'4111111111111111',
+                                       'card_type': 'visa',
+                                       'verification_value': 100})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount': amount,
+                                             'response': response,
+                                             'title': 'Chargebee'})
 
 def offsite_authorize_net(request):
     params = {'x_amount': 1,
