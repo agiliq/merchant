@@ -11,7 +11,7 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
         self.merchant = get_gateway("authorize_net")
         self.merchant.test_mode = True
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2011,
+                                      month=10, year=2020,
                                       number="4222222222222",
                                       verification_value="100")
 

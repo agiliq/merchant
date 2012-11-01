@@ -11,7 +11,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
         self.merchant = get_gateway("braintree_payments")
         self.merchant.test_mode = True
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2011,
+                                      month=10, year=2020,
                                       number="4111111111111111",
                                       verification_value="100")
 
