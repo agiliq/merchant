@@ -55,7 +55,7 @@ Example:
     # subscription with an interval of a decade or more
     >>> resp = chargebee.purchase(1000, credit_card,
         options = {"plan_id": "oneshot", "description": "Quick Purchase"})
-    >>> resp["response"]["customer"]["subscription"]["id"]
+    >>> resp["response"]["invoice"]["subscription_id"]
     ...
 
     # Authorize the card for 100 USD
@@ -72,7 +72,7 @@ Example:
     'SUCCESS'
 
     # Void an authorized transaction
-    >>> resp = chargebee.void(resp["response"]["subscription"]["id"])
+    >>> resp = chargebee.void(resp["response"]["invoice"]["subscription_id"])
     >>> resp["status"]
     'SUCCESS'
 
