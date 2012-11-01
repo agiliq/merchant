@@ -5,6 +5,7 @@ Changes
 0.07
 -----
 
+* Added Chargebee support
 * Added Beanstream gateway
 
 0.06

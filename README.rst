@@ -19,6 +19,7 @@ Following gateways are supported:
 * Paylane
 * WePay
 * Beanstream
+* Chargebee
 
 Off-Site Processing
 --------------------

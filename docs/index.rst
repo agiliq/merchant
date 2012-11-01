@@ -27,6 +27,7 @@ Contents:
     * :doc:`Paylane  <gateways/paylane_gateway>`
     * :doc:`WePay  <gateways/we_pay_gateway>`
     * :doc:`Beanstream  <gateways/beanstream_gateway>`
+    * :doc:`Chargebee  <gateways/chargebee_gateway>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 
