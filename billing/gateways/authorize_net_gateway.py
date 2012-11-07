@@ -202,7 +202,7 @@ class AuthorizeNetGateway(Gateway):
             status = "FAILURE"
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
-                                              response="response")
+                                              response=response)
         else:
             transaction_was_successful.send(sender=self,
                                             type="purchase",
