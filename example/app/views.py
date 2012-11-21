@@ -395,7 +395,7 @@ def offsite_eway(request):
     return_url = request.build_absolute_uri(reverse(offsite_eway_done))
     eway_obj = get_integration("eway_au")
     customer = eway_obj.request_access_code(
-            request, return_url=return_url, customer={},
+            return_url=return_url, customer={},
             payment={"total_amount": 100})
     request.session["eway_access_code"] = eway_obj.access_code
     template_vars = {"title": "eWAY",
@@ -406,6 +406,6 @@ def offsite_eway(request):
 def offsite_eway_done(request):
     access_code = request.session["eway_access_code"]
     eway_obj = get_integration("eway_au", access_code=access_code)
-    result = eway_obj.check_transaction(access_code)
+    result = eway_obj.check_transaction()
 
     return render(request, "app/eway_done.html", {"result": result}) 

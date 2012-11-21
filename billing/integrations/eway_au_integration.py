@@ -103,14 +103,14 @@ class EwayAuIntegration(Integration):
         initial_data = dict(EWAY_ACCESSCODE=self.access_code, **self.fields)
         return EwayAuForm(initial=initial_data)
 
-    def request_access_code(self, payment, redirect_url, customer=None,
+    def request_access_code(self, payment, return_url, customer=None,
                             billing_country=None, ip_address=None):
         # enforce required fields
         assert self.customer_id
         assert self.username
         assert self.password
         assert payment['total_amount']
-        assert redirect_url
+        assert return_url
 
         # Request a new access code.
         req = client.factory.create("CreateAccessCodeRequest")
@@ -119,7 +119,7 @@ class EwayAuIntegration(Integration):
         req.Authentication.Password = self.password
         attr_update(req.Payment, translate(payment))
         attr_update(req.Customer, translate(customer or {}))
-        req.RedirectUrl = redirect_url
+        req.RedirectUrl = return_url
         if ip_address:
             req.IPAddress = ip_address
         if billing_country:
