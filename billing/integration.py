@@ -66,7 +66,7 @@ def get_integration(integration, *args, **kwargs):
             except ImportError:
                 pass
         if not integration_module:
-            raise IntegrationModuleNotFound("Missing integration")
+            raise IntegrationModuleNotFound("Missing integration: %s" % (integration))
         integration_class_name = "".join(integration_filename.title().split("_"))
         try:
             klass = getattr(integration_module, integration_class_name)
