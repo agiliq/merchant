@@ -3,3 +3,5 @@ stripe
 django-paypal
 boto
 braintree
+wepay
+suds
