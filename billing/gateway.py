@@ -118,7 +118,7 @@ def get_gateway(gateway, *args, **kwargs):
             except ImportError:
                 pass
         if not gateway_module:
-            raise GatewayModuleNotFound("Missing gateway")
+            raise GatewayModuleNotFound("Missing gateway: %s" % (gateway))
         gateway_class_name = "".join(gateway_filename.title().split("_"))
         try:
             clazz = getattr(gateway_module, gateway_class_name)
