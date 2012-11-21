@@ -11,8 +11,6 @@ class BraintreePaymentsGateway(Gateway):
     supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
     supported_countries = ["US"]
     default_currency = "USD"
-
-    supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
     homepage_url = "http://www.braintreepayments.com/"
     display_name = "Braintree Payments"
 
