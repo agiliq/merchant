@@ -92,7 +92,21 @@ MERCHANT_SETTINGS = {
         # Below two are optional
         "HASH_ALGORITHM"   : "",
         "HASHCODE"  : ""
-    }
+    },
+
+    "chargebee": {
+        "API_KEY": "",
+        "SITE": ""
+    },
+
+    "bitcoin": {
+        "RPCUSER": "",
+        "RPCPASSWORD": "",
+        "HOST": "",
+        "PORT": "",
+        "ACCOUNT": "",
+        "MINCONF": 1,
+    },
 }
 
 # Special case for PayPal because we rely on django-paypal

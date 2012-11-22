@@ -34,6 +34,11 @@ Off-Site Processing
 * eWAY
 * Authorize.net Direct Post Method
 
+Other
+-----
+
+* Bitcoin
+
 Documentation
 --------------
 
