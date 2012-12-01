@@ -19,4 +19,5 @@ Thanks go out to all the contributors listed in alphabetical order:
 * nmonteiro <https://github.com/nmonteiro>
 * Plaban Nayak <plaban.nayak@gmail.com>
 * Shabda Raaj <shabda@agiliq.com>
+* Si Feng <https://github.com/devfeng>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
