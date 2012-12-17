@@ -27,15 +27,15 @@ class WePayGateway(Gateway):
         options = options or {}
         params = {}
         params.update({
-                'account_id': self.we_pay_settings.get("ACCOUNT_ID", ""),
+                'account_id': options.pop("account_id", self.we_pay_settings.get("ACCOUNT_ID", "")),
                 'short_description': options.pop("description", ""),
                 'amount': money,
                 })
-        params.update(options)
         if credit_card and not isinstance(credit_card, CreditCard):
             params["payment_method_id"] = credit_card
             params["payment_method_type"] = "credit_card"
         token = options.pop("access_token", self.we_pay_settings["ACCESS_TOKEN"])
+        params.update(options)
         try:
             response = self.we_pay.call('/checkout/create', params, token=token)
         except WePayError, error:
