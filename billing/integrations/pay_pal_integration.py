@@ -16,6 +16,9 @@ class PayPalIntegration(Integration):
             raise IntegrationNotConfigured("The '%s' integration is not correctly "
                                        "configured." % self.display_name)
         pay_pal_settings = merchant_settings["pay_pal"]
+        self.encrypted = False
+        if pay_pal_settings.get("ENCRYPTED"):
+            self.encrypted = True
         # Required Fields. Just a template for the user
         self.fields = {"business": pay_pal_settings['RECEIVER_EMAIL'],
                        "item_name": "",
