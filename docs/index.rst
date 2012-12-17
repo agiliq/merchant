@@ -28,6 +28,7 @@ Contents:
     * :doc:`WePay  <gateways/we_pay_gateway>`
     * :doc:`Beanstream  <gateways/beanstream_gateway>`
     * :doc:`Chargebee  <gateways/chargebee_gateway>`
+    * :doc:`Bitcoin <gateways/bitcoin_gateway>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 
@@ -40,8 +41,6 @@ Contents:
     * :doc:`Samurai  <offsite/samurai_integration>`
     * :doc:`eWAY <offsite/eway_au>`
     * :doc:`Authorize.Net Direct Post Method <offsite/authorize_net_dpm>`
-
-  * :doc:`Bitcoin <gateways/bitcoin_gateway>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
