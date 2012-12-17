@@ -41,6 +41,8 @@ Contents:
     * :doc:`eWAY <offsite/eway_au>`
     * :doc:`Authorize.Net Direct Post Method <offsite/authorize_net_dpm>`
 
+  * :doc:`Bitcoin <gateways/bitcoin_gateway>`
+
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`
 * :doc:`Customizing the inbuilt Gateway/Integrations <customize>`
