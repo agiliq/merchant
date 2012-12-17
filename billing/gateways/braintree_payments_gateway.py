@@ -2,7 +2,7 @@ from billing import Gateway, GatewayNotConfigured
 from billing.gateway import InvalidData
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
-    AmericanExpress, Discover
+    AmericanExpress, Discover, CreditCard
 from django.conf import settings
 import braintree
 
@@ -110,6 +110,9 @@ class BraintreePaymentsGateway(Gateway):
 
         request_hash = self._build_request_hash(options)
         request_hash["amount"] = money
+
+        if options.get("merchant_account_id"):
+            request_hash["merchant_account_id"] = options.get("merchant_account_id")
 
         if isinstance(credit_card, CreditCard):
             request_hash["credit_card"] = {
