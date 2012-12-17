@@ -11,12 +11,15 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Chris Glass <https://github.com/chrisglass>
 * Dragonx <https://github.com/dragonx>
 * Daniel Sokolowski <https://github.com/danols>
+* Donald Stufft <https://github.com/dstufft>
 * Greg McGuire <https://github.com/gmcguire>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
+* Konrad Rotkiewicz <https://github.com/krotkiewicz>
 * Markus Gattol <markus.gattol@sunoano.org>
 * Mikey Ryan <https://github.com/mikery>
 * nmonteiro <https://github.com/nmonteiro>
+* Patrick Altman < https://github.com/paltman>
 * Plaban Nayak <plaban.nayak@gmail.com>
 * Shabda Raaj <shabda@agiliq.com>
 * Si Feng <https://github.com/devfeng>
