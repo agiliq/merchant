@@ -409,3 +409,30 @@ def offsite_eway_done(request):
     result = eway_obj.check_transaction()
 
     return render(request, "app/eway_done.html", {"result": result}) 
+
+
+def bitcoin(request):
+    bitcoin_obj = get_gateway("bitcoin")
+    address = request.session.get("bitcoin_address", None)
+    if not address:
+        address = bitcoin_obj.get_new_address()
+        request.session["bitcoin_address"] = address
+    return render(request, "app/bitcoin.html", {
+        "title": "Bitcoin",
+        "address": address
+    })
+
+def bitcoin_done(request):
+    amount = 1
+    bitcoin_obj = get_gateway("bitcoin")
+    address = request.session.get("bitcoin_address", None)
+    if not address:
+        return HttpResponseRedirect(reverse("app_bitcoin"))
+    result = bitcoin_obj.purchase(amount, address)
+    if result['status'] == 'SUCCESS':
+        del request.session["bitcoin_address"]
+    return render(request, "app/bitcoin_done.html", {
+        "title": "Bitcoin",
+        "address": address,
+        "result": result
+    })
