@@ -1,0 +1,21 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+Paying 1 BTC  to address: {{ address }}
+<br />
+
+<strong>Result</strong>: {{ result.status }}
+
+<ol>
+    {% for txn in result.response %}
+    <li>Received: {{ txn.amount }} BTC - transaction id: {{ txn.txid }}</li>
+    {% empty %}
+    <li>No transactions to this address so far.</li>
+    <form action="." method="POST">
+        {% csrf_token %}
+        <input type="submit" name="retry" value="Retry" />
+    </form>
+    {% endfor %}
+</ol>
+
+{% endblock %}

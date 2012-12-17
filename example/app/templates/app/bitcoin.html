@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+Please pay 1 BTC to the following address from your bitcoin wallet:
+<br />
+<strong>{{ address }}</strong>
+
+<br />
+Click continue when done.
+
+<form action="/bitcoin/done/" method="POST">
+    {% csrf_token %}
+    <input type="submit" name="continue" value="Continue" />
+</form>
+{% endblock %}

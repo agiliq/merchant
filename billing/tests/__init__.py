@@ -40,6 +40,7 @@ except ImportError:
     
 from paylane_tests import *
 from chargebee_tests import *
+from bitcoin_tests import *
 
 if __name__ == "__main__":
     unittest.main()
