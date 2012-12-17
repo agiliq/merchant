@@ -105,6 +105,22 @@ class BraintreePaymentsGateway(Gateway):
     def purchase(self, money, credit_card, options=None):
         if not options:
             options = {}
+        if isinstance(credit_card, CreditCard) and not self.validate_card(credit_card):
+             raise InvalidCard("Invalid Card")
+
+        request_hash = self._build_request_hash(options)
+        request_hash["amount"] = money
+
+        if isinstance(credit_card, CreditCard):
+            request_hash["credit_card"] = {
+                "number": credit_card.number,
+                "expiration_date": self._cc_expiration_date(credit_card),
+                "cardholder_name": self._cc_cardholder_name(credit_card),
+                "cvv": credit_card.verification_value,
+            }
+        else:
+            request_hash["payment_method_token"] = credit_card
+
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
 
