@@ -2,6 +2,12 @@
 Changes
 ========
 
+0.08
+-----
+
+* Added bitcoin backend
+* Bugfixes to eWay, paypal integration and authorize.net
+
 0.07
 -----
 
