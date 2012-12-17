@@ -16,12 +16,34 @@ viewed from the django admin.
 
 Test or Live Mode
 -----------------
-By default the form renders in test mode with POST against sandbox.paypal.com. Add
-following to you `settings.py` to put the form into live mode::
+By default the form renders in test mode with POST against ``sandbox.paypal.com``.
+Add following to you `settings.py` to put the form into live mode::
 
 	### Django Merchant
 	MERCHANT_TEST_MODE = False
-	PAYPAL_TEST = MERCHANT_TEST_MODE 
+	PAYPAL_TEST = MERCHANT_TEST_MODE
+
+Don't forget to add the settings attributes from ``django-paypal``::
+
+    INSTALLED_APPS = (
+        ...,
+	'paypal.standard.pdt',
+	...)
+
+     MERCHANT_SETTINGS = {
+         ...,
+	 'pay_pal': {
+             "WPP_USER" : '...',
+             "WPP_PASSWORD" : '...',
+             "WPP_SIGNATURE" : '...',
+             "RECEIVER_EMAIL" : '...',
+	     # Below attribute is optional
+	     "ENCRYPTED": True
+	 }
+	 ...}
+
+     PAYPAL_RECEIVER_EMAIL = MERCHANT_SETTINGS['pay_pal']['RECEIVER_EMAIL']
+
 
 Example
 -------
