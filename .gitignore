@@ -18,3 +18,6 @@ docs/_build/*
 *egg*
 dist/*
 build/*
+.project
+.pydevproject
+
