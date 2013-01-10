@@ -1,11 +1,5 @@
 from suds.client import Client, WebFault
 
-REBILL_TEST_URL = "https://www.eway.com.au/gateway/rebill/test/manageRebill_test.asmx?WSDL"
-REBILL_LIVE_URL = "https://www.eway.com.au/gateway/rebill/manageRebill.asmx?WSDL"
-
-HOSTED_TEST_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/test/managedCreditCardPayment.asmx?WSDL"
-HOSTED_LIVE_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/managedCreditCardPayment.asmx?WSDL"
-
 
 class RebillEwayClient(object):
     """
@@ -19,15 +13,17 @@ class RebillEwayClient(object):
         CreditCard: hosted customer
     """
     def __init__(self, test_mode=True, customer_id=None, username=None, password=None, url=None):
-        self.gateway_url = REBILL_LIVE_URL
-        self.test_mode = test_mode
+#        self.gateway_url = REBILL_LIVE_URL
+        self.gateway_url = url
+#        self.test_mode = test_mode
         self.customer_id = customer_id
         self.username = username
         self.password = password
-        if test_mode:
-            self.gateway_url = REBILL_TEST_URL
-        if url:
-            self.gateway_url = url
+#        if test_mode:
+#            self.gateway_url = REBILL_TEST_URL
+#        if url:
+#            self.gateway_url = url
+#        print self.gateway_url
         self.client = Client(self.gateway_url)
         self.set_eway_header()
 
@@ -45,13 +41,16 @@ class RebillEwayClient(object):
 
     def create_rebill_customer(self, rebill_customer=None, **kwargs):
         """
+        eWay Urls : http://www.eway.com.au/developers/api/recurring
+        Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
+        
         creates rebill customer with CustomerDetails type from the webservice
 
         also accepts keyword arguments if CustomerDetails object is not passed
         return CustomerDetails.RebillCustomerID and CustomerDetails.Result if successfull
         """
         if rebill_customer:
-            return self.client.service.CreateRebillCustomer(
+            response = self.client.service.CreateRebillCustomer(
                                                              rebill_customer.CustomerTitle,
                                                              rebill_customer.CustomerFirstName,
                                                              rebill_customer.CustomerLastName,
@@ -70,6 +69,7 @@ class RebillEwayClient(object):
                                                              rebill_customer.CustomerComments,
                                                              rebill_customer.CustomerURL,
                                                              )
+            return response
         else:
             return self.client.service.CreateRebillCustomer(**kwargs)
 
@@ -87,8 +87,11 @@ class RebillEwayClient(object):
 
     def create_rebill_event(self, rebill_event=None, **kwargs):
         """
+        eWay Urls : http://www.eway.com.au/developers/api/recurring
+        Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
+            
         creates a rebill event based on RebillEventDetails object
-        returns RebillEventDetails.RebillCustomerID and RebillEventDetails.RebillID if successfull
+        returns RebillEventDetails.RebillCustomerID and RebillEventDetails.RebillID if successful
         """
         if rebill_event:
             return self.client.service.CreateRebillEvent(
@@ -109,6 +112,19 @@ class RebillEwayClient(object):
                                                            )
         else:
             return self.client.service.CreateRebillEvent(**kwargs)
+
+    def delete_rebill_event(self, RebillCustomerID, RebillID):
+        """
+        eWay Urls : http://www.eway.com.au/developers/api/recurring
+        Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
+            
+        Deletes a rebill event based on RebillEventDetails object
+        returns Result as Successful if successful
+        """
+        if rebill_event:
+            return self.client.service.DeleteRebillEvent(RebillCustomerID, RebillID)
+        else:
+            return self.client.service.DeleteRebillEvent(**kwargs)
 
     def update_rebill_event(self, **kwargs):
         """
@@ -139,12 +155,16 @@ class RebillEwayClient(object):
 
     def create_hosted_customer(self, hosted_customer=None, **kwargs):
         """
+        eWay Urls : http://www.eway.com.au/developers/api/token
+        Doc       : http://www.eway.com.au/docs/api-documentation/token-payments-field-description.pdf?sfvrsn=2
+        
         creates hosted customer based on CreditCard type details or kwargs
 
         returns id of newly created customer (112233445566 in test mode)
         """
         try:
             if hosted_customer:
+                print "hosted_customer: #####", hosted_customer
                 return self.client.service.CreateCustomer(
                                                             hosted_customer.Title,
                                                             hosted_customer.FirstName,
@@ -158,11 +178,11 @@ class RebillEwayClient(object):
                                                             hosted_customer.Email,
                                                             hosted_customer.Fax,
                                                             hosted_customer.Phone,
-                                                            # hosted_customer.Mobile,
-                                                            # hosted_customer.CustomerRef,
-                                                            # hosted_customer.JobDesc,
-                                                            # hosted_customer.Comments,
-                                                            # hosted_customer.URL,
+                                                            hosted_customer.Mobile,
+                                                            hosted_customer.CustomerRef,
+                                                            hosted_customer.JobDesc,
+                                                            hosted_customer.Comments,
+                                                            hosted_customer.URL,
                                                             hosted_customer.CCNumber,
                                                             hosted_customer.CCNameOnCard,
                                                             hosted_customer.CCExpiryMonth,
@@ -171,6 +191,7 @@ class RebillEwayClient(object):
             else:
                 return self.client.service.CreateCustomer(**kwargs)
         except WebFault as wf:
+            print wf
             return wf
 
     def update_hosted_customer(self, **kwargs):
