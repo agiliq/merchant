@@ -37,14 +37,6 @@ class EwayGateway(Gateway):
         self.eway_username = eway_settings['USERNAME']
         self.eway_password = eway_settings['PASSWORD']
         
-        fp = open('/home/lalit/cred.txt', 'w+')
-        fp.write(self.customer_id)
-        fp.write(self.rebill_url)
-        fp.write(self.hosted_url)
-        fp.write(self.eway_username)
-        fp.write(self.eway_password)
-        fp.close()
-            
 
     def add_creditcard(self, hosted_customer, credit_card):
         """add credit card details to the request parameters"""
