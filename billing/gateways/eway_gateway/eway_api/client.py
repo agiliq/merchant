@@ -113,7 +113,7 @@ class RebillEwayClient(object):
         else:
             return self.client.service.CreateRebillEvent(**kwargs)
 
-    def delete_rebill_event(self, RebillCustomerID, RebillID):
+    def delete_rebill_event(self, rebill_customer_id=None, rebill_event_id=None, **kwargs):
         """
         eWay Urls : http://www.eway.com.au/developers/api/recurring
         Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
@@ -121,8 +121,8 @@ class RebillEwayClient(object):
         Deletes a rebill event based on RebillEventDetails object
         returns Result as Successful if successful
         """
-        if rebill_event:
-            return self.client.service.DeleteRebillEvent(RebillCustomerID, RebillID)
+        if rebill_customer_id and rebill_event_id:
+            return self.client.service.DeleteRebillEvent(rebill_customer_id, rebill_event_id)
         else:
             return self.client.service.DeleteRebillEvent(**kwargs)
 
@@ -131,12 +131,6 @@ class RebillEwayClient(object):
         same as create, takes RebillEventDetails.RebillCustomerID and RebillEventDetails.RebillID
         """
         return self.client.service.CreateRebillEvent(**kwargs)
-
-    def delete_rebill_event(self, rebill_customer_id, rebill_event_id):
-        """
-        delete a rebill event based on rebill customer id and event id
-        """
-        return self.client.service.DeleteRebillEvent(rebill_customer_id, rebill_event_id)
 
     def query_next_transaction(self, RebillCustomerID, RebillID):
         return self.client.service.QueryNextTransaction(RebillCustomerID, RebillID)
