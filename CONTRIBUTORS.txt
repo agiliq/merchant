@@ -15,6 +15,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Greg McGuire <https://github.com/gmcguire>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
+* Ken Cochrane <https://github.com/kencochrane>
 * Konrad Rotkiewicz <https://github.com/krotkiewicz>
 * Markus Gattol <markus.gattol@sunoano.org>
 * Mikey Ryan <https://github.com/mikery>

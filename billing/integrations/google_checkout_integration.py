@@ -60,7 +60,87 @@ class GoogleCheckoutIntegration(Integration):
     def button_height(self):
         return self.fields.get("button_height", 46)
 
-    def generate_cart_xml(self):
+    def _add_nodes(self, doc, parent_node, child_node_name,
+                   child_subnode_name, child_node_values):
+        """ Helper method that makes it easy to add a bunch of like child nodes
+        to a parent node"""
+        if child_node_values:
+            for value in child_node_values:
+                child_node = doc.createElement(unicode(child_node_name))
+                child_sub_node = doc.createElement(unicode(child_subnode_name))
+                child_node.appendChild(child_sub_node)
+                child_sub_node.appendChild(doc.createTextNode(value))
+                parent_node.appendChild(child_node)
+
+    def _shipping_allowed_excluded(self, doc, parent_node, data):
+        """ Build the nodes for the allowed-areas, excluded-areas
+        for shipping-restrictions and address-filters """
+        if not data:
+            return
+        states = data.get('us-state-area', None)
+        zips = data.get('us-zip-area', None)
+        country = data.get('us-country-area', None)
+        world = data.get('world-area', False)
+        postal = data.get('postal-area', None)
+
+        self._add_nodes(doc, parent_node, 'us-state-area', 'state', states)
+        self._add_nodes(doc, parent_node, 'us-zip-area', 'zip-pattern', zips)
+
+        if country:
+            us_country_area = doc.createElement('us-country-area')
+            us_country_area.setAttribute('country-area', unicode(country))
+            parent_node.appendChild(us_country_area)
+
+        if world:
+            parent_node.appendChild(doc.createElement('world-area'))
+
+        if postal:
+            for post in postal:
+                p_country_code = post.get('country-code', None)
+                p_pattern = post.get('postal-code-pattern', None)
+                postal_area = doc.createElement('postal-area')
+                if p_country_code:
+                    c_code = doc.createElement('country-code')
+                    c_code.appendChild(doc.createTextNode(unicode(p_country_code)))
+                    postal_area.appendChild(c_code)
+                if p_pattern:
+                    for pp in p_pattern:
+                        p_p = doc.createElement('postal-code-pattern')
+                        p_p.appendChild(doc.createTextNode(unicode(pp)))
+                        postal_area.appendChild(p_p)
+                parent_node.appendChild(postal_area)
+
+
+    def _shipping_restrictions_filters(self, doc, parent_node, data):
+        """ process the shipping restriction and address-filter sections for
+        the shipping method merchant-calculated-shipping and flat-rate-shipping
+        """
+        the_allowed_areas = data.get('allowed-areas', None)
+        the_excluded_areas = data.get('excluded-areas', None)
+        allow_us_po_box = data.get('allow-us-po-box', None)
+
+        if allow_us_po_box is not None:
+            allow_po_box = doc.createElement('allow-us-po-box')
+            allow_po_box.appendChild(
+                    doc.createTextNode(str(allow_us_po_box).lower()))
+            parent_node.appendChild(allow_po_box)
+
+        if the_allowed_areas:
+            allowed_areas = doc.createElement('allowed-areas')
+            parent_node.appendChild(allowed_areas)
+            self._shipping_allowed_excluded(doc,
+                                            allowed_areas,
+                                            the_allowed_areas)
+
+        if the_excluded_areas:
+            excluded_areas = doc.createElement('excluded-areas')
+            parent_node.appendChild(excluded_areas)
+            self._shipping_allowed_excluded(doc,
+                                            excluded_areas,
+                                            the_excluded_areas)
+
+    def build_xml(self):
+        """ Build up the Cart XML. Seperate method for easier unit testing """
         doc = Document()
         root = doc.createElement('checkout-shopping-cart')
         root.setAttribute('xmlns', 'http://checkout.google.com/schema/2')
@@ -95,6 +175,11 @@ class GoogleCheckoutIntegration(Integration):
             it_unique_id = doc.createElement("merchant-item-id")
             it_unique_id.appendChild(doc.createTextNode(unicode(item["id"])))
             it.appendChild(it_unique_id)
+            if item.get('private-item-data', None):
+                it_private = doc.createElement("merchant-private-item-data")
+                it.appendChild(it_private)
+                it_data = unicode(item.get('private-item-data', ""))
+                it_private.appendChild(doc.createTextNode(it_data))
 
         checkout_flow = doc.createElement('checkout-flow-support')
         root.appendChild(checkout_flow)
@@ -104,7 +189,47 @@ class GoogleCheckoutIntegration(Integration):
         return_url.appendChild(doc.createTextNode(self.fields["return_url"]))
         merchant_checkout_flow.appendChild(return_url)
 
-        cart_xml = doc.toxml(encoding="utf-8")
+        # supports: flat-rate-shipping, merchant-calculated-shipping, pickup
+        # No support for carrier-calculated-shipping yet
+        shipping = self.fields.get("shipping-methods", [])
+        if shipping:
+            shipping_methods = doc.createElement('shipping-methods')
+            merchant_checkout_flow.appendChild(shipping_methods)
+
+            for ship_method in shipping:
+                # don't put dict.get() because we want these to fail if 
+                # they aren't here because they are required.
+                shipping_type = doc.createElement(unicode(ship_method["shipping_type"]))
+                shipping_type.setAttribute('name', unicode(ship_method["name"]))
+                shipping_methods.appendChild(shipping_type)
+
+                shipping_price = doc.createElement('price')
+                shipping_price.setAttribute('currency', unicode(ship_method["currency"]))
+                shipping_type.appendChild(shipping_price)
+
+                shipping_price_text = doc.createTextNode(unicode(ship_method["price"]))
+                shipping_price.appendChild(shipping_price_text)
+
+                restrictions = ship_method.get('shipping-restrictions', None)
+                if restrictions:
+                    shipping_restrictions = doc.createElement('shipping-restrictions')
+                    shipping_type.appendChild(shipping_restrictions)
+                    self._shipping_restrictions_filters(doc, 
+                                                        shipping_restrictions,
+                                                        restrictions)
+
+                address_filters = ship_method.get('address-filters', None)
+                if address_filters:
+                    address_filters_node = doc.createElement('address-filters')
+                    shipping_type.appendChild(address_filters_node)
+                    self._shipping_restrictions_filters(doc, 
+                                                        address_filters_node,
+                                                        address_filters)
+
+        return doc.toxml(encoding="utf-8")
+
+    def generate_cart_xml(self):
+        cart_xml = self.build_xml()
         hmac_signature = hmac.new(self.merchant_key, cart_xml, hashlib.sha1).digest()
         self._signature = base64.b64encode(hmac_signature)
         return base64.b64encode(cart_xml)
