@@ -87,6 +87,7 @@ should be available under ``<app>/integrations/<integration_name>_integration.py
 
 In urls.py::
 
+    from billing import get_integration
     amazon_fps = get_integration("fps")
     urlpatterns += patterns('',
       (r'^amazon_fps/', include(amazon_fps.urls)),
@@ -97,6 +98,7 @@ In urls.py::
 
 In views.py::
 
+    from billing import get_integration
     def productPage(request):
        amazon_fps = get_integration("fps")
        url_scheme = "http"
