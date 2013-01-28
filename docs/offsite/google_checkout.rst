@@ -33,11 +33,12 @@ Example
 
 In urls.py::
 
+  from billing import get_integration
   gc = get_integration("google_checkout")
   urlpatterns += patterns('',
     (r'^gc/', include(gc.urls)),
-    # You'll have to register /gc/gc-notify-handler/ in the
-    # WorldPay admin dashboard for the notification URL
+    # You'll have to add /gc/gc-notify-handler/ to the
+    # Google Checkout settings->Integration page for the callback URL
   )
 
 In views.py::
