@@ -267,7 +267,8 @@ class AuthorizeNetGateway(Gateway):
         post["trans_id"] = identification
         post.update(options)
 
-        response = self.commit("VOID", money, post)
+        # commit ignores the money argument for void, so we set it None
+        response = self.commit("VOID", None, post)
         status = "SUCCESS"
         if response.response_code != 1:
             status = "FAILURE"
