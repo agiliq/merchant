@@ -69,31 +69,53 @@ class AmazonFpsIntegration(Integration):
         if not options:
             options = {}
         tmp_options = options.copy()
-        permissible_options = ["senderTokenId", "recipientTokenId",
-            "chargeFeeTo", "callerReference", "senderReference", "recipientReference",
-            "senderDescription", "recipientDescription", "callerDescription",
-            "metadata", "transactionDate", "reserve"]
-        tmp_options["senderTokenId"] = options["tokenID"]
+        permissible_options = ["SenderTokenId", "CallerReference",
+            "SenderDescription", "CallerDescription", "TransactionTimeoutInMins"
+            "TransactionAmount", "OverrideIPNURL", "DescriptorPolicy"]
+        tmp_options['TransactionAmount'] = amount
+        if 'tokenID' in options:
+            tmp_options["SenderTokenId"] = options["tokenID"]
+        if 'callerReference' in options:
+            tmp_options['CallerReference'] = options["callerReference"]
         for key in options:
             if key not in permissible_options:
                 tmp_options.pop(key)
-        resp = self.fps_connection.pay(amount, tmp_options.pop("senderTokenId"),
-                                       callerReference=tmp_options.pop("callerReference"),
-                                       **tmp_options)
-        return {"status": resp[0].TransactionStatus, "response": resp[0]}
+        resp = self.fps_connection.pay(**tmp_options)
+        return {"status": resp.PayResult.TransactionStatus, "response": resp.PayResult}
 
     def authorize(self, amount, options=None):
+        """ 
+        amount: the amount of money to authorize.
+        options:
+            Required:
+                CallerReference
+                SenderTokenId
+                TransactionAmount
+
+            Conditional:
+                SenderDescription
+
+            Optional:
+                CallerDescription
+                DescriptorPolicy
+                OverrideIPNURL
+                TransactionTimeoutInMins
+
+            See: http://docs.aws.amazon.com/AmazonFPS/latest/FPSBasicGuide/Reserve.html
+            for more info
+        """
         if not options:
             options = {}
-        options["reserve"] = True
-        return self.purchase(amount, options)
+        options['TransactionAmount'] = amount
+        resp = self.fps_connection.reserve(**options)
+        return {"status": resp.ReserveResult.TransactionStatus, "response": resp.ReserveResult}
 
     def capture(self, amount, options=None):
         if not options:
             options = {}
         assert "ReserveTransactionId" in options, "Expecting 'ReserveTransactionId' in options"
         resp = self.fps_connection.settle(options["ReserveTransactionId"], amount)
-        return {"status": resp[0].TransactionStatus, "response": resp[0]}
+        return {"status": resp.SettleResult.TransactionStatus, "response": resp.SettleResult}
 
     def credit(self, amount, options=None):
         if not options:
@@ -104,7 +126,7 @@ class AmazonFpsIntegration(Integration):
                                           options["TransactionId"],
                                           refundAmount=amount,
                                           callerDescription=options.get("description", None))
-        return {"status": resp[0].TransactionStatus, "response": resp[0]}
+        return {"status": resp.RefundResult.TransactionStatus, "response": resp.RefundResult}
 
     def void(self, identification, options=None):
         if not options:
@@ -112,7 +134,7 @@ class AmazonFpsIntegration(Integration):
         # Requires the TransactionID to be passed as 'identification'
         resp = self.fps_connection.cancel(identification,
                                           options.get("description", None))
-        return {"status": resp[0].TransactionStatus, "response": resp[0]}
+        return {"status": resp.CancelResult.TransactionStatus, "response": resp.CancelResult}
 
     def get_urls(self):
         urlpatterns = patterns('',
@@ -162,11 +184,11 @@ class AmazonFpsIntegration(Integration):
     def fps_return_url(self, request):
         uri = request.build_absolute_uri()
         parsed_url = urlparse.urlparse(uri)
-        resp = self.fps_connection.verify_signature("%s://%s%s" % (parsed_url.scheme,
+        resp = self.fps_connection.verify_signature(UrlEndPoint="%s://%s%s" % (parsed_url.scheme,
                                                                   parsed_url.netloc,
                                                                   parsed_url.path),
-                                                    parsed_url.query)
-        if not resp[0].VerificationStatus == "Success":
+                                                    HttpParameters=parsed_url.query)
+        if not resp.VerifySignatureResult.VerificationStatus == "Success":
             return HttpResponseForbidden()
 
         return self.transaction(request)
