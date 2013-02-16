@@ -148,11 +148,11 @@ class AmazonFpsIntegration(Integration):
     def fps_ipn_handler(self, request):
         uri = request.build_absolute_uri()
         parsed_url = urlparse.urlparse(uri)
-        resp = self.fps_connection.verify_signature("%s://%s%s" % (parsed_url.scheme,
+        resp = self.fps_connection.verify_signature(UrlEndPoint="%s://%s%s" % (parsed_url.scheme,
                                                                   parsed_url.netloc,
                                                                   parsed_url.path),
-                                                    request.raw_post_data)
-        if not resp[0].VerificationStatus == "Success":
+                                                    HttpParameters=request.raw_post_data)
+        if not resp.VerifySignatureResult.VerificationStatus == "Success":
             return HttpResponseForbidden()
 
         data = dict(map(lambda x: x.split("="), request.raw_post_data.split("&")))
