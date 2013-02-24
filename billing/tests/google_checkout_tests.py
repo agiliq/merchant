@@ -325,6 +325,182 @@ class GoogleCheckoutTaxTestCase(TestCase):
         doc_good = parseString(xml1)
         self.assertEquals(doc.toxml(), doc_good.toxml())
 
+    def testTaxes5(self):
+        doc = Document()
+        parent_node = doc.createElement('parent_node')
+        doc.appendChild(parent_node)
+        data = {
+                'default-tax-table': {
+                        'tax-rules': [
+                            {
+                                'shipping-taxed': True,
+                                'rate': 0.06,
+                                'tax-area': {
+                                    'us-state-area': ['CT'],
+                                 }
+                            },
+                            {
+                                'rate': 0.05,
+                                'tax-area': {
+                                    'us-state-area': ['MD'],
+                                 }
+                            }
+                        ]
+                    },
+                'alternate-tax-tables': [
+                    {'name': 'bicycle_helmets',
+                     'standalone': False,
+                     'alternative-tax-rules': [
+                        { 'rate': 0,
+                          'tax-area': {
+                            'us-state-area': ['CT'],
+                          }
+                        }
+                      ]
+                    }
+                ]
+        }
+        self.gc._taxes(doc, parent_node, data)
+        xml1 = "<parent_node><tax-tables>\
+<default-tax-table><tax-rules><default-tax-rule>\
+<shipping-taxed>true</shipping-taxed><rate>0.06</rate>\
+<tax-area><us-state-area><state>CT</state></us-state-area>\
+</tax-area></default-tax-rule><default-tax-rule>\
+<shipping-taxed>false</shipping-taxed><rate>0.05</rate>\
+<tax-area><us-state-area><state>MD</state></us-state-area>\
+</tax-area></default-tax-rule></tax-rules></default-tax-table>\
+<alternate-tax-tables><alternate-tax-table name='bicycle_helmets' standalone='false'>\
+<alternate-tax-rules><alternate-tax-rule><rate>0</rate>\
+<tax-area><us-state-area><state>CT</state></us-state-area></tax-area>\
+</alternate-tax-rule></alternate-tax-rules></alternate-tax-table>\
+</alternate-tax-tables></tax-tables></parent_node>"
+        doc_good = parseString(xml1)
+        self.assertEquals(doc.toxml(), doc_good.toxml())
+
+    def testTaxes6(self):
+        doc = Document()
+        parent_node = doc.createElement('parent_node')
+        doc.appendChild(parent_node)
+        data = {
+                'default-tax-table': {
+                        'tax-rules': [
+                            {
+                                'shipping-taxed': True,
+                                'rate': 0.06,
+                                'tax-area': {
+                                    'us-state-area': ['CT'],
+                                 }
+                            },
+                            {
+                                'rate': 0.05,
+                                'tax-area': {
+                                    'us-state-area': ['MD'],
+                                 }
+                            }
+                        ]
+                    },
+                'alternate-tax-tables': [
+                    {'name': 'tax_exempt',
+                     'standalone': True,
+                    }
+                ]
+        }
+        self.gc._taxes(doc, parent_node, data)
+        xml1 = "<parent_node><tax-tables>\
+<default-tax-table><tax-rules><default-tax-rule>\
+<shipping-taxed>true</shipping-taxed><rate>0.06</rate>\
+<tax-area><us-state-area><state>CT</state></us-state-area>\
+</tax-area></default-tax-rule><default-tax-rule>\
+<shipping-taxed>false</shipping-taxed><rate>0.05</rate>\
+<tax-area><us-state-area><state>MD</state></us-state-area>\
+</tax-area></default-tax-rule></tax-rules></default-tax-table>\
+<alternate-tax-tables><alternate-tax-table name='tax_exempt' standalone='true'>\
+<alternate-tax-rules/></alternate-tax-table>\
+</alternate-tax-tables></tax-tables></parent_node>"
+        doc_good = parseString(xml1)
+        self.assertEquals(doc.toxml(), doc_good.toxml())
+
+    def testTaxes7(self):
+        doc = Document()
+        parent_node = doc.createElement('parent_node')
+        doc.appendChild(parent_node)
+        data = {
+                'default-tax-table': {
+                        'tax-rules': [
+                            {
+                                'shipping-taxed': True,
+                                'rate': 0.175,
+                                'tax-area': {
+                                    'postal-area': [
+                                        {'country-code': 'DE'},
+                                        {'country-code': 'ES'},
+                                        {'country-code': 'GB'},
+                                    ],
+                                 },
+                            },
+                        ]
+                    },
+        }
+        self.gc._taxes(doc, parent_node, data)
+        xml1 = "<parent_node><tax-tables>\
+<default-tax-table><tax-rules><default-tax-rule>\
+<shipping-taxed>true</shipping-taxed><rate>0.175</rate>\
+<tax-areas><postal-area><country-code>DE</country-code>\
+</postal-area><postal-area><country-code>ES</country-code>\
+</postal-area><postal-area><country-code>GB</country-code>\
+</postal-area></tax-areas></default-tax-rule></tax-rules>\
+</default-tax-table></tax-tables></parent_node>"
+        doc_good = parseString(xml1)
+        self.assertEquals(doc.toxml(), doc_good.toxml())
+
+    def testTaxes8(self):
+        doc = Document()
+        parent_node = doc.createElement('parent_node')
+        doc.appendChild(parent_node)
+        data = {
+                'default-tax-table': {
+                        'tax-rules': [
+                            {
+                                'shipping-taxed': True,
+                                'rate': 0.175,
+                                'tax-area': {
+                                    'world-area': True,
+                                 },
+                            },
+                        ]
+                    },
+                'alternate-tax-tables': [
+                    {'name': 'reduced',
+                     'standalone': True,
+                     'alternative-tax-rules': [
+                        { 'rate': 0.05,
+                          'tax-area': {
+                            'world-area': True,
+                          }
+                        },
+                      ]
+                     },
+                    { 'name': 'tax_exempt',
+                     'standalone': True,
+                    }
+                ]
+        }
+        self.gc._taxes(doc, parent_node, data)
+        xml1 = "<parent_node><tax-tables>\
+<default-tax-table><tax-rules>\
+<default-tax-rule><shipping-taxed>true</shipping-taxed>\
+<rate>0.175</rate><tax-area><world-area/></tax-area>\
+</default-tax-rule></tax-rules></default-tax-table>\
+<alternate-tax-tables><alternate-tax-table name='reduced' standalone='true'>\
+<alternate-tax-rules><alternate-tax-rule><rate>0.05</rate><tax-area>\
+<world-area/></tax-area></alternate-tax-rule></alternate-tax-rules>\
+</alternate-tax-table><alternate-tax-table standalone='true' name='tax_exempt'>\
+<alternate-tax-rules/></alternate-tax-table></alternate-tax-tables>\
+</tax-tables></parent_node>"
+        doc_good = parseString(xml1)
+        self.assertEquals(doc.toxml(), doc_good.toxml())
+
+
     def testFullCartXML(self):
         fields = {"items": [{
             "name": "name of the item",
@@ -333,7 +509,17 @@ class GoogleCheckoutTaxTestCase(TestCase):
             "id": "999AXZ",
             "currency": "USD",
             "quantity": 1,
-            }],
+            },
+            {
+            "name": "tax free item",
+            "description": "Item description",
+            "amount": 2,
+            "id": "999AXZ",
+            "currency": "USD",
+            "quantity": 1,
+            "tax-table-selector": 'tax_exempt',
+            },
+            ],
            'tax-tables': {
                 'default-tax-table': {
                     'tax-rules': [
@@ -352,15 +538,22 @@ class GoogleCheckoutTaxTestCase(TestCase):
                              }
                         }
                     ]
-                }
+                },
+                'alternate-tax-tables': [
+                    {
+                     'name': 'tax_exempt',
+                     'standalone': True,
+                    }
+                ]
            },
            "return_url": "http://127.0.0.1:8000/offsite/google-checkout/",
            }
         self.gc.add_fields(fields)
 
         xml = self.gc.build_xml()
-        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url><tax-tables><default-tax-table><tax-rules><default-tax-rule><shipping-taxed>false</shipping-taxed><rate>0.08375</rate><tax-area><us-zip-area><zip-pattern>100*</zip-pattern></us-zip-area></tax-area></default-tax-rule><default-tax-rule><shipping-taxed>true</shipping-taxed><rate>0.04</rate><tax-area><us-state-area><state>NY</state></us-state-area></tax-area></default-tax-rule></tax-rules></default-tax-table></tax-tables></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""    
+        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item><item><item-name>tax free item</item-name><item-description>Item description</item-description><unit-price currency="USD">2</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id><tax-table-selector>tax_exempt</tax-table-selector></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url><tax-tables><default-tax-table><tax-rules><default-tax-rule><shipping-taxed>false</shipping-taxed><rate>0.08375</rate><tax-area><us-zip-area><zip-pattern>100*</zip-pattern></us-zip-area></tax-area></default-tax-rule><default-tax-rule><shipping-taxed>true</shipping-taxed><rate>0.04</rate><tax-area><us-state-area><state>NY</state></us-state-area></tax-area></default-tax-rule></tax-rules></default-tax-table><alternate-tax-tables><alternate-tax-table name="tax_exempt" standalone="true"><alternate-tax-rules/></alternate-tax-table></alternate-tax-tables></tax-tables></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""    
         self.assertEquals(xml, good_xml)
+    
     
     
     

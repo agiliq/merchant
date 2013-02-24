@@ -139,14 +139,101 @@ class GoogleCheckoutIntegration(Integration):
                                             excluded_areas,
                                             the_excluded_areas)
 
-    def _taxes(self, doc, parent_node, data):
-        """ Process the taxes section """
 
-        tax_tables = doc.createElement('tax-tables')
-        parent_node.appendChild(tax_tables)
+    def _process_tax_rule(self, doc, parent_node, node_name, data, show_shipping_tax=True):
+        """ process a tax rule default_tax_rule, and alternative_tax_rule"""
+        tax_rule = doc.createElement(node_name)
+        parent_node.appendChild(tax_rule)
+        shipping_taxed = data.get('shipping-taxed', False)
+        rate = data.get('rate', 0)
+        tax_area = data.get('tax-area', {})
+        zips = tax_area.get('us-zip-area', [])
+        states = tax_area.get('us-state-area', [])
+        postal = tax_area.get('postal-area', [])
+        country = tax_area.get('us-country-area', None)
+        word_area = tax_area.get('world-area', False)
 
+        if shipping_taxed is not None and show_shipping_tax:
+            shippingtaxed_node = doc.createElement('shipping-taxed')
+            shippingtaxed_node.appendChild(
+            doc.createTextNode(str(shipping_taxed).lower()))
+            tax_rule.appendChild(shippingtaxed_node)
+
+        rate_node = doc.createElement('rate')
+        rate_node.appendChild(
+        doc.createTextNode(str(rate)))
+        tax_rule.appendChild(rate_node)
+
+        # if there is more then one area then the tag switches from
+        # tax-area to tax-areas.
+        total_areas = len(zips) + len(states) + len(postal)
+        if word_area:
+            total_areas += 1
+        if country is not None:
+            total_areas += 1
+
+        if total_areas == 1:
+            tax_area_label = 'tax-area'
+        else:
+            tax_area_label = 'tax-areas'
+
+        tax_area_node = doc.createElement(tax_area_label)
+        tax_rule.appendChild(tax_area_node)
+
+        self._add_nodes(doc, tax_area_node, 'us-state-area', 'state', states)
+        self._add_nodes(doc, tax_area_node, 'us-zip-area', 'zip-pattern', zips)
+
+        if country is not None:
+            us_country_area = doc.createElement('us-country-area')
+            us_country_area.setAttribute('country-area', unicode(country))
+            tax_area_node.appendChild(us_country_area)
+
+        if word_area:
+            tax_area_node.appendChild(doc.createElement('world-area'))
+
+        if postal:
+            for post in postal:
+                p_country_code = post.get('country-code', None)
+                p_pattern = post.get('postal-code-pattern', None)
+                postal_area = doc.createElement('postal-area')
+                if p_country_code:
+                    c_code = doc.createElement('country-code')
+                    c_code.appendChild(doc.createTextNode(unicode(p_country_code)))
+                    postal_area.appendChild(c_code)
+                if p_pattern:
+                    for pp in p_pattern:
+                        p_p = doc.createElement('postal-code-pattern')
+                        p_p.appendChild(doc.createTextNode(unicode(pp)))
+                        postal_area.appendChild(p_p)
+                tax_area_node.appendChild(postal_area)
+
+    def _alt_tax_tables(self, doc, parent_node, data):
+        """ Alternative Tax tables """
+        alt_tax_tables = data.get('alternate-tax-tables', None)
+        if not alt_tax_tables:
+            return
+
+        alt_tax_tables_node = doc.createElement('alternate-tax-tables')
+        parent_node.appendChild(alt_tax_tables_node)
+
+        for alt_tax_table in alt_tax_tables:
+            alt_tax_table_node = doc.createElement('alternate-tax-table')
+            alt_tax_table_node.setAttribute('name', unicode(alt_tax_table.get('name')))
+            alt_tax_table_node.setAttribute('standalone', unicode(str(alt_tax_table.get('standalone', False)).lower()))
+            alt_tax_tables_node.appendChild(alt_tax_table_node)
+
+            # if there are no rules we still want to show the element <alternate-tax-rules/>
+            alt_tax_rules = alt_tax_table.get('alternative-tax-rules', [])
+            alt_tax_rules_node = doc.createElement('alternate-tax-rules')
+            alt_tax_table_node.appendChild(alt_tax_rules_node)
+
+            for tax_rule in alt_tax_rules:
+                self._process_tax_rule(doc, alt_tax_rules_node, 'alternate-tax-rule', tax_rule, show_shipping_tax=False)
+
+    def _default_tax_table(self, doc, parent_node, data):
+        """ process default tax table """
         default_tax_table_node = doc.createElement('default-tax-table')
-        tax_tables.appendChild(default_tax_table_node)
+        parent_node.appendChild(default_tax_table_node)
 
         tax_rules_node = doc.createElement('tax-rules')
         default_tax_table_node.appendChild(tax_rules_node)
@@ -155,71 +242,16 @@ class GoogleCheckoutIntegration(Integration):
         if default_tax_table:
             tax_rules = default_tax_table.get('tax-rules', [])
             for tax_rule in tax_rules:
-                default_tax_rule = doc.createElement('default-tax-rule')
-                tax_rules_node.appendChild(default_tax_rule)
-                shipping_taxed = tax_rule.get('shipping-taxed', False)
-                rate = tax_rule.get('rate', None)
-                tax_area = tax_rule.get('tax-area', None)
-                zips = tax_area.get('us-zip-area', [])
-                states = tax_area.get('us-state-area', [])
-                postal = tax_area.get('postal-area', [])
-                country = tax_area.get('us-country-area', None)
-                word_area = tax_area.get('world-area', False)
+                self._process_tax_rule(doc, tax_rules_node, 'default-tax-rule', tax_rule)
 
-                if shipping_taxed is not None:
-                    shippingtaxed_node = doc.createElement('shipping-taxed')
-                    shippingtaxed_node.appendChild(
-                    doc.createTextNode(str(shipping_taxed).lower()))
-                    default_tax_rule.appendChild(shippingtaxed_node)
+    def _taxes(self, doc, parent_node, data):
+        """ Process the taxes section """
 
-                if rate:
-                    rate_node = doc.createElement('rate')
-                    rate_node.appendChild(
-                    doc.createTextNode(str(rate)))
-                    default_tax_rule.appendChild(rate_node)
+        tax_tables = doc.createElement('tax-tables')
+        parent_node.appendChild(tax_tables)
 
-                # if there is more then one area then the tag switches from
-                # tax-area to tax-areas.
-                total_areas = len(zips) + len(states) + len(postal)
-                if word_area:
-                    total_areas += 1
-                if country is not None:
-                    total_areas += 1
-
-                if total_areas == 1:
-                    tax_area_label = 'tax-area'
-                else:
-                    tax_area_label = 'tax-areas'
-
-                tax_area_node = doc.createElement(tax_area_label)
-                default_tax_rule.appendChild(tax_area_node)
-
-                self._add_nodes(doc, tax_area_node, 'us-state-area', 'state', states)
-                self._add_nodes(doc, tax_area_node, 'us-zip-area', 'zip-pattern', zips)
-
-                if country is not None:
-                    us_country_area = doc.createElement('us-country-area')
-                    us_country_area.setAttribute('country-area', unicode(country))
-                    tax_area_node.appendChild(us_country_area)
-
-                if word_area:
-                    tax_area_node.appendChild(doc.createElement('world-area'))
-
-                if postal:
-                    for post in postal:
-                        p_country_code = post.get('country-code', None)
-                        p_pattern = post.get('postal-code-pattern', None)
-                        postal_area = doc.createElement('postal-area')
-                        if p_country_code:
-                            c_code = doc.createElement('country-code')
-                            c_code.appendChild(doc.createTextNode(unicode(p_country_code)))
-                            postal_area.appendChild(c_code)
-                        if p_pattern:
-                            for pp in p_pattern:
-                                p_p = doc.createElement('postal-code-pattern')
-                                p_p.appendChild(doc.createTextNode(unicode(pp)))
-                                postal_area.appendChild(p_p)
-                        default_tax_rule.appendChild(postal_area)
+        self._default_tax_table(doc, tax_tables, data)
+        self._alt_tax_tables(doc, tax_tables, data)
 
     def build_xml(self):
         """ Build up the Cart XML. Seperate method for easier unit testing """
@@ -257,11 +289,16 @@ class GoogleCheckoutIntegration(Integration):
             it_unique_id = doc.createElement("merchant-item-id")
             it_unique_id.appendChild(doc.createTextNode(unicode(item["id"])))
             it.appendChild(it_unique_id)
-            if item.get('private-item-data', None):
+            if 'private-item-data' in item:
                 it_private = doc.createElement("merchant-private-item-data")
                 it.appendChild(it_private)
                 it_data = unicode(item.get('private-item-data', ""))
                 it_private.appendChild(doc.createTextNode(it_data))
+            if 'tax-table-selector' in item:
+                tax_table_selector_node = doc.createElement('tax-table-selector')
+                it.appendChild(tax_table_selector_node)
+                it_tax_table = unicode(item.get('tax-table-selector', ""))
+                tax_table_selector_node.appendChild(doc.createTextNode(it_tax_table))
 
         checkout_flow = doc.createElement('checkout-flow-support')
         root.appendChild(checkout_flow)
@@ -309,8 +346,7 @@ class GoogleCheckoutIntegration(Integration):
                                                         address_filters)
 
         # add support for taxes.
-        # default-tax-table is supported.
-        # alternate-tax-tables not supported yet
+        # both default-tax-table and alternate-tax-tables is supported.
         taxes = self.fields.get("tax-tables", None)
         if taxes:
             self._taxes(doc, merchant_checkout_flow, taxes)
@@ -353,13 +389,7 @@ class GoogleCheckoutIntegration(Integration):
             item_quantity = post_data.get('%s.quantity' % (item), '')
             item_private_data = post_data.get('%s.merchant-private-item-data' % (item), '')
             cart_blob += '%(item_id)s\t%(item_name)s\t%(item_desc)s\t%(item_price)s\t%(item_price_currency)s\t%(item_quantity)s\t%(item_private_data)s\n\n' % ({"item_id": item_id,
-                                                                                                                                         "item_name": item_name,
-                                                                                                                                         "item_desc": item_desc,
-                                                                                                                                         "item_price": item_price,
-                                                                                                                                         "item_price_currency": item_price_currency,
-                                                                                                                                         "item_quantity": item_quantity,
-                                                                                                                                         "item_private_data": item_private_data,
-                                                                                                                                         })
+                                                                                                                                 })
         return cart_blob
 
     def gc_new_order_notification(self, request):

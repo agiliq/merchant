@@ -92,7 +92,7 @@ You can do the same thing on items as well using the private-item-data field on 
 
 Taxes:
 ------
-The following tax methods are supported: default-tax-table, alternate-tax-tables is currently not supported.
+The following tax methods are supported: default-tax-table and alternate-tax-tables
 
 default-tax-table:
 ^^^^^^^^^^^^^^^^^^
@@ -278,6 +278,405 @@ Python:
                         ]
                     }
                 }
+        })
+
+
+alternate-tax-tables:
+^^^^^^^^^^^^^^^^^^^^^
+Alternate tax tables are good for dealing with non-standard taxing issues. For example, having taxable, and tax free items in the same shopping cart.
+
+Example 4: Alternate tax rules
+******************************
+This example shows how to create an alternate tax table for an item that is tax-exempt. The tax tables in this example indicate that the merchant charges sales tax in Connecticut and Maryland. In Connecticut, sales of bicycle helmets are tax-exempt. (Google does not return any search results indicating that bicycle helmet sales are also tax-exempt in Maryland.)
+
+In this example, the XML contains an alternate tax table for bicycle helmets. That tax table contains one alternate tax rule, which indicates that Connecticut does not charge tax for items associated with that tax table. Please note that value of the <alternate-tax-table> tag's standalone attribute is set to false, which is that element's default value. As a result, if an item specifies the "bicycle helmets" tax table, and there is no alternate tax rule for the shipping address, Google will use the default tax table to calculate tax for the item. Therefore, if the item is shipped to Connecticut, no tax will be charged. However, if the item is shipped to Maryland, the regular tax rate will be assessed.
+
+XML:
+
+.. code-block:: xml
+
+    <shopping-cart>
+      <items>
+        <item>
+          <item-name>Bike Helmet</item-name>
+          <item-description>Black helmet that is tax-exempt in CT but not MD.</item-description>
+          <unit-price currency="USD">49.99</unit-price>
+          <quantity>1</quantity>
+          <tax-table-selector>bicycle_helmets</tax-table-selector>
+        </item>
+      </items>
+    </shopping-cart>
+    <checkout-flow-support>
+      <merchant-checkout-flow-support>
+        <tax-tables>
+          <default-tax-table>
+            <tax-rules>
+
+              <default-tax-rule>
+                <shipping-taxed>true</shipping-taxed>
+                <rate>0.0600</rate>
+                <tax-area>
+                  <us-state-area>
+                    <state>CT</state>
+                  </us-state-area>
+                </tax-area>
+              </default-tax-rule>
+
+              <default-tax-rule>
+                <rate>0.0500</rate>
+                <tax-area>
+                  <us-state-area>
+                    <state>MD</state>
+                  </us-state-area>
+                </tax-area>
+              </default-tax-rule>
+
+            </tax-rules>
+          </default-tax-table>
+
+          <alternate-tax-tables>
+            <alternate-tax-table standalone="false" name="bicycle_helmets">
+              <alternate-tax-rules>
+                <alternate-tax-rule>
+                  <rate>0</rate>
+                  <tax-area>
+                    <us-state-area>
+                      <state>CT</state>
+                    </us-state-area>
+                  </tax-area>
+                </alternate-tax-rule>
+              </alternate-tax-rules>
+            </alternate-tax-table>
+          </alternate-tax-tables>
+
+        </tax-tables>
+      </merchant-checkout-flow-support>
+    </checkout-flow-support>
+
+
+Python:
+
+.. code-block:: python
+
+    >>> gc.add_fields({'items': [{
+      "amount": 49.99,
+      "name": "Bike Helmet",
+      "description": "Black helmet that is tax-exempt in CT but not MD.",
+      "currency": "USD",
+      "id": "item_id",
+      "quantity": 1,
+      "tax-table-selector": "bicycle_helmets"
+      }],
+      'tax-tables': {
+                'default-tax-table': {
+                        'tax-rules': [
+                            {
+                                'shipping-taxed': True,
+                                'rate': 0.06,
+                                'tax-area': {
+                                    'us-state-area': ['CT'],
+                                 }
+                            },
+                            {
+                                'rate': 0.05,
+                                'tax-area': {
+                                    'us-state-area': ['MD'],
+                                 }
+                            }
+                        ]
+                    },
+                'alternate-tax-tables': [
+                    {'name': 'bicycle_helmets',
+                     'standalone': False,
+                     'alternative-tax-rules': [
+                        { 'rate': 0,
+                          'tax-area': {
+                            'us-state-area': ['CT'],
+                          }
+                        }
+                      ]
+                    }
+                  ]
+        })
+
+
+Example 5: Alternate tax rules for items that are always tax-exempt
+*******************************************************************
+This example shows how to identify an item that is always tax-exempt, regardless of the shipping address. The tax tables indicate that the merchant charges sales tax in Connecticut and Maryland, and sales of nonprescription drugs are tax-exempt in both states. In this example, the XML contains an alternate tax table for tax-exempt goods, and that tax table does not specify any alternate tax rules. However, since the value of the <alternate-tax-table> tag's standalone attribute is set to true, Google will not calculate taxes for an item if it specifies the tax-exempt tax table and there is no alternate tax rule for the shipping address. Since the item in the example is always tax-exempt for this merchant, the tax table does not need to specify any tax rules.
+
+
+XML:
+
+.. code-block:: xml
+
+    <shopping-cart>
+      <items>
+        <item>
+          <item-name>Tylenol Caplets</item-name>
+          <item-description>Fast relief without a prescription.</item-description>
+          <unit-price currency="USD">7.99</unit-price>
+          <quantity>1</quantity>
+          <tax-table-selector>tax_exempt</tax-table-selector>
+        </item>
+      </items>
+    </shopping-cart>
+    <checkout-flow-support>
+      <merchant-checkout-flow-support>
+        <tax-tables>
+          <default-tax-table>
+            <tax-rules>
+
+              <default-tax-rule>
+                <shipping-taxed>true</shipping-taxed>
+                <rate>0.0600</rate>
+                <tax-area>
+                  <us-state-area>
+                    <state>CT</state>
+                  </us-state-area>
+                </tax-area>
+              </default-tax-rule>
+
+              <default-tax-rule>
+                <rate>0.0500</rate>
+                <tax-area>
+                  <us-state-area>
+                    <state>MD</state>
+                  </us-state-area>
+                </tax-area>
+              </default-tax-rule>
+
+            </tax-rules>
+          </default-tax-table>
+
+          <alternate-tax-tables>
+            <alternate-tax-table standalone="true" name="tax_exempt">
+              <alternate-tax-rules/>
+            </alternate-tax-table>
+          </alternate-tax-tables>
+        </tax-tables>
+      </merchant-checkout-flow-support>
+    </checkout-flow-support>
+
+
+Python:
+
+.. code-block:: python
+
+    >>> gc.add_fields({'items': [{
+      "amount": 7.99,
+      "name": "Tylenol Caplets",
+      "description": "Fast relief without a prescription.",
+      "currency": "USD",
+      "id": "item_id",
+      "quantity": 1,
+      "tax-table-selector": "tax_exempt"
+      }],
+      'tax-tables': {
+                'default-tax-table': {
+                        'tax-rules': [
+                            {
+                                'shipping-taxed': True,
+                                'rate': 0.06,
+                                'tax-area': {
+                                    'us-state-area': ['CT'],
+                                 }
+                            },
+                            {
+                                'rate': 0.05,
+                                'tax-area': {
+                                    'us-state-area': ['MD'],
+                                 }
+                            }
+                        ]
+                    },
+                'alternate-tax-tables': [
+                    {'name': 'tax_exempt',
+                     'standalone': True,
+                    }
+                ]
+        })
+
+
+Example 6: Applying a tax rule in multiple geographic areas
+***********************************************************
+This example demonstrates how to use the <tax-areas> tag to apply a tax rule in multiple geographic areas. This example applies the same tax rule in multiple European countries. The same principle could be used to apply a tax rule in multiple U.S. states or zip code ranges.
+
+XML:
+
+.. code-block:: xml
+
+        <tax-tables>
+          <default-tax-table>
+            <tax-rules>
+
+              <default-tax-rule>
+                <shipping-taxed>true</shipping-taxed>
+                <rate>0.175</rate>
+                <tax-areas>
+                  <postal-area>
+                    <country-code>DE</country-code>
+                  </postal-area>
+                  <postal-area>
+                    <country-code>ES</country-code>
+                  </postal-area>
+                  <postal-area>
+                    <country-code>GB</country-code>
+                  </postal-area>
+                </tax-areas>
+              </default-tax-rule>
+
+            </tax-rules>
+          </default-tax-table>
+        </tax-tables>
+
+Python:
+
+.. code-block:: python
+
+        >>> gc.add_fields({'items': ... ,
+            'tax-tables': {
+                'default-tax-table': {
+                        'tax-rules': [
+                            {
+                                'shipping-taxed': True,
+                                'rate': 0.175,
+                                'tax-area': {
+                                    'postal-area': [
+                                        {'country-code': 'DE'},
+                                        {'country-code': 'ES'},
+                                        {'country-code': 'GB'},
+                                    ],
+                                 },
+                            },
+                        ]
+                    },
+                }
+            })
+
+
+Example 7: Alternate tax tables for U.K. merchants
+**************************************************
+This example shows a common way to structure tax tables in the United Kingdom. The order includes three items. The first item uses the default tax rate of 17.5 percent, the second item uses a reduced tax rate of 5 percent, and the third item is untaxed. Note that the cost of each item is £10.00. When you click the Checkout button for this order, Google Checkout displays the price for each item inclusive of tax.
+
+
+XML:
+
+.. code-block:: xml
+
+    <shopping-cart>
+      <items>
+        <item>
+          <item-name>Regular Test Item</item-name>
+          <item-description>Regular Test Item</item-description>
+          <unit-price currency="GBP">10.0</unit-price>
+          <quantity>1</quantity>
+        </item>
+        <item>
+          <item-name>Reduced Test Item</item-name>
+          <item-description>Reduced Test Item</item-description>
+          <unit-price currency="GBP">10.0</unit-price>
+          <quantity>1</quantity>
+          <tax-table-selector>reduced</tax-table-selector>
+        </item>
+        <item>
+          <item-name>Zero Test Item</item-name>
+          <item-description>Zero Test Item</item-description>
+          <unit-price currency="GBP">10.0</unit-price>
+          <quantity>1</quantity>
+          <tax-table-selector>tax_exempt</tax-table-selector>
+        </item>
+      </items>
+    </shopping-cart>
+    <checkout-flow-support>
+      <merchant-checkout-flow-support>
+        <tax-tables>
+          <default-tax-table>
+            <tax-rules>
+
+              <default-tax-rule>
+                <shipping-taxed>true</shipping-taxed>
+                <rate>0.175</rate>
+                <tax-area>
+                  <world-area/>
+                </tax-area>
+              </default-tax-rule>
+
+            </tax-rules>
+          </default-tax-table>
+
+          <alternate-tax-tables>
+            <alternate-tax-table name="reduced" standalone="true">
+              <alternate-tax-rules>
+                <alternate-tax-rule>
+                  <rate>0.05</rate>
+                  <tax-area>
+                    <world-area/>
+                  </tax-area>
+                </alternate-tax-rule>
+              </alternate-tax-rules>
+            </alternate-tax-table>
+
+            <alternate-tax-table standalone="true" name="tax_exempt">
+              <alternate-tax-rules/>
+            </alternate-tax-table>
+          </alternate-tax-tables>
+
+        </tax-tables>
+      </merchant-checkout-flow-support>
+    </checkout-flow-support>
+
+Python:
+
+.. code-block:: python
+
+    >>> gc.add_fields({'items': [{
+      "amount": 10.0,
+      "name": "Regular Test Item",
+      "description": "Regular Test Item",
+      "currency": "GBP",
+      "quantity": 1,
+      },{
+      "amount": 10.0,
+      "name": "Reduced Test Item",
+      "description": "Reduced Test Item",
+      "currency": "GBP",
+      "quantity": 1,
+      "tax-table-selector": "reduced"
+      },{
+      "amount": 10.0,
+      "name": "Zero Test Item",
+      "description": "Zero Test Item",
+      "currency": "GBP",
+      "quantity": 1,
+      "tax-table-selector": "tax_exempt"
+      }],
+      'tax-tables': {
+                'default-tax-table': {
+                        'tax-rules': [
+                            {
+                                'shipping-taxed': True,
+                                'rate': 0.175,
+                                'tax-area': {
+                                    'world-area': True,
+                                 },
+                            },
+                        ]
+                    },
+                'alternate-tax-tables': [
+                    {'name': 'reduced',
+                     'standalone': True,
+                     'alternative-tax-rules': [
+                        { 'rate': 0.05,
+                          'tax-area': {
+                            'world-area': True,
+                          }
+                        },
+                      ]
+                     },
+                    { 'name': 'tax_exempt',
+                     'standalone': True,
+                    }
+                ]
         })
 
 
