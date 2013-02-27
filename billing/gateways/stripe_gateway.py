@@ -35,7 +35,7 @@ class StripeGateway(Gateway):
                 }
         try:
             response = self.stripe.Charge.create(
-                amount=amount * 100,
+                amount=int(amount * 100),
                 currency=self.default_currency.lower(),
                 card=card)
         except self.stripe.CardError, error:
@@ -152,7 +152,7 @@ class StripeGateway(Gateway):
         try:
             token = self.stripe.Token.create(
                 card=card,
-                amount=money * 100
+                amount=int(money * 100),
             )
             transaction_was_successful.send(sender=self,
                                             type="authorize",
@@ -167,7 +167,7 @@ class StripeGateway(Gateway):
     def capture(self, money, authorization, options=None):
         try:
             response = self.stripe.Charge.create(
-                amount=money * 100,
+                amount=int(money * 100),
                 card=authorization,
                 currency=self.default_currency.lower()
             )
