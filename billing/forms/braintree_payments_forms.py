@@ -9,7 +9,7 @@ class BraintreePaymentsForm(forms.Form):
     transaction__customer__email = forms.EmailField(required=False)
     transaction__customer__phone = forms.CharField(max_length=15, required=False)
     transaction__customer__fax = forms.CharField(max_length=15, required=False)
-    transaction__customer__website = forms.URLField(verify_exists=True, required=False)
+    transaction__customer__website = forms.URLField(required=False)
     transaction__credit_card__cardholder_name = forms.CharField(max_length=100)
     transaction__credit_card__number = forms.CharField()
     transaction__credit_card__cvv = forms.CharField(max_length=4)
