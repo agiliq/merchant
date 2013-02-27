@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from billing import get_integration
 
 pay_pal = get_integration("pay_pal")

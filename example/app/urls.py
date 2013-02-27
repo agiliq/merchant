@@ -1,5 +1,4 @@
-
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from billing import get_integration
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.simple import direct_to_template

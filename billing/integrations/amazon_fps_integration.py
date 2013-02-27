@@ -1,7 +1,7 @@
 from billing.integration import Integration, IntegrationNotConfigured
 from django.conf import settings
 from boto.fps.connection import FPSConnection
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST

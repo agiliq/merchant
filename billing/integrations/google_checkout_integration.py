@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from billing import signals
-from django.conf.urls.defaults import patterns
+from django.conf.urls import patterns
 from django.utils.decorators import method_decorator
 
 SANDBOX_URL = 'https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%s'
