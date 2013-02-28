@@ -389,7 +389,13 @@ class GoogleCheckoutIntegration(Integration):
             item_quantity = post_data.get('%s.quantity' % (item), '')
             item_private_data = post_data.get('%s.merchant-private-item-data' % (item), '')
             cart_blob += '%(item_id)s\t%(item_name)s\t%(item_desc)s\t%(item_price)s\t%(item_price_currency)s\t%(item_quantity)s\t%(item_private_data)s\n\n' % ({"item_id": item_id,
-                                                                                                                                 })
+                                                                                                                             "item_name": item_name,
+                                                                                                                             "item_desc": item_desc,
+                                                                                                                             "item_price": item_price,
+                                                                                                                             "item_price_currency": item_price_currency,
+                                                                                                                             "item_quantity": item_quantity,
+                                                                                                                             "item_private_data": item_private_data,
+                                                                                                                             })
         return cart_blob
 
     def gc_new_order_notification(self, request):
