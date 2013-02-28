@@ -1,6 +1,6 @@
 from billing import Integration, get_gateway, IntegrationNotConfigured
 from django.conf import settings
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.views.decorators.csrf import csrf_exempt
 from billing.forms.samurai_forms import SamuraiForm
 

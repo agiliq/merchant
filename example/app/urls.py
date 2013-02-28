@@ -1,8 +1,7 @@
-
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from billing import get_integration
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 
 google_checkout_obj = get_integration("google_checkout")
 authorize_net_obj = get_integration("authorize_net_dpm")
@@ -73,12 +72,10 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
     url(r'offsite/paypal/done/$',
-        csrf_exempt(direct_to_template),
-        {'template': 'app/payment_done.html'},
+        csrf_exempt(TemplateView.as_view(template_name="app/payment_done.html")),
         name='app_offsite_paypal_done'),
     url(r'offsite/google-checkout/done/$',
-        direct_to_template,
-        {'template': 'app/payment_done.html'},
+        TemplateView.as_view(template_name="app/payment_done.html"),
         name='app_offsite_google_checkout_done'),
 )
 

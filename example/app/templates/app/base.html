@@ -1,4 +1,4 @@
-
+<!doctype html>{% load future %}
 <html>
 
 <head>
@@ -8,30 +8,30 @@
 <body>
   <h2>example project</h2>
   Card:
-    <a href='{% url app_authorize %}'>Authorize</a>
-    <a href='{% url app_eway %}'>Eway</a>
-    <a href='{% url app_paypal %}'>Paypal</a>
-    <a href='{% url app_braintree %}'>Braintree Payments (S2S)</a>
-    <a href='{% url app_stripe %}'>Stripe Payment</a>
-    <a href='{% url app_samurai %}'>Samurai</a>
-    <a href='{% url app_paylane %}'>Paylane</a>
-    <a href='{% url app_we_pay %}'>WePay</a>
-    <a href='{% url app_beanstream %}'>Beanstream</a>
-    <a href='{% url app_chargebee %}'>Chargebee</a>
+    <a href="{% url 'app.views.authorize' %}">Authorize</a>
+    <a href="{% url 'app.views.eway' %}">Eway</a>
+    <a href="{% url 'app.views.paypal' %}">Paypal</a>
+    <a href="{% url 'app.views.braintree' %}">Braintree Payments (S2S)</a>
+    <a href="{% url 'app.views.stripe' %}">Stripe Payment</a>
+    <a href="{% url 'app.views.samurai' %}">Samurai</a>
+    <a href="{% url 'app.views.paylane' %}">Paylane</a>
+    <a href="{% url 'app.views.we_pay' %}">WePay</a>
+    <a href="{% url 'app.views.beanstream' %}">Beanstream</a>
+    <a href="{% url 'app.views.chargebee' %}">Chargebee</a>
   <br/><br/>
   Offsite:
-    <a href='{% url app_offsite_authorize_net %}'>Authorize.Net DPM</a>
-    <a href='{% url app_offsite_paypal %}'>Paypal</a>
-    <a href='{% url app_offsite_google_checkout %}'>Google Checkout</a>
-    <a href='{% url app_offsite_world_pay %}'>WorldPay</a>
-    <a href='{% url app_offsite_amazon_fps %}'>Amazon FPS</a>
-    <a href='{% url app_offsite_braintree %}'>Braintree Payments (TR)</a>
-    <a href='{% url app_offsite_stripe %}'>Stripe</a>
-    <a href='{% url app_offsite_samurai %}'>Samurai</a>
-    <a href='{% url app_offsite_eway %}'>eWAY</a>
+    <a href="{% url 'app.views.offsite_authorize_net' %}">Authorize.Net DPM</a>
+    <a href="{% url 'app.views.offsite_paypal' %}">Paypal</a>
+    <a href="{% url 'app.views.offsite_google_checkout' %}">Google Checkout</a>
+    <a href="{% url 'app.views.offsite_world_pay' %}">WorldPay</a>
+    <a href="{% url 'app.views.offsite_amazon_fps' %}">Amazon FPS</a>
+    <a href="{% url 'app.views.offsite_braintree' %}">Braintree Payments (TR)</a>
+    <a href="{% url 'app.views.offsite_stripe' %}">Stripe</a>
+    <a href="{% url 'app.views.offsite_samurai' %}">Samurai</a>
+    <a href="{% url 'app.views.offsite_eway' %}">eWAY</a>
   <br/><br/>
   Other:
-    <a href='{% url app_bitcoin %}'>Bitcoin</a>
+    <a href="{% url 'app.views.bitcoin' %}">Bitcoin</a>
   <h1>{{ title }} </h1>
   {% block content %}
 

@@ -2,7 +2,7 @@ from billing import Integration, IntegrationNotConfigured
 from django.conf import settings
 from django.views.decorators.http import require_GET
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 import braintree
 import urllib
 from django.core.urlresolvers import reverse

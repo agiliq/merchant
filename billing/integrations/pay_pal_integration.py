@@ -1,7 +1,7 @@
 from billing import Integration, IntegrationNotConfigured
 from django.conf import settings
 from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
-from django.conf.urls.defaults import patterns, include
+from django.conf.urls import patterns, include
 from paypal.standard.ipn.signals import payment_was_flagged, payment_was_successful
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from paypal.standard.forms import PayPalPaymentsForm, PayPalEncryptedPaymentsForm

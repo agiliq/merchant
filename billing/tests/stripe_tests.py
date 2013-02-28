@@ -30,6 +30,10 @@ class StripeGatewayTestCase(TestCase):
         resp = self.merchant.purchase(1, self.credit_card)
         self.assertEquals(resp["status"], "SUCCESS")
 
+    def testPurchaseDecimalAmount(self):
+        resp = self.merchant.purchase(1.99, self.credit_card)
+        self.assertEquals(resp["status"], "SUCCESS")
+
     def testStoreMissingCustomer(self):
         self.assertRaises(TypeError, self.merchant.store)
 

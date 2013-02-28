@@ -41,12 +41,12 @@ class ChargebeeGateway(Gateway):
         if 200 <= resp.status_code < 300:
             transaction_was_successful.send(sender=self,
                                             type="purchase",
-                                            response=resp.json)
-            return {'status': 'SUCCESS', 'response': resp.json}
+                                            response=resp.json())
+            return {'status': 'SUCCESS', 'response': resp.json()}
         transaction_was_unsuccessful.send(sender=self,
                                           type="purchase",
-                                          response=resp.json)
-        return {'status': 'FAILURE', 'response': resp.json}
+                                          response=resp.json())
+        return {'status': 'FAILURE', 'response': resp.json()}
             
 
     def authorize(self, money, credit_card, options = None):
@@ -64,12 +64,12 @@ class ChargebeeGateway(Gateway):
         if 200 <= resp.status_code < 300:
             transaction_was_successful.send(sender=self,
                                             type="capture",
-                                            response=resp.json)
-            return {'status': 'SUCCESS', 'response': resp.json}
+                                            response=resp.json())
+            return {'status': 'SUCCESS', 'response': resp.json()}
         transaction_was_unsuccessful.send(sender=self,
                                           type="capture",
-                                          response=resp.json)
-        return {'status': 'FAILURE', 'response': resp.json}
+                                          response=resp.json())
+        return {'status': 'FAILURE', 'response': resp.json()}
 
     def void(self, identification, options = None):
         return self.unstore(identification, options = options)
@@ -90,12 +90,12 @@ class ChargebeeGateway(Gateway):
         if 200 <= resp.status_code < 300:
             transaction_was_successful.send(sender=self,
                                             type="store",
-                                            response=resp.json)
-            return {'status': 'SUCCESS', 'response': resp.json}
+                                            response=resp.json())
+            return {'status': 'SUCCESS', 'response': resp.json()}
         transaction_was_unsuccessful.send(sender=self,
                                           type="store",
-                                          response=resp.json)
-        return {'status': 'FAILURE', 'response': resp.json}
+                                          response=resp.json())
+        return {'status': 'FAILURE', 'response': resp.json()}
 
     def unstore(self, identification, options = None):
         options = options or {}
@@ -105,9 +105,9 @@ class ChargebeeGateway(Gateway):
         if 200 <= resp.status_code < 300:
             transaction_was_successful.send(sender=self,
                                             type="void",
-                                            response=resp.json)
-            return {'status': 'SUCCESS', 'response': resp.json}
+                                            response=resp.json())
+            return {'status': 'SUCCESS', 'response': resp.json()}
         transaction_was_unsuccessful.send(sender=self,
                                           type="void",
-                                          response=resp.json)
-        return {'status': 'FAILURE', 'response': resp.json}
+                                          response=resp.json())
+        return {'status': 'FAILURE', 'response': resp.json()}

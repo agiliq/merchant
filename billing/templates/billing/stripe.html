@@ -1,4 +1,4 @@
-<div class="payment-errors"></div>
+<div class="payment-errors"></div>{% load future %}
 <script type="text/javascript" src="//code.jquery.com/jquery.min.js"></script>
 <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
 <script type="text/javascript">
@@ -12,7 +12,7 @@ $(document).ready(function() {
 console.log(response);
       var token = response['id'];
       $("#payment-form input[name=stripeToken]").val(token);
-      $("#payment-form").attr("action", "{% url stripe_transaction %}");
+      $("#payment-form").attr("action", "{% url 'stripe_transaction' %}");
       $("#payment-form").get(0).submit();
     }
   }

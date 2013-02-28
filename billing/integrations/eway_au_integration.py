@@ -1,7 +1,7 @@
 from billing import Integration, get_gateway, IntegrationNotConfigured
 from billing.forms.eway_au_forms import EwayAuForm
 from django.conf import settings
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.views.decorators.csrf import csrf_exempt
 import operator
 from suds.client import Client
