@@ -5,3 +5,4 @@ boto
 braintree
 wepay
 suds
+lxml

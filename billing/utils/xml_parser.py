@@ -1,4 +1,5 @@
 from xml.dom.minidom import parse, parseString
+from lxml import etree
 import os
 
 
@@ -76,6 +77,8 @@ def readConfig(filename):
     return nodeToDic(dom)
 
 if __name__ == "__main__":
-    import sys
-    import pprint
-    pprint.pprint(readConfig(sys.argv[1]))
+    #import sys
+    #import pprint
+    #pprint.pprint(readConfig(sys.argv[1]))
+    xml = '''<ewayResponse><ewayTrxnStatus>True</ewayTrxnStatus><ewayTrxnNumber>20712</ewayTrxnNumber><ewayTrxnReference>987654321</ewayTrxnReference><ewayTrxnOption1/><ewayTrxnOption2/><ewayTrxnOption3/><ewayAuthCode>123456</ewayAuthCode><ewayReturnAmount>10</ewayReturnAmount><ewayTrxnError>10,Approved For Partial Amount(Test CVN Gateway)</ewayTrxnError></ewayResponse>'''
+    print nodeToDic(etree.fromstring(xml))

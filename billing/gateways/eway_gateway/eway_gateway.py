@@ -4,12 +4,8 @@ from eway_api.client import RebillEwayClient
 from billing import Gateway, GatewayNotConfigured
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import Visa, MasterCard, DinersClub, JCB, AmericanExpress, InvalidCard
+from eway_api.client import REBILL_TEST_URL, REBILL_LIVE_URL, HOSTED_TEST_URL, HOSTED_LIVE_URL
 
-REBILL_TEST_URL = "https://www.eway.com.au/gateway/rebill/test/manageRebill_test.asmx?WSDL"
-REBILL_LIVE_URL = "https://www.eway.com.au/gateway/rebill/manageRebill.asmx?WSDL"
-
-HOSTED_TEST_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/test/managedCreditCardPayment.asmx?WSDL"
-HOSTED_LIVE_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/managedCreditCardPayment.asmx?WSDL"
 
 class EwayGateway(Gateway):
     default_currency = "AUD"
@@ -124,12 +120,11 @@ class EwayGateway(Gateway):
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
         
-        client = RebillEwayClient(test_mode=self.test_mode,
-                                      customer_id = self.customer_id,
-                                      username = self.eway_username,
-                                      password = self.eway_password,
-                                      url=self.service_url,
-                                      )
+        client = RebillEwayClient(customer_id = self.customer_id,
+                                  username = self.eway_username,
+                                  password = self.eway_password,
+                                  url=self.service_url,
+                                  )
         hosted_customer = client.client.factory.create("CreditCard")
         
         self.add_creditcard(hosted_customer, credit_card)
@@ -192,12 +187,11 @@ class EwayGateway(Gateway):
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
         
-        rebillClient = RebillEwayClient(test_mode=self.test_mode,
-                                  customer_id = self.customer_id,
-                                  username = self.eway_username,
-                                  password = self.eway_password,
-                                  url=self.rebill_url,
-                                  )
+        rebillClient = RebillEwayClient(customer_id = self.customer_id,
+                                      username = self.eway_username,
+                                      password = self.eway_password,
+                                      url=self.rebill_url,
+                                      )
         # CustomerDetails : To create rebill Customer
         customer_detail = rebillClient.client.factory.create("CustomerDetails")
         self.add_customer_details(credit_card, customer_detail, options)
@@ -253,8 +247,7 @@ class EwayGateway(Gateway):
                 status : 'SUCCESS' or 'FAILURE'
                 response : Rebill/Recurring Cancelation Response from eWay Web service.
         """
-        rebillDeleteClient = RebillEwayClient(test_mode=self.test_mode,
-                                  customer_id = self.customer_id,
+        rebillDeleteClient = RebillEwayClient(customer_id = self.customer_id,
                                   username = self.eway_username,
                                   password = self.eway_password,
                                   url=self.rebill_url,
@@ -289,6 +282,34 @@ def main():
     '''
         # Create recurring payment
     '''
+    merchant = get_gateway("eway")
+    
+    data = {'number':'4444333322221111',
+           'verification_value': '000',
+           'month': 7,
+           'year': 2012}
+    credit_card = CreditCard(**data)
+    print merchant.validate_card(credit_card)
+    
+#    billing_address = {'salutation': 'Mr.',
+#                               'address1': 'test',
+#                               'address2': ' street',
+#                               'city': 'Sydney',
+#                               'state': 'NSW',
+#                               'company': 'Test Company',
+#                               'zip': '2000',
+#                               'country': 'au',
+#                               'email': 'test@example.com',
+#                               'fax': '0267720000',
+#                               'phone': '0267720000',
+#                               'mobile': '0404085992',
+#                               'customer_ref': 'REF100',
+#                               'job_desc': 'test',
+#                               'comments': 'any',
+#                               'url': 'http://www.google.com.au',
+#                               }
+#    response = merchant.purchase(100, credit_card, options={'billing_address': billing_address})
+#    print response
 #    options = {}
 #    options["customer_details"] = {}
 #    options["customer_details"]["customer_ref"] = 'REF1234'

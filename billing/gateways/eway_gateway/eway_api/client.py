@@ -1,4 +1,18 @@
+import requests
+from lxml import etree
 from suds.client import Client, WebFault
+
+# Token Payments urls( Web Service ) : http://www.eway.com.au/developers/api/token
+HOSTED_TEST_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/test/managedCreditCardPayment.asmx?WSDL"
+HOSTED_LIVE_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/managedCreditCardPayment.asmx?WSDL"
+
+# Recurring Payments urls( Web Service ) : http://www.eway.com.au/developers/api/recurring
+REBILL_TEST_URL = "https://www.eway.com.au/gateway/rebill/test/manageRebill_test.asmx?WSDL"
+REBILL_LIVE_URL = "https://www.eway.com.au/gateway/rebill/manageRebill.asmx?WSDL"
+
+# Direct Payments urls( XML Based ) : http://www.eway.com.au/developers/api/token
+DIRECT_PAYMENT_TEST_URL = "https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp"
+DIRECT_PAYMENT_LIVE_URL = "https://www.eway.com.au/gateway_cvn/xmlpayment.asp"
 
 
 class RebillEwayClient(object):
@@ -12,7 +26,8 @@ class RebillEwayClient(object):
         RebillEventDetails: rebill event
         CreditCard: hosted customer
     """
-    def __init__(self, test_mode=True, customer_id=None, username=None, password=None, url=None):
+    #def __init__(self, test_mode=True, customer_id=None, username=None, password=None, url=None):
+    def __init__(self, customer_id=None, username=None, password=None, url=None):
 #        self.gateway_url = REBILL_LIVE_URL
         self.gateway_url = url
 #        self.test_mode = test_mode
@@ -158,7 +173,6 @@ class RebillEwayClient(object):
         """
         try:
             if hosted_customer:
-                print "hosted_customer: #####", hosted_customer
                 return self.client.service.CreateCustomer(
                                                             hosted_customer.Title,
                                                             hosted_customer.FirstName,
@@ -223,3 +237,62 @@ class RebillEwayClient(object):
 
     def query_payment(self, managedCustomerID):
         return self.client.service.QueryPayment(managedCustomerID)
+
+class DirectPaymentClient(object):
+    """
+        Wrapper for eway payment gateway's Direct Payment:
+            eWay Link: http://www.eway.com.au/developers/api/direct-payments
+            
+    """
+    def __init__(self, customer_id=None, url=None):
+        self.gateway_url = url
+    def process_direct_payment(self, direct_payment_details=None, **kwargs):
+        '''
+            Input format : http://www.eway.com.au/developers/api/direct-payments#tab-1
+            
+            Output format :
+                
+        '''
+        if direct_payment_details:
+            # Create XML to send
+            payment_xml_root = etree.Element("ewaygateway")
+            for each_field in direct_payment_details:
+                field = etree.Element(each_field)
+                field.text = str(direct_payment_details.get(each_field))
+                payment_xml_root.append(field)
+            # pretty string
+            payment_xml_string = etree.tostring(payment_xml_root, pretty_print=True)  
+            response = requests.post('https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp', data=payment_xml_string)
+            
+        else:
+            return self.process_direct_payment(**kwargs)
+        
+        
+def main():
+    '''
+        # Create recurring payment
+    '''
+    dpObj = DirectPaymentClient(DIRECT_PAYMENT_TEST_URL)
+    direct_payment_dict = {}
+    direct_payment_dict['ewayCustomerID'] = 87654321
+    direct_payment_dict['ewayTotalAmount'] = 10
+    direct_payment_dict['ewayCustomerFirstName'] = 'Lalit'
+    direct_payment_dict['ewayCustomerLastName'] = 'Chandnani'
+    direct_payment_dict['ewayCustomerEmail'] = 'lailtc@langoor.net'
+    direct_payment_dict['ewayCustomerAddress'] = '#417 10th main'
+    direct_payment_dict['ewayCustomerPostcode'] = 560041
+    direct_payment_dict['ewayCustomerInvoiceDescription'] = 'langoor.mobi Subscription' 
+    direct_payment_dict['ewayCustomerInvoiceRef'] = 'REF123'
+    direct_payment_dict['ewayCardHoldersName'] = 'LALIT CHANDNANI' 
+    direct_payment_dict['ewayCardNumber'] = 4444333322221111 
+    direct_payment_dict['ewayCardExpiryMonth'] = '03'
+    direct_payment_dict['ewayCardExpiryYear'] = '17'
+    direct_payment_dict['ewayTrxnNumber'] = 987654321
+    direct_payment_dict['ewayOption1'] = ''
+    direct_payment_dict['ewayOption2'] = ''
+    direct_payment_dict['ewayOption3'] = ''
+    direct_payment_dict['ewayCVN'] = 123
+    print dpObj.process_direct_payment(direct_payment_dict)
+    
+if __name__ == '__main__':
+    main()
