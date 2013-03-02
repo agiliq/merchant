@@ -97,7 +97,6 @@ INSTALLED_APPS = (
     'app',
     'billing',
     'stripe',
-    'samurai'
 )
 
 STATIC_URL = "http://merchant.agiliq.com/"

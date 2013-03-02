@@ -15,7 +15,6 @@ Following gateways are supported:
 * Eway
 * Braintree Payments (Server to Server)
 * Stripe
-* Samurai from Fee Fighters
 * Paylane
 * WePay
 * Beanstream
@@ -30,7 +29,6 @@ Off-Site Processing
 * Amazon FPS
 * Braintree Payments (Transparent Redirect)
 * Stripe.js
-* Samurai
 * eWAY
 * Authorize.net Direct Post Method
 

@@ -1,4 +1,3 @@
-samurai
 stripe
 django-paypal
 boto

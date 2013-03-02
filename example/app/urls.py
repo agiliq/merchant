@@ -11,7 +11,6 @@ fps_recur_obj = get_integration("fps")
 world_pay_obj = get_integration("world_pay")
 braintree_obj = get_integration("braintree_payments")
 stripe_obj = get_integration("stripe_example")
-samurai_obj = get_integration("samurai_example")
 
 urlpatterns = patterns('app.views',
     url(r'^$', 'index', name='app_index'),
@@ -20,7 +19,6 @@ urlpatterns = patterns('app.views',
     url(r'^eway/$', 'eway', name='app_eway'),
     url(r'^braintree/$', 'braintree', name='app_braintree'),
     url(r'^stripe/$', 'stripe', name='app_stripe'),
-    url(r'^samurai/$', 'samurai', name='app_samurai'),
     url(r'^paylane/$', 'paylane', name='app_paylane'),
     url(r'^beanstream/$', 'beanstream', name='app_beanstream'),
     url(r'^chargebee/$', 'chargebee', name='app_chargebee'),
@@ -37,7 +35,6 @@ urlpatterns += patterns('app.views',
     url(r'offsite/amazon_fps/$', 'offsite_amazon_fps', name='app_offsite_amazon_fps'),
     url(r'offsite/braintree/$', 'offsite_braintree', name='app_offsite_braintree'),
     url(r'offsite/stripe/$', 'offsite_stripe', name='app_offsite_stripe'),
-    url(r'offsite/samurai/$', 'offsite_samurai', name='app_offsite_samurai'),
     url(r'offsite/eway/$', 'offsite_eway', name='app_offsite_eway'),
 
     # redirect handler
@@ -65,9 +62,6 @@ urlpatterns += patterns('',
 )
 urlpatterns += patterns('',
     (r'^stripe/', include(stripe_obj.urls)),
-)
-urlpatterns += patterns('',
-    (r'^samurai/', include(samurai_obj.urls)),
 )
 
 urlpatterns += patterns('',

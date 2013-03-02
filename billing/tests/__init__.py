@@ -27,12 +27,6 @@ except ImportError:
     pass
     
 try:
-    import samurai
-    from samurai_tests import *
-except ImportError:
-    pass
-
-try:
     import beanstream
     from beanstream_tests import *
 except ImportError:

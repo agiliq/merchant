@@ -61,13 +61,6 @@ MERCHANT_SETTINGS = {
         "PUBLISHABLE_KEY" : ''
         },
 
-    # SAMURAI Settings
-    "samurai": {
-        "MERCHANT_KEY" : '',
-        "MERCHANT_PASSWORD" : '',
-        "PROCESSOR_TOKEN" : ''
-    },
-
     # Paylane Settings
     "paylane": {
         "USERNAME": "",
