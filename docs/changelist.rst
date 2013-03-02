@@ -2,6 +2,11 @@
 Changes
 ========
 
+0.09
+----
+
+* Removed Samurai gateway and integration
+
 0.08
 -----
 
