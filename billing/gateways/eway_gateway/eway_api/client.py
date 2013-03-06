@@ -1,5 +1,9 @@
 import requests
+
 from lxml import etree
+from xml.dom.minidom import parseString
+
+from billing.utils.xml_parser import nodeToDic
 from suds.client import Client, WebFault
 
 # Token Payments urls( Web Service ) : http://www.eway.com.au/developers/api/token
@@ -15,6 +19,92 @@ DIRECT_PAYMENT_TEST_URL = "https://www.eway.com.au/gateway_cvn/xmltest/testpage.
 DIRECT_PAYMENT_LIVE_URL = "https://www.eway.com.au/gateway_cvn/xmlpayment.asp"
 
 
+class DirectPaymentClient(object):
+    """
+        Wrapper for eway payment gateway's Direct Payment:
+            eWay Link: http://www.eway.com.au/developers/api/direct-payments
+            
+    """
+    def __init__(self, gateway_url=None):
+        self.gateway_url = gateway_url
+        
+    def process_direct_payment(self, direct_payment_details=None, **kwargs):
+        '''
+            Input format : http://www.eway.com.au/developers/api/direct-payments#tab-1
+                {
+                    'ewayCVN': 123,
+                    'ewayCardExpiryMonth': '03',
+                    'ewayCardExpiryYear': '17',
+                    'ewayCardHoldersName': 'TEST CARD',
+                    'ewayCardNumber': 4444333322221111L,
+                    'ewayCustomerAddress': '#43, abc',
+                    'ewayCustomerEmail': 'test@email.com',
+                    'ewayCustomerFirstName': 'test',
+                    'ewayCustomerID': 87654321,
+                    'ewayCustomerInvoiceDescription': 'Direct Payment',
+                    'ewayCustomerInvoiceRef': 'RE423',
+                    'ewayCustomerLastName': 'user',
+                    'ewayCustomerPostcode': 560041,
+                    'ewayOption1': '',
+                    'ewayOption2': '',
+                    'ewayOption3': '',
+                    'ewayTotalAmount': 10,
+                    'ewayTrxnNumber': 987654321
+                 }
+
+            
+            Output format :
+                SUCCESS:
+                {
+                   u'ewayResponse': 
+                   {
+                       u'ewayAuthCode': u'123456',
+                       u'ewayReturnAmount': u'10',
+                       u'ewayTrxnError': u'10,Approved For Partial Amount(Test CVN Gateway)',
+                       u'ewayTrxnNumber': u'20391',
+                       u'ewayTrxnOption1': '',
+                       u'ewayTrxnOption2': '',
+                       u'ewayTrxnOption3': '',
+                       u'ewayTrxnReference': u'987654321',
+                       u'ewayTrxnStatus': u'True'
+                   }
+               }
+               
+               ERROR:
+               {
+                   u'ewayResponse': 
+                   {
+                        u'ewayTrxnReference': '', 
+                        u'ewayReturnAmount': u'100', 
+                        u'ewayTrxnOption1': '', 
+                        u'ewayTrxnOption2': '', 
+                        u'ewayTrxnOption3': '', 
+                        u'ewayTrxnStatus': u'False', 
+                        u'ewayAuthCode': '', 
+                        u'ewayTrxnError': u'Invalid Expiry Date',
+                        u'ewayTrxnNumber': ''
+                  }
+            }
+
+        '''
+        if direct_payment_details:
+            # Create XML to send
+            payment_xml_root = etree.Element("ewaygateway")
+            for each_field in direct_payment_details:
+                field = etree.Element(each_field)
+                field.text = str(direct_payment_details.get(each_field))
+                payment_xml_root.append(field)
+            # pretty string
+            payment_xml_string = etree.tostring(payment_xml_root, pretty_print=True)  
+            response = requests.post(self.gateway_url, data=payment_xml_string)
+            response_xml = parseString(response.text)
+            response_dict = nodeToDic(response_xml)
+            
+            return response_dict
+        else:
+            return self.process_direct_payment(**kwargs)
+        
+
 class RebillEwayClient(object):
     """
     Wrapper for eway payment gateway's managed and rebill webservices
@@ -26,19 +116,11 @@ class RebillEwayClient(object):
         RebillEventDetails: rebill event
         CreditCard: hosted customer
     """
-    #def __init__(self, test_mode=True, customer_id=None, username=None, password=None, url=None):
     def __init__(self, customer_id=None, username=None, password=None, url=None):
-#        self.gateway_url = REBILL_LIVE_URL
         self.gateway_url = url
-#        self.test_mode = test_mode
         self.customer_id = customer_id
         self.username = username
         self.password = password
-#        if test_mode:
-#            self.gateway_url = REBILL_TEST_URL
-#        if url:
-#            self.gateway_url = url
-#        print self.gateway_url
         self.client = Client(self.gateway_url)
         self.set_eway_header()
 
@@ -237,35 +319,6 @@ class RebillEwayClient(object):
 
     def query_payment(self, managedCustomerID):
         return self.client.service.QueryPayment(managedCustomerID)
-
-class DirectPaymentClient(object):
-    """
-        Wrapper for eway payment gateway's Direct Payment:
-            eWay Link: http://www.eway.com.au/developers/api/direct-payments
-            
-    """
-    def __init__(self, customer_id=None, url=None):
-        self.gateway_url = url
-    def process_direct_payment(self, direct_payment_details=None, **kwargs):
-        '''
-            Input format : http://www.eway.com.au/developers/api/direct-payments#tab-1
-            
-            Output format :
-                
-        '''
-        if direct_payment_details:
-            # Create XML to send
-            payment_xml_root = etree.Element("ewaygateway")
-            for each_field in direct_payment_details:
-                field = etree.Element(each_field)
-                field.text = str(direct_payment_details.get(each_field))
-                payment_xml_root.append(field)
-            # pretty string
-            payment_xml_string = etree.tostring(payment_xml_root, pretty_print=True)  
-            response = requests.post('https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp', data=payment_xml_string)
-            
-        else:
-            return self.process_direct_payment(**kwargs)
         
         
 def main():
@@ -276,14 +329,14 @@ def main():
     direct_payment_dict = {}
     direct_payment_dict['ewayCustomerID'] = 87654321
     direct_payment_dict['ewayTotalAmount'] = 10
-    direct_payment_dict['ewayCustomerFirstName'] = 'Lalit'
-    direct_payment_dict['ewayCustomerLastName'] = 'Chandnani'
-    direct_payment_dict['ewayCustomerEmail'] = 'lailtc@langoor.net'
-    direct_payment_dict['ewayCustomerAddress'] = '#417 10th main'
+    direct_payment_dict['ewayCustomerFirstName'] = 'test'
+    direct_payment_dict['ewayCustomerLastName'] = 'user'
+    direct_payment_dict['ewayCustomerEmail'] = 'test@email.com'
+    direct_payment_dict['ewayCustomerAddress'] = '#43, abc'
     direct_payment_dict['ewayCustomerPostcode'] = 560041
-    direct_payment_dict['ewayCustomerInvoiceDescription'] = 'langoor.mobi Subscription' 
-    direct_payment_dict['ewayCustomerInvoiceRef'] = 'REF123'
-    direct_payment_dict['ewayCardHoldersName'] = 'LALIT CHANDNANI' 
+    direct_payment_dict['ewayCustomerInvoiceDescription'] = 'Direct Payment' 
+    direct_payment_dict['ewayCustomerInvoiceRef'] = 'RE423'
+    direct_payment_dict['ewayCardHoldersName'] = 'TEST CARD' 
     direct_payment_dict['ewayCardNumber'] = 4444333322221111 
     direct_payment_dict['ewayCardExpiryMonth'] = '03'
     direct_payment_dict['ewayCardExpiryYear'] = '17'
@@ -292,7 +345,8 @@ def main():
     direct_payment_dict['ewayOption2'] = ''
     direct_payment_dict['ewayOption3'] = ''
     direct_payment_dict['ewayCVN'] = 123
-    print dpObj.process_direct_payment(direct_payment_dict)
+    #print direct_payment_dict
+    return dpObj.process_direct_payment(direct_payment_dict)
     
 if __name__ == '__main__':
     main()
