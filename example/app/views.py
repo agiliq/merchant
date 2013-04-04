@@ -390,6 +390,7 @@ def offsite_eway_done(request):
 
 
 def bitcoin(request):
+    amount = 0.01
     bitcoin_obj = get_gateway("bitcoin")
     address = request.session.get("bitcoin_address", None)
     if not address:
@@ -397,11 +398,12 @@ def bitcoin(request):
         request.session["bitcoin_address"] = address
     return render(request, "app/bitcoin.html", {
         "title": "Bitcoin",
+        "amount": amount,
         "address": address
     })
 
 def bitcoin_done(request):
-    amount = 1
+    amount = 0.01
     bitcoin_obj = get_gateway("bitcoin")
     address = request.session.get("bitcoin_address", None)
     if not address:
@@ -411,6 +413,7 @@ def bitcoin_done(request):
         del request.session["bitcoin_address"]
     return render(request, "app/bitcoin_done.html", {
         "title": "Bitcoin",
+        "amount": amount,
         "address": address,
         "result": result
     })
