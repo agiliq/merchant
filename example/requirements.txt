@@ -1,5 +1,5 @@
 stripe
-django-paypal
+python-bitcoin
 boto
 braintree
 wepay
