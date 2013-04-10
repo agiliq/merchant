@@ -19,10 +19,7 @@ class EwayGateway(Gateway):
             raise GatewayNotConfigured("The '%s' gateway is not correctly "
                                        "configured." % self.display_name)
         eway_settings = merchant_settings["eway"]
-        if self.test_mode:
-            customer_id = eway_settings['TEST_CUSTOMER_ID']
-        else:
-            customer_id = eway_settings['CUSTOMER_ID']
+        customer_id = eway_settings['CUSTOMER_ID']
         self.client = RebillEwayClient(test_mode=self.test_mode,
                                       customer_id=customer_id,
                                       username=eway_settings['USERNAME'],
@@ -45,7 +42,7 @@ class EwayGateway(Gateway):
         if not options:
             options = {}
         address = options.get("billing_address", {})
-        self.hosted_customer.Title = address.get("salutation", "Mr./Ms.")
+        self.hosted_customer.Title = address.get("salutation", "Mr.")
         self.hosted_customer.Address = address.get("address1", '') + address.get("address2", "")
         self.hosted_customer.Suburb = address.get("city")
         self.hosted_customer.State = address.get("state")
