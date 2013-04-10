@@ -24,7 +24,6 @@ MERCHANT_SETTINGS = {
         "CUSTOMER_ID" : '',
         "USERNAME" : '',
         "PASSWORD" : '',
-        "TEST_CUSTOMER_ID" : ''
         },
 
     # GOOGLE CHECKOUT SETTINGS
