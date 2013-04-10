@@ -1,6 +1,9 @@
 import unittest
-from client import RebillEwayClient, HOSTED_TEST_URL
+
+from datetime import datetime, timedelta
 from suds import WebFault
+
+from client import RebillEwayClient, HOSTED_TEST_URL
 
 # uncomment to enable debugging
 #import logging
@@ -19,6 +22,10 @@ class ClientTestCase(unittest.TestCase):
                                             password='test123',
                                             url=HOSTED_TEST_URL)
         self.hosted_customer = self.hosted_test.client.factory.create("CreditCard")
+
+        self.rebill_init_date = datetime.today()
+        self.rebill_start_date = datetime.today() + timedelta(days=1)
+        self.rebill_end_date = datetime.today() + timedelta(days=31)
 
     def test_create_rebill_customer(self):
         self.rebill_customer.CustomerTitle = "Mr."
@@ -103,14 +110,14 @@ class ClientTestCase(unittest.TestCase):
         self.rebill_event.RebillCCName = "test"
         self.rebill_event.RebillCCNumber = "4444333322221111"
         self.rebill_event.RebillCCExpMonth = "07"
-        self.rebill_event.RebillCCExpYear = "12"
+        self.rebill_event.RebillCCExpYear = "20"
         self.rebill_event.RebillInitAmt = "100"
-        self.rebill_event.RebillInitDate = "08/06/2011"
+        self.rebill_event.RebillInitDate = self.rebill_init_date.strftime("%d/%m/%Y")
         self.rebill_event.RebillRecurAmt = "100"
-        self.rebill_event.RebillStartDate = "09/06/2011"
+        self.rebill_event.RebillStartDate = self.rebill_init_date.strftime("%d/%m/%Y")
         self.rebill_event.RebillInterval = "1"
         self.rebill_event.RebillIntervalType = "1"
-        self.rebill_event.RebillEndDate = "08/07/2011"
+        self.rebill_event.RebillEndDate = self.rebill_end_date.strftime("%d/%m/%Y")
 
         new_rebill_event = self.rebill_test.create_rebill_event(self.rebill_event)
         print "create rebill event", new_rebill_event
@@ -124,14 +131,14 @@ class ClientTestCase(unittest.TestCase):
                                                                                  RebillCCName="test",
                                                                                  RebillCCNumber="4444333322221111",
                                                                                  RebillCCExpMonth="07",
-                                                                                 RebillCCExpYear="12",
+                                                                                 RebillCCExpYear="20",
                                                                                  RebillInitAmt="100",
-                                                                                 RebillInitDate="08/06/2011",
+                                                                                 RebillInitDate=self.rebill_init_date.strftime("%d/%m/%Y"),
                                                                                  RebillRecurAmt="100",
-                                                                                 RebillStartDate="09/06/2011",
+                                                                                 RebillStartDate=self.rebill_start_date.strftime("%d/%m/%Y"),
                                                                                  RebillInterval="1",
                                                                                  RebillIntervalType="1",
-                                                                                 RebillEndDate="08/07/2011"
+                                                                                 RebillEndDate=self.rebill_end_date.strftime("%d/%m/%Y")
                                                                                  )
         print "create rebill event with kwargs", new_rebill_event_with_kwargs
         self.assertEqual(new_rebill_event_with_kwargs.Result, "Success")
@@ -145,14 +152,14 @@ class ClientTestCase(unittest.TestCase):
                                                                          RebillCCName="test",
                                                                          RebillCCNumber="4444333322221111",
                                                                          RebillCCExpMonth="07",
-                                                                         RebillCCExpYear="12",
+                                                                         RebillCCExpYear="20",
                                                                          RebillInitAmt="100",
-                                                                         RebillInitDate="08/06/2011",
+                                                                         RebillInitDate=self.rebill_init_date.strftime("%d/%m/%Y"),
                                                                          RebillRecurAmt="100",
-                                                                         RebillStartDate="09/06/2011",
+                                                                         RebillStartDate=self.rebill_start_date.strftime("%d/%m/%Y"),
                                                                          RebillInterval="1",
                                                                          RebillIntervalType="1",
-                                                                         RebillEndDate="08/07/2011"
+                                                                         RebillEndDate=self.rebill_end_date.strftime("%d/%m/%Y")
                                                                          )
         print "update rebill event", updated_rebill_event
         self.assertEqual(updated_rebill_event.Result, "Success")
@@ -273,11 +280,6 @@ class ClientTestCase(unittest.TestCase):
         query_result = self.hosted_test.query_customer("9876543211000")
         print "test_query_customer", query_result
         self.assertFalse(query_result == None)
-
-    def test_query_customer_by_reference(self):
-        ref_result = self.hosted_test.query_customer_by_reference("customer reference")
-        print "test_query_customer_by_reference", ref_result
-        self.assertFalse(ref_result == None)
 
     def test_query_payment(self):
         query_payment_result = self.hosted_test.query_payment("9876543211000")

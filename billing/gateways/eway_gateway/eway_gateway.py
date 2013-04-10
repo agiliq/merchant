@@ -42,7 +42,7 @@ class EwayGateway(Gateway):
         if not options:
             options = {}
         address = options.get("billing_address", {})
-        self.hosted_customer.Title = address.get("salutation", "Mr./Ms.")
+        self.hosted_customer.Title = address.get("salutation", "Mr.")
         self.hosted_customer.Address = address.get("address1", '') + address.get("address2", "")
         self.hosted_customer.Suburb = address.get("city")
         self.hosted_customer.State = address.get("state")
