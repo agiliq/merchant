@@ -51,6 +51,7 @@ class BitcoinGateway(Gateway):
 
     def purchase(self, money, address, options = None):
         options = options or {}
+        money = Decimal(str(money))
         txns = self.get_transactions_by_address(address)
         received = self.get_txns_sum(txns)
         response = [txn.__dict__ for txn in txns]
