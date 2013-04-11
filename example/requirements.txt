@@ -1,6 +1,9 @@
-stripe
-python-bitcoin
-boto
-braintree
-wepay
-suds
+Django==1.5.1
+FormEncode==1.2.6
+boto==2.8.0
+braintree==2.20.0
+bitcoin-python==0.3
+requests==1.2.0
+stripe==1.7.10
+suds==0.4
+wepay==0.1.5
