@@ -8,7 +8,7 @@ DEBUG = False
 
 def get_merchant_settings():
     env_dict = dict(filter(lambda x: x[0].startswith('MERCHANT'), os.environ.items()))
-    variable_decode(env_dict, dict_char='__')['MERCHANT']
+    return variable_decode(env_dict, dict_char='__')['MERCHANT']
 
 # MERCHANT SETTINGS
 MERCHANT_TEST_MODE = True
