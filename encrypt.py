@@ -15,7 +15,7 @@ from django.conf import settings
 
 from formencode.variabledecode import variable_encode
 
-env_dict = variable_encode(settings.MERCHANT_SETTINGS, prepend='MERCHANT')
+env_dict = variable_encode(settings.MERCHANT_SETTINGS, prepend='MERCHANT', dict_char='__')
 for k, v in env_dict.iteritems():
     print 'adding %s' % (k)
     os.system('travis encrypt %s="%s" --add env.global' % (k, v))
