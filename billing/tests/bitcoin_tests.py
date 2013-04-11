@@ -1,9 +1,8 @@
 from django.test import TestCase
 from billing import get_gateway
-from billing.signals import *
-from billing.models import EwayResponse
-from billing.gateway import CardNotSupported
-from billing.utils.credit_card import Visa
+from billing.signals import transaction_was_successful, transaction_was_unsuccessful
+
+TEST_AMOUNT = 0.01
 
 
 class BitcoinGatewayTestCase(TestCase):
@@ -12,8 +11,8 @@ class BitcoinGatewayTestCase(TestCase):
         self.address = self.merchant.get_new_address()
 
     def testPurchase(self):
-        self.merchant.connection.sendtoaddress(self.address, 1)
-        resp = self.merchant.purchase(1, self.address)
+        self.merchant.connection.sendtoaddress(self.address, TEST_AMOUNT)
+        resp = self.merchant.purchase(TEST_AMOUNT, self.address)
         self.assertEquals(resp['status'], 'SUCCESS')
 
     def testPaymentSuccessfulSignal(self):
@@ -24,8 +23,8 @@ class BitcoinGatewayTestCase(TestCase):
 
         transaction_was_successful.connect(receive)
 
-        self.merchant.connection.sendtoaddress(self.address, 1)
-        resp = self.merchant.purchase(1, self.address)
+        self.merchant.connection.sendtoaddress(self.address, TEST_AMOUNT)
+        self.merchant.purchase(TEST_AMOUNT, self.address)
         self.assertEquals(received_signals, [transaction_was_successful])
 
     def testPaymentUnSuccessfulSignal(self):
@@ -36,5 +35,5 @@ class BitcoinGatewayTestCase(TestCase):
 
         transaction_was_unsuccessful.connect(receive)
 
-        resp = self.merchant.purchase(0.01, self.address)
+        self.merchant.purchase(0.001, self.address)
         self.assertEquals(received_signals, [transaction_was_unsuccessful])

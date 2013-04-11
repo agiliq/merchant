@@ -1,10 +1,12 @@
-from django.test import TestCase
-from django.utils.html import strip_spaces_between_tags
-from billing import get_integration
-from django.template import Template, Context
-from django.conf import settings
+import re
 
 from xml.dom.minidom import Document, parseString
+
+from django.conf import settings
+from django.test import TestCase
+from django.template import Template, Context
+
+from billing import get_integration
 
 
 class GoogleCheckoutTestCase(TestCase):
@@ -25,12 +27,20 @@ class GoogleCheckoutTestCase(TestCase):
     def testFormGen(self):
         tmpl = Template("{% load google_checkout from google_checkout_tags %}{% google_checkout obj %}")
         form = tmpl.render(Context({"obj": self.gc}))
-        pregen_form = """<form action="https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%(mid)s" method="post"><input type="hidden" name="cart" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48Y2hlY2tvdXQtc2hvcHBpbmctY2FydCB4bWxucz0iaHR0cDovL2NoZWNrb3V0Lmdvb2dsZS5jb20vc2NoZW1hLzIiPjxzaG9wcGluZy1jYXJ0PjxpdGVtcz48aXRlbT48aXRlbS1uYW1lPm5hbWUgb2YgdGhlIGl0ZW08L2l0ZW0tbmFtZT48aXRlbS1kZXNjcmlwdGlvbj5JdGVtIGRlc2NyaXB0aW9uPC9pdGVtLWRlc2NyaXB0aW9uPjx1bml0LXByaWNlIGN1cnJlbmN5PSJVU0QiPjE8L3VuaXQtcHJpY2U+PHF1YW50aXR5PjE8L3F1YW50aXR5PjxtZXJjaGFudC1pdGVtLWlkPjk5OUFYWjwvbWVyY2hhbnQtaXRlbS1pZD48L2l0ZW0+PC9pdGVtcz48bWVyY2hhbnQtcHJpdmF0ZS1kYXRhPjwvbWVyY2hhbnQtcHJpdmF0ZS1kYXRhPjwvc2hvcHBpbmctY2FydD48L2NoZWNrb3V0LXNob3BwaW5nLWNhcnQ+" /><input type="hidden" name="signature" value="E+hwrsOjpJYbfy3abEcyCynzurs=" /><input type="image" name="Google Checkout" alt="Fast checkout through Google" src="http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%(mid)s&amp;w=180&amp;h=46&amp;style=white&amp;variant=text&amp;loc=en_US" height="46" width="180" /></form>""" % ({"mid": settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']})
-        self.assertEquals(pregen_form, strip_spaces_between_tags(form).strip())
-        
+
+        form_action_url = re.search('form action="(.*)" method="post"', form).groups()[0]
+        input_image_src = re.search('<input type="image" .* src="(.*)" height', form).groups()[0]
+
+        expected_form_action_url = "https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%s" % settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']
+        expected_input_image_src = "http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%s&amp;w=180&amp;h=46&amp;style=white&amp;variant=text&amp;loc=en_US" % settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']
+
+        self.assertEquals(form_action_url, expected_form_action_url)
+        self.assertEquals(input_image_src, expected_input_image_src)
+
+
     def testBuildXML(self):
         xml = self.gc.build_xml()
-        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""    
+        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""
         self.assertEquals(xml, good_xml)
 
 
@@ -180,7 +190,7 @@ class GoogleCheckoutShippingTestCase(TestCase):
         self.gc.add_fields(fields)
 
         xml = self.gc.build_xml()
-        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url><shipping-methods><flat-rate-shipping name="UPS Next Day Air"><price currency="USD">20.0</price><shipping-restrictions><allow-us-po-box>false</allow-us-po-box><excluded-areas><us-state-area><state>AK</state></us-state-area><us-state-area><state>HI</state></us-state-area></excluded-areas></shipping-restrictions></flat-rate-shipping><flat-rate-shipping name="UPS Ground"><price currency="USD">15.0</price><shipping-restrictions><allow-us-po-box>false</allow-us-po-box></shipping-restrictions></flat-rate-shipping></shipping-methods></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""    
+        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url><shipping-methods><flat-rate-shipping name="UPS Next Day Air"><price currency="USD">20.0</price><shipping-restrictions><allow-us-po-box>false</allow-us-po-box><excluded-areas><us-state-area><state>AK</state></us-state-area><us-state-area><state>HI</state></us-state-area></excluded-areas></shipping-restrictions></flat-rate-shipping><flat-rate-shipping name="UPS Ground"><price currency="USD">15.0</price><shipping-restrictions><allow-us-po-box>false</allow-us-po-box></shipping-restrictions></flat-rate-shipping></shipping-methods></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""
         self.assertEquals(xml, good_xml)
 
 
@@ -551,9 +561,5 @@ class GoogleCheckoutTaxTestCase(TestCase):
         self.gc.add_fields(fields)
 
         xml = self.gc.build_xml()
-        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item><item><item-name>tax free item</item-name><item-description>Item description</item-description><unit-price currency="USD">2</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id><tax-table-selector>tax_exempt</tax-table-selector></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url><tax-tables><default-tax-table><tax-rules><default-tax-rule><shipping-taxed>false</shipping-taxed><rate>0.08375</rate><tax-area><us-zip-area><zip-pattern>100*</zip-pattern></us-zip-area></tax-area></default-tax-rule><default-tax-rule><shipping-taxed>true</shipping-taxed><rate>0.04</rate><tax-area><us-state-area><state>NY</state></us-state-area></tax-area></default-tax-rule></tax-rules></default-tax-table><alternate-tax-tables><alternate-tax-table name="tax_exempt" standalone="true"><alternate-tax-rules/></alternate-tax-table></alternate-tax-tables></tax-tables></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""    
+        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item><item><item-name>tax free item</item-name><item-description>Item description</item-description><unit-price currency="USD">2</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id><tax-table-selector>tax_exempt</tax-table-selector></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url><tax-tables><default-tax-table><tax-rules><default-tax-rule><shipping-taxed>false</shipping-taxed><rate>0.08375</rate><tax-area><us-zip-area><zip-pattern>100*</zip-pattern></us-zip-area></tax-area></default-tax-rule><default-tax-rule><shipping-taxed>true</shipping-taxed><rate>0.04</rate><tax-area><us-state-area><state>NY</state></us-state-area></tax-area></default-tax-rule></tax-rules></default-tax-table><alternate-tax-tables><alternate-tax-table name="tax_exempt" standalone="true"><alternate-tax-rules/></alternate-tax-table></alternate-tax-tables></tax-tables></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""
         self.assertEquals(xml, good_xml)
-    
-    
-    
-    

@@ -1,9 +1,11 @@
+import braintree
+
 from django.test import TestCase
+
 from billing import get_gateway, CreditCard
 from billing.signals import *
 from billing.gateway import CardNotSupported, InvalidData
 from billing.utils.credit_card import Visa
-import braintree
 
 
 class BraintreePaymentsGatewayTestCase(TestCase):
@@ -15,6 +17,16 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                                       number="4111111111111111",
                                       verification_value="100")
 
+    def assertBraintreeResponseSuccess(self, resp, msg=None):
+        if resp['status'] == "FAILURE":
+            standardMsg = resp['response'].message
+            self.fail(self._formatMessage(msg, standardMsg))
+        else:
+            self.assertEquals(resp['status'], "SUCCESS")
+
+    def assertBraintreeResponseFailure(self, resp, msg=None):
+        self.assertEquals(resp['status'], "FAILURE")
+
     def testCardSupported(self):
         self.credit_card.number = "5019222222222222"
         self.assertRaises(CardNotSupported,
@@ -25,16 +37,16 @@ class BraintreePaymentsGatewayTestCase(TestCase):
         self.assertEquals(self.credit_card.card_type, Visa)
 
     def testPurchase(self):
-        resp = self.merchant.purchase(1, self.credit_card)
-        self.assertEquals(resp["status"], "SUCCESS")
+        resp = self.merchant.purchase(5, self.credit_card)
+        self.assertBraintreeResponseSuccess(resp)
 
     def testFailedPurchase(self):
         resp = self.merchant.purchase(2001, self.credit_card)
-        self.assertEquals(resp["status"], "FAILURE")
+        self.assertBraintreeResponseFailure(resp)
 
     def testDeclinedPurchase(self):
         resp = self.merchant.purchase(2900, self.credit_card)
-        self.assertEquals(resp["status"], "FAILURE")
+        self.assertBraintreeResponseFailure(resp)
 
     def testPaymentSuccessfulSignal(self):
         received_signals = []
@@ -68,9 +80,9 @@ class BraintreePaymentsGatewayTestCase(TestCase):
 
     def testAuthorizeAndCapture(self):
         resp = self.merchant.authorize(100, self.credit_card)
-        self.assertEquals(resp["status"], "SUCCESS")
-        response = self.merchant.capture(50, resp["response"].transaction.id)
-        self.assertEquals(response["status"], "SUCCESS")
+        self.assertBraintreeResponseSuccess(resp)
+        resp = self.merchant.capture(50, resp["response"].transaction.id)
+        self.assertBraintreeResponseSuccess(resp)
 
     # Need a way to test this. Requires delaying the status to either
     # "settled" or "settling"
@@ -81,10 +93,10 @@ class BraintreePaymentsGatewayTestCase(TestCase):
     #     self.assertEquals(response["status"], "SUCCESS")
 
     def testAuthorizeAndVoid(self):
-        resp = self.merchant.authorize(100, self.credit_card)
-        self.assertEquals(resp["status"], "SUCCESS")
-        response = self.merchant.void(resp["response"].transaction.id)
-        self.assertEquals(response["status"], "SUCCESS")
+        resp = self.merchant.authorize(105, self.credit_card)
+        self.assertBraintreeResponseSuccess(resp)
+        resp = self.merchant.void(resp["response"].transaction.id)
+        self.assertBraintreeResponseSuccess(resp)
 
     def testStoreMissingCustomer(self):
         self.assertRaises(InvalidData,
@@ -98,7 +110,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 },
             }
         resp = self.merchant.store(self.credit_card, options=options)
-        self.assertEquals(resp["status"], "SUCCESS")
+        self.assertBraintreeResponseSuccess(resp)
         self.assertEquals(resp["response"].customer.credit_cards[0].expiration_date,
                           "%s/%s" % (self.credit_card.month,
                                     self.credit_card.year))
@@ -123,7 +135,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 }
             }
         resp = self.merchant.store(self.credit_card, options=options)
-        self.assertEquals(resp["status"], "SUCCESS")
+        self.assertBraintreeResponseSuccess(resp)
         self.assertTrue(getattr(resp["response"].customer.credit_cards[0], "billing_address"))
         # The tests below don't seem to work.
         # billing_address = resp["response"].customer.credit_cards[0].billing_address
@@ -141,9 +153,9 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 },
             }
         resp = self.merchant.store(self.credit_card, options=options)
-        self.assertEquals(resp["status"], "SUCCESS")
-        response = self.merchant.unstore(resp["response"].customer.credit_cards[0].token)
-        self.assertEquals(response["status"], "SUCCESS")
+        self.assertBraintreeResponseSuccess(resp)
+        resp = self.merchant.unstore(resp["response"].customer.credit_cards[0].token)
+        self.assertBraintreeResponseSuccess(resp)
 
     # The below tests require 'test_plan' to be created in the sandbox
     # console panel. This cannot be created by API at the moment
@@ -158,7 +170,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 },
             }
         resp = self.merchant.recurring(10, self.credit_card, options=options)
-        self.assertEquals(resp["status"], "SUCCESS")
+        self.assertBraintreeResponseSuccess(resp)
         subscription = resp["response"].subscription
         self.assertEquals(subscription.status,
                           braintree.Subscription.Status.Active)
@@ -174,8 +186,8 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 "price": 15
                 },
             }
-        resp = self.merchant.recurring(10, self.credit_card, options=options)
-        self.assertEquals(resp["status"], "SUCCESS")
+        resp = self.merchant.recurring(15, self.credit_card, options=options)
+        self.assertBraintreeResponseSuccess(resp)
         subscription = resp["response"].subscription
         self.assertEquals(subscription.price, 15)
 
@@ -192,7 +204,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
                 "number_of_billing_cycles": 12,
                 },
             }
-        resp = self.merchant.recurring(10, self.credit_card, options=options)
-        self.assertEquals(resp["status"], "SUCCESS")
+        resp = self.merchant.recurring(20, self.credit_card, options=options)
+        self.assertBraintreeResponseSuccess(resp)
         subscription = resp["response"].subscription
         self.assertEquals(subscription.number_of_billing_cycles, 12)
