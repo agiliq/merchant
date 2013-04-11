@@ -1,6 +1,6 @@
 --- 
 install: pip install -r example/requirements.txt
-script: python example/manage.py --settings=settings.travis test billing
+script: python example/manage.py test billing --settings=settings.travis
 python: 
 - "2.7"
 env: 
