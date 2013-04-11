@@ -2,13 +2,13 @@
 Django-Merchant
 ----------------
 
-Django-Merchant is a django application that enables you to use
-multiple payment processors from a single API.
-
 |TravisCI|_
 
-.. |TravisCI| image:: https://secure.travis-ci.org/tuxcanfly/merchant.png?branch=master
-.. _TravisCI: https://secure.travis-ci.org/tuxcanfly/merchant
+.. |TravisCI| image:: https://api.travis-ci.org/tuxcanfly/merchant.png?branch=master
+.. _TravisCI: https://travis-ci.org/tuxcanfly/merchant
+
+Django-Merchant is a django application that enables you to use
+multiple payment processors from a single API.
 
 Gateways
 ---------
