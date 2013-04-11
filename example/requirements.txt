@@ -1,3 +1,4 @@
+Django
 stripe
 python-bitcoin
 boto
