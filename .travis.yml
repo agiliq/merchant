@@ -1,180 +1,180 @@
 --- 
-script: python example/manage.py test billing --settings=settings.travis
-python: 
-- "2.7"
 language: python
 env: 
   global: 
   - secure: |-
-      Hlqr9H1MEz2W/vpArT/kPHhrKwW+qKMuxxq5pG3cnqObADl/3JJWlnKuqZNK
-      uS8pkwafKePf5NgJscdk03exB3Q0Oq0FRwL2GtR4Psf3/RXEk3BTJ9u751ac
-      nNSXQxWCIhaAxAus+pAKY/3eVa0Tyv71pEPDeZuMHECi1bPnqvE=
+      OVLVI+R/qdCTXRoCOQu5M/TvXy4GA0reTzq4dv66fR6kd9Iy+Qj59Mxb9QD2
+      UiZmUpY3hg/ieZ1UmJGIMD5HZwMuFiJ0hFzLmg6QKOFRpn0f1sSYvpZ2aaxY
+      CZZ/CH9rpQqYCcEd5WNH3jOdrGYWL1XDr3G9JddEOVW3qg88WRo=
   - secure: |-
-      S3hlP/vJEE/1oBDK1qlRYRFhFGFwAjNOGx98AQgP6+8TolnJrrVWDR0lgQ5s
-      tAEurbKxtDvemmL0hpvaYUlYKBETBRtuRvTBBizjDFDyk4uUbwWO/lYpSL2W
-      Svi5J98p8d/B8u+kjbqFsu+NN8ZE+Tl7PxIoS1fzfCUvbEOeusg=
+      GkU0CxfLX0yCQ0OI8eex9/71yaChmAMPuw05IHgmrBs+kU9IaKDrgNqFZlBd
+      1C/M115+alR4jnhoFJS8PsVER2ShFiXehXkLHBvZ3Dbmlgq8jtc5Ms+Z76G7
+      Gz095qnGJuRLm2ICRoEzg03vaWf7eL+wMO+bduA8+nqx026P2ss=
   - secure: |-
-      NjP+QDji4RKfoNNKLw26swnMRtdLT0CJirEMdRqrO63qqDWFsWlSg/e8yhJi
-      UH/T6mTudHZubqE8aFPwVVCc5Uja8UdKPqU/4jzAPFArFYAih6uUkJlJsXRL
-      zE4f/B9ZvXpBHh+cb8KPNJQBAMJyr/qh54n4qZm0ODj/WW0R06M=
+      knie3Dd9jM8x+sPj9e/HY0iF0LRHdBk/ktMr1FoGF15hMGBw8/JoYGa0xS+b
+      7YcdoZm6dEVKy4bZgK7S+gxhJsPd6AISwJJKt2H6Wfvn25SM7fB8Emr/Rdt5
+      NLuzLve8u7br8cz5tHSchsP1oMbVInjcecmuteHGX4K6WBl4Yig=
   - secure: |-
-      GzFv1xwgNgSuE2Sqzp3rDmqE6dLpQIJUGCg2fNHhfXJiIn4gzlqu9C9Bcw/c
-      qo01TQg4ne2as2036TLbhNbvODguip5UuV1yZDiLzBTU2zsuttzlxnf2B3ey
-      RwZSKc/RzTJMsu2g/5UiNjr2YIQcLpenJNQGkQIKdmDI4qZBtk4=
+      EKIZ2Wv4ogNvAOm2by5lY2toat/Y8g2GdsHk8NTJz5aLOnOnR60ZWeKxK0a3
+      5RVAx4tbGhUSfEyQ1a4jL9EhDiXJjnl9tWU0neN/wioQ5KwYyHXAVovqTR19
+      Jj1PDd9b/jnfRCYy5sCnmpQOX1h5GfDjss+gIevy6kBq2PD0kNw=
   - secure: |-
-      R4O9LYN45x8tFdHeD5Y2jNQAJKeIe/eT9fvJEjSiBUutNTHUpm4XkRV3ZI6d
-      LRUrAPxiJ6ObZxVHwLfIj8g9TWWMTAXLmCEyMOg1ov0mUpfdRLd4sjGVwIVS
-      mQrEB0MwUz89oQq9mP+vsYJKqCrQpH/YzCMlWPFyj2DSpf2amLQ=
+      SqjTk10VPq/L13VkR7ohjwva5WQOnUS+tpjOjc3vAZUAVOG9bwUPbGR5FeZm
+      mXuhvYBd6ALzOoHZG9AgR+SISv/bYsBX7IKLJ3Zndl+OiqZ5bMTGVYbjc2BV
+      F1E2cNbi56N4dVyHQ0rd0g95nrjf9rMN9shV1GU9tlxhdhGfiWU=
   - secure: |-
-      TIcvMWPxcMBzJtI/HqKzzpaUyfHZyfUumdm2kDdlAo6thgV9lvHwtGS+IQUn
-      xFj+KzuPqYayOQoOEkY8wjDyjT5DrvqThtj9YhJF9DuRyxOEeWpFW1L6C9+y
-      B7AoqG/dvCaXpQclMbZMOSdwNTWZuuriQylb0G1cdV5hYszS4FQ=
+      is5miOQ+ujyRG4SoIeraUY03y3Uc2qJ/ejz3oDmnijEWYmnpKaw/q0xz9dUq
+      /hE/FqQnI8ze7cBVWPANK156owsjqs7uQFKsqJRiBB3qGRbtMwc9Kzet71SF
+      NYqwlGo+o8NSjiCwamVgCWDaLzk5wk2BjbSuTz+NRBfljwDJOXU=
   - secure: |-
-      ThZ3Dy4xKxa0cDJEA+p+BzuJNmMrk/rO4RODO+i7ZyLfTuN2hDRs78CkwL/Q
-      wyXjExndCt+7NlxTdCc3XnAyLr0aEJkifIl3wAkctOi5SJmfejBy81P5FvjC
-      V7gIZ4JSug7oBOD8SSigsBD+RpR9LtQ7I8yOlrWWSDK9sSvBcig=
+      C4wRDZGPd7nBnYtjIG6Y80Ky5YPQlY4kV3rRtd1Tk4Qps+9wONA26qkmQYdu
+      2xGk6NhXps1njzp+pT8WFxp7NhZ36Dqo3EF9Gq0pz1yMZBOT+hz9sx8p4ULy
+      JM08z02wraZJBW6RVYFpxcb4U/kocaSbEBUkgW0QAAkidaJO7Uw=
   - secure: |-
-      WaJLGfv7ZlwF89ANXPU49yybUzWBq5G/YYOuKrCT56UNnfQ+ZGWoqfTTCpXQ
-      sHydTGRBLNsut7mMx9XC6ohP88Am7nKrjzycz9Ag9ny+g/r6CcsS+GYt7B/G
-      i+1XsmDnPzJFI7kl8e14lF8SnbrnQLqEdKKKcpIA8kPtiJlsa3U=
+      HIaWUEhqVksJxvd7Ti/iJK3WONdBvzLIpdE2ZqRUx3iUtl7nNQLCq6ZeGR1E
+      Q+hD1tya+76MHyTH33rdUgQ+yYzdPCW+mBcj2Ksgriu0LOCdYQrqPibCFMpY
+      qh/sS8Z3gOvxuew0FdWpgJIdhzcyymIUIbajjGlGa/Uv9EbnXPY=
   - secure: |-
-      IPRZfHlWT+dx9l58TVtz135rR6NRNtVQ5PG2t0i+wlhyoaARMNVwNCkBBgRw
-      Ck4NftmzXsPiFxLIw5+mZGyJxTnCAwdI5CR0hAz7+i4hzucay68hW6pAllz4
-      sdyeFc/kA2u0yGiysaeQ3HndQJwfvwbZTDXqSFc3UeRuAQkaNhs=
+      WJ3SFPLw55qg72KLyZnBtAFnmP8ogzLZFAszmMsViCZ9mv3vjaNjdRuRu0R8
+      +Nix6HYajr+lAj+wA3qKFSa5WS2lcsuAOK5uLICXoSpmvyQFlGDI8a8ClhyG
+      wXz0+snaJXKxv1HMz8ICl3hcvcrClupG+JOR/r8+Ynhrc7Xxsm0=
   - secure: |-
-      PfWygGSkMCVVbrZTWMHdwWmEz87s5bnjmFlbMoE8HRoIDSUmNA3d5WulZfA3
-      oShtG/qLb1njIqgADrICIZax+80AXb6Zv+SwY+LAHyw4p3bgiT8GP3Bb/1+M
-      d9O7Mj7kpkD8ZrAGJt8mwXonfPdDYgXZJrCUJsGdgvOn/m6kdmU=
+      enHThTF8E+WnFzWaWocdJ+A6ReQhoXsinKbwX9dXwY49ZMQ81VoXYQNndqCz
+      CTMXHHV06wyNl20Xqd3x7C0XBggX5xEz6C5ibIlkd1ir8pvXKT4mfzH7kWQi
+      QB9cjeYm2K3q626WYJIFjIqj2lCekkz1ORx+JULglrOJ9XcjSlM=
   - secure: |-
-      SHZiBhfHre7iSEymaHMqoTX9//c4ZhaTEXZxnc3/PgKd5j3drzMbrK4x83K4
-      CfR1/P8fImfk9tlbdbsNNY8JSzyJgwjZsuDfiGDMxsT6jiVyBntOJZtDIK3j
-      LxhGtksOrUujnIJOE7NZAFvOpp1FXzCD1aO5XecQp3g3s4HpYBk=
+      IMnKMsC/4QJBpDwU8mjfwVi1MTgtuCOcLyfG2OSKE2F97BTJ1rejOGaMm/tx
+      zfoK/ku6Br/OSBo/5l7x1dTmqhiyzK8r/oOupal+Yp6/aJmoRZ9sWGg+adBp
+      o7nd/QuXtfEnDrrWytcyurnuByxIAoO8RmTNvt0kGobubluJDmM=
   - secure: |-
-      e6Cm2kSM6vJBYFoH4RTwsoj8doEtqAXpCKaVQ8FpegNmtcrv0OKzQh6Ds90m
-      lEhY+9RPWqP4k4zy9ZysxbaWE9MrgaKwq0IeTq3jS/gBqSSSFO88kCfZAfWZ
-      hmUQ6TPNdIRqQO8xSzuVyzLQJQN874QWs5OM3HVHHEUwfrZ01Z4=
+      XmlGfZc+3yNjQJg9xmIngKgW0KRyb5884v7IwlYYiHBUemlDJm9L+dXQVk3G
+      o/rmZnEkx0SxejmP4jGoMDNenmPeLDHqq1m2A9C7IgyNoc+A14etSkJ9PoNB
+      Fc8POJq3w6xHvIFb1ugbmuq89MD5mzbygMbIg8hbkeqoGjZqzME=
   - secure: |-
-      DEjWCAzYDfTBfyg2RL55ee+b/VM59vvXB6lX8DUxde1rQ5Bpf5I3HvL7g2hI
-      oQNNTS0HbLic5dcvP/UnZCvXnJBSRCa5mlYXqw4f5HW+LXHHUrTLumFmKPsQ
-      RP1vHax86t1XWERJ6J/og9ZXXgOzJpn7WGNGRtthBeEHefRoNtw=
+      GPcis33492wKe8NTSdyjKPOD6ahfvLszNFWhlW+NwPYsjqlBWxnLQzoAHxyt
+      +UcRvGaWZYVRJRm9ucV8LVeZn6GxINbcxLmI5eTLMQl+Q/8y29RMSmSRaiNW
+      jQf/FpwRlHCWa32j4eWJzdxHkRsJB4e5CY6Low5s8C4LTlOmLFI=
   - secure: |-
-      h5oksdn1wq2225OvNMbv4eiNskI1nwED3r9t0kH9gSM2TDn1NmKWfNGTpL6J
-      Yacx3XRWdhokjji/kJumGkIg6L6AwcNfLhlR5nQLTiwRmCER+Z058LTwbIuA
-      Y6q505Z8BpoHKSzGTKRoIzZT3SY5H8gppaL0Z3XrxPwL1Bu/UmU=
+      QQZIEyZxz8tvGXcL3TsrSRlvje/z8QXtssYaqGfLxsVQCrT5mDXHPDmxrffr
+      T2ol6fZZ48r/qED3FjcBHQZr1yjYruZ56Htw9f8vwBR3u/T+tIx9xkAOlvn2
+      cL3uy1qwb47lnsD7UMsRWyWgFrMUqUec8BdMAK4TsQ6qdQHYKDw=
   - secure: |-
-      IDDxzersXn24a5HluHKelU5vxxGjlhXzvcYnNAO6g0gOalwhEbpo2/V4oMZM
-      0TllJvYq1S4eUjph/JQtLyFZyT8+0rV9hdBad3ZgshEa0EEQ408tlnLziaIE
-      m2DpIOyeCPCEWlW+h4StFiSMdCVOQgl8CM0QhaYONYLjypHBQAE=
+      GILpe6VTfnsMWDrXY4cn+PyF9fPWVmAgyZfqrSYyqTHFr6jCwG4Zr/PK2laz
+      U2QiSji+dGOblz+ZuFpNll3m8TxMgsp/L7EWwRgOydMmbFT7vHDXE74P9KEw
+      O02Gm+qjTON0FuI50TpESsZ/AVvZvoXif+gZ/CLHPyq1Je0/Ocg=
   - secure: |-
-      C+J7ArQcK5/bpZjGxwwBPkGqc6z51UVHlTOxlr6EfAVff+oi/Rtiz3+1n8Pc
-      fGmUgpldSuzZTLueiOb3iELqYZvYextoOjxPjRgFezd7igDEI5muymSmTXz4
-      jEkTQnLFN2zHW31GNRYfnL7oOBKcmBXtzJTSgg9q19vl91r00xQ=
+      ZMJSKTdRcMThZtfrTcyRdM0atewt8CtBaa3BDq60lC4GZHbKvuBegiGwpDTA
+      WyV9amLutAyAWY1lfVjdRD9TK6Qx/G8Nq2zAC6ItAo+zCdRdLc0UHR1xxGl0
+      mP3UsOjTPiSTJbiI5/qrR1g16yoGJOPQUf+KQDpmGfkC+dNZquM=
   - secure: |-
-      ZNAxcqZiNYktTmEZk+nUeZBfsF0ShXZPeYKhjkOP6LQowgYkqYmDghL7EPY7
-      buhQY76FIUZIq8Lfzae3P5h41gq00TtgwOOXtve9k/fla5E5/zpbLOOEpiMc
-      kKU3mkIw+SXvyhPedbTg1mBMZtETIuEdxm0818qAkfKaRQrQnhY=
+      XYdwsGAzz7XGYuf5wEn6W4wX5Gs/EU8hFVunWIuM77NcqSvB7AddnE1UyrQr
+      V8cIMDHZGCLhxYY/+3OIyB6z655iUp0fBZkSYCGNZNohvwL1nLxCbf1GlwWn
+      oPUiuboWXZK87MQsouikN0JBDGZcF75n/RILYE3lSwcOU8X20hQ=
   - secure: |-
-      R7eTjVxb/kUHJ1LFNBazMOagty8H+f4V52VP7lZEmSwS87S/JAZF8VJ4WstS
-      2KAgVx16HIcOdo2Ly5p9PuzPt/DdqMBfrv3A+DDw810Yc4gIfFsuSwc94Krs
-      upYsNNb0vWg40JlWFRR7ZXlNmtbZ7LdW1G5yuzrkSujfB4xyisA=
+      lBP0zVk6j/sbu2mbXv7k3FHEYcLe68csiFPYO7d0TKirGciwEFJHuWSKoOAb
+      Qi/PNP0fvI8oMpVTSAMmI3eTCLCjq3bweYbvFQ3QD9OA1KC6Im1WbYwhZ7CI
+      jeI3daWDW70ZbaSXW5zRTG9hl+rpq0PYYXsUX9iMeaMKZRwM1lQ=
   - secure: |-
-      IIJKes0YmyqbSBtjG+clszhfwbppIEu6tcfrXlI9y/IpQMjYA7aDFPHrVO7Q
-      oofatfVhQfW3S8ymK4TbBGZBN/uW4tSaAVjyGPAxJ3blNqXaD1/w/86ZwTIp
-      tSgJslC3mUdaEL/I1RyfVq0HTUqKuTfsijkDoUVFxdoQj0pQvhg=
+      fcim0PvNodL4XXiqckw52mWWD0samlYmHvUGEkahuT87ZbPYE1ltU6b7uaga
+      FY08x/MyRQQgSFXYxCbm0bO4npvpeZTxnVburLn4C3QMkNP+neU5jLUXO9Vp
+      5kX87pLWxNEzpCwIl8E56Juub3y+XKpo/16pqUazzzWpTym/e9k=
   - secure: |-
-      aDW6Vr/v+35U4nQ8bGysIfb+aLtOGH9UXjJbR8Zw6PBDta+08L2Q7zGOq2IO
-      ZLHq/1WdeAAr7jmit93dzDcymJBQgJVS6DhfJYo1D+wz9NHrpanUvx6qTXvn
-      BEgQ/IcFErs2fNpvIwUWSFb3aizO1RhJNYAX15Sb+P64NKTWNiE=
+      SnOfLEBNftQsmBefcDMn/GL8N8346N5WQfBQiBHideA0Y1lThmJ+WMDxgj+w
+      CpsSffnjBtf5FNvogLS1VJe16HOclB7VML66HOFcjJmkuTdTFGeQcGzUm85I
+      oQ/z96rOsACC9wG7DScxcM/LAoV+n4DSlOameyMfANbDmw7T1hg=
   - secure: |-
-      d+vDMgo84gmx6TY8nb6B3yyIZ2T3AOFI1dS2QbQ0lJc+P8anKSzyPfGqOuCm
-      afdrbgvaa2XpwKD8tWyqqWZmD2/lIHqiP5uDkotVNJhdEvkoxS+d9mlx7P8m
-      8bmbIAtRAh0LiZWV34t20DswELlmNwEPE0qk+gQCLjk9xjncmQ0=
+      ZsjKg5t/624aw5MDtf4CTY2AZ8NzegixmGAgnjMpjZhICN//bFzDIVmgaQaI
+      1AEGaazH1C0hnv2FHeYWuFq3Lz5m3EatiFyq48WdwmonVgTyChv4pLSCkvB2
+      24sYJT0JSpMizi9OSLSDoeVnAQipJ2F3Zu5vyoWpqk7F6/loeF4=
   - secure: |-
-      QWFK1gODOgkGzmd88I4JQYtYKXS5WNk4Vfb27dZD4oOiyxoDgUb1SZ+KEgss
-      ekYb4gWY8iIPIyicwcrNy0umCeq50Micix0rL6LBMSX6sp3m8aDaYQMi1gwm
-      iSG+u3sQBLhmh1dfnfX80eOSBprYtI2JbApaVvgodKNZkAvsPUc=
+      L7TDGrIhNjjkNkIhlESDRl4GryaFoF9SyXHe7KJ6VT1EOqRZl+QLyFrFC8tx
+      RAFKtZwk8RmRpa2ULW8tH2sEJ0T1z86TLVvwAiUAGwPZKeezCJyIHmmKDuhB
+      H3ewjzIRNs+lbjqDRjViqnJ1tRjTwyfZMqy30t8/xQqKX5bnQY0=
   - secure: |-
-      Jpj4A70Mlqc5LGUhNZmxlcIj/Y+0rJtQdKEduD8CHK596b3b7XsWTnVNYOOk
-      pgVX8D2R/wP2Ci48WDOSehW1AKkn2DtjQXAoa5GsiX5eFXhNKG1kPBASlh/v
-      RYSsfv+cmTi63IXgb3nJcX3907heaxLqLBzJ10cmODzNgVM1KU4=
+      cPiUiiMuhNDAjTy3khI73TRA+rYtHqf/mhLSs45t8C3Sb6jAnfCOj6Z2g14f
+      V3RKli2QhpyjJ735XGUU837Ef47tqjUZSXg1dk01yAdKFkk21e+yg5o4+8QO
+      D9c4k4e0WY5iWpkszxfIy8SPlpAg5TtpTWwR0exu5a+C6Jw3nXQ=
   - secure: |-
-      VVye6ZldNi7UXb/RXR4fSd1dvDt1WHL7Dy+2PqZdX84vVl+HKrMorExScns+
-      qFnAo5u9JbgtdTKLG9Dep1mLx7+qTX16GOhhjTLPQbarjt3WFRRBBd2R+dJw
-      K8W+rY6kh738YN0ZrDbDCbLgPqgZi+rRixAw5lO3Z1duhdUyNws=
+      Kvd0PIw7cW8LkYaYDiKWY8CyPPeHSj2Ts28Jfwzs/w9Xak0iP09S3EPbTesE
+      1bQtekxWU9Q9A3Lbt12cjUoyUQy7OAc55lhIzb0CfgReDq1V+1wurh/dWqpu
+      apma+rcvNOQSrvIuMuxvX9PVnMPXXF6rs0JwiuUXJmQvVWZzm8o=
   - secure: |-
-      CrzT014Ikdh1DwnCXJZsa08Y5ZLT1Zck0yEz38Kpih68an2P4L9JS9uBuRDl
-      Qa+6RArSNw2k9HnvR5kM9ZTfrwEzhq8foU1Mi6dkYuyi3Jwxe6DH8Z10/Fhv
-      NHCCTEnuL3rAwyFzEfG8IRDhbt565nR2AE/e4nWTMjzD49JVj94=
+      ieSHg0DNzZKuAK+9WHQmRnV9tM0AnDWyDMT7J7rZiyBgE32JTIVHHK2KdxUR
+      EqimS1HfL2jM5QpDzL1yvDq7IyejvTkiYvlw0dOasWSE0FKfzDvi5hnCPcQk
+      GRabGsOHqDXpfsJU7ahnS3PKo3GyXp0ip/ffsuXAhEMZg3kQv5E=
   - secure: |-
-      hpVFTlal13swoLJNLPGUfAfFCIqBEJ/rfM3Xfq6f0VdWsEvrncZGLwtQFRpr
-      G8gfPfobmJlTHu1n+wl82sHWvW9XgZLE57QIBLbP35eXC9igHGZXLjmmLELN
-      ZnBceMLVkohGJ4hwy1VNq7o3rmDu7P+aiDL9225Oi58JABMRpyI=
+      Gt2sUpj/v3Sl7QUzJF0jDk7ELLkuWLu6KiEZ/NX82uA9qRltdycpQnQaL/oC
+      htDUCMUKBzro/+8FrHPLmB0+ao/560RFvtXGC4HKocjQeRB10gwJDJgyxgmW
+      65q0CZd+r4ssMQisCJejP/0d/ofJoi9luBPN2wsfPwxzQ8CWmmE=
   - secure: |-
-      Y+eyEL21IUDIUkX/l466z2xv/nb8rKSabymLLkbVGDWVkxi6+ycK8yVwA2kk
-      7jWsmYoyASJLN8QnZ1bIOipHD0T/n/trUt2xFyi8lyepL3sbX5BED9w2BmEZ
-      5XqfCAi30GHVbwm2uMRftnDCquqS//RGyI8mUvsN+jQq6G0HU6Q=
+      FRQQpGv3gRCYr0DHaJa+xkZPQBw8E9ct18/yxMdHCSzVgDDG+tA/gnCJOt32
+      mB1jXYdt2nzSddKC3aev3wkiFXNkH9sRpjU+9WZxQUgQ1e691wjmlqSIqPIC
+      /JFK1Wvvzd0XSvsx93nTzWYEbbK1zVvWyJQQSmXlUuVn1bUGv1U=
   - secure: |-
-      WqAhz2np5guBbznxqy+Vlv7jHINQJmwNX18V2advsMeEyjT+6j8B3kxF6rAE
-      ZczlhtkditpVi2gtkCxxIKvPvnEgVFfo8MGSUcgdgG1c0khWB4wkz28Bjgsm
-      g3DqL4X0f1GPObW3IpkV/5qdjrJc4QxT+6tbJiPZOWUjtQcgHzA=
+      CdDI1S8JowDYixrphluT45hSmjJsGaFFG23tu/6dRa8T8BTWl41kruZjmELx
+      2e7FDKjX5EWeweDiAfhiL+eQC/o6sLZpU3PuBK7Aqxy9RoPU+RVv9CbkoQcP
+      mfoDMrIXaOcncnZ0TeUDyEpCUYg/O47wbvLLBGYx/gx+GhEbHKU=
   - secure: |-
-      OOBbUkHWWrCLFfpGMC2FfbwlAPYI7txdwyDyfi7HBbtBnJuqjImyH/gqLa0G
-      3gcgWzVMO+qKOFHDfsMavHuan6FyGr1qm/TVqffYThbHrr8OG7qi07m1DbW2
-      3Y10Jnp9wNnpTu6cRm9TKI0r5w3fElDSKr6Dhtsp2TDNULq5xP4=
+      P8sKd52/W/WX1u1r3+yzRspEv95ztscLAa3CaIFh/MTA54jJ1MlMmVEq9e4q
+      QCt2ZtJ+10h91Wu+Tr/qos+ah/9yseXpyO5vclmTg4LDqJw+6sJLu2YwK6wx
+      VuTypJ69xXba50Kv/pFzvsD2FWKEtgATziCt2iTTWk5hyRy+0Y8=
   - secure: |-
-      bhGT9nqMMkkzaNhKGKIUCID+BqgkJA14nkztXTMhF4hgSRZzo1oNjYc7xoNj
-      da1wbjLxJI3PI/63LZh8J3esMh4GjmUAADqwct6jI2U0PbtytvW/JzaU9fIx
-      uTPFBerF2JOj+6K56PrgS6wuuvPBZ4V3+1UpJRW3lbtZpeb05bc=
+      kU2KVAvNhbOpcW+G5e0So5vvNkgHIqUAW4Cg5UYA1y2DgSy5ncbc6NlU0nSe
+      dELHXYQ2Tc7+eKtPvjr8Ng2MrCpACAr7WL71W8ueBkP/iegO//ERB1qg7G1o
+      XdT4gIFxpbItc2DlViTw9X2pqPbSqzMvcAil2IiTj6OhOoD0rEw=
   - secure: |-
-      c0XCDjoqX6K7bPM5cB9+PQ1jRIZdfFAF5fIRpJCBa78IBCZOFj01rELvIKdB
-      aLlB+TLHGR/Ji/HZpveu1XJe+pOBqT1fzVUu28dFU/HWeZ6BPgjoZBWd57hF
-      84FM3/aMRea5XR63cwnLff/equTwYfa/D9fd/lAetfQfqRWXCUE=
+      M6y420FyY1Yp+IwxulC1Fi2dAxcf2ValclEWx0WLDRLixg/zeOhQaEMX5yLe
+      fk8CjMM/Rmc3bLaQetUVOmXxJCzonReC1CWwQ4HeaXrWv14dTKEEgkwTlrp/
+      PTYyVFPB2LY/wHRCWCug7WG0CvuxLi31q7sB9cJbGfzoBEGx2uQ=
   - secure: |-
-      cNu+iAaPNDqQ+pxYh5O2zol+9KdR62iMU8qC/APkdbbjSW/+wPvcBBmjxiJ+
-      hGWuqtvPN241wWOJJa23f9JrURhd10UkAzu/yjHAG1uA7S81kLrTke89gq/j
-      EoDK7/kH/UfVpX8YX29MEc1vriMB5J4nPtogfXlHUcIdlVkBD4E=
+      XX27Bo6Epa85zMkIEvfJBciEJGBZmG0g+Ohl2Px3xbaHUgXXlHnt1pJ1uSHY
+      2DIZAkXvQtAqY4gXZ58Aem9UEzMYyE7eSzbNyNYUSFfn2tU/quLNhsKe8o1d
+      AsZUVo9KHoi5a9xrUO7hGYZmdgVu4cx+ZPHV+8CzYYI7iTe+P28=
   - secure: |-
-      cjFG3m+DZFK4eDWLegZNmo4H/1n9Nwa1LnuVID5GFq6GBmYQU2NVUhfNWYq7
-      ZlNtnyHruNlKvXDu5bpe9YB/I9qlKepFCe6f5RAu+7gnRxy1hTjt5a85SLoQ
-      2FB/h5nqKQz92IwrwuuhQ9LpNpk84isEyZLTJzk8yNFAalCSjtg=
+      htPWIP10HlfdpvoECry3nGj2earC3B6u9+73E3bvRg2dWxuWBOSCmlTaoMYS
+      PSWTcy1euebMjgUwhIgH1cCwB7G4VvLKMx0XqFMhHJY0LBdJmuLpnVqRUsZ3
+      Tvgw2UIUWvdPdYgzAUwny5pfdvh7kLScwEvciDo7/Qclk+HKHbQ=
   - secure: |-
-      OEzPqkeu/lhxqQY0DNC3pVKSsniPvZ51N2eDMfLgvdSmKbHW/uvyCCdKVk51
-      HpBQp1d8cZXh3ggu5T+hRPMqk57w2E96uGRR75y6ACroVSZHsXmbQ5o3FnQ9
-      e3ZQTmNa5SGpHlqwRqRscimbZ7WCeuWE+zaZTuBMOYtujcdIIuY=
+      H8FQjL8AVsB7oG9r73+CrRaCqowaYeaGKL0b6RnMKLgWm9S/7IbEVWU4XOgZ
+      601S/iq2hKbYbNRThC3FGv7AEL/2zxB2r/U3MWp7QI3sUxJZtcpx6mb32Q0s
+      5mLmHGU3FCsLD1TJHj2ytSwm2hbu/A6raChIY6df+AxETnR6LTY=
   - secure: |-
-      gI7TvIcdZh+Hf2zFGOhn7BOKKhcKHht6wrniAgAzJ+8qETRWRtZHClShvkq4
-      9qG1vTBT4ctV5ZQYUvsnXeTQeWuwVDmcQfi4qyOxYl+5haxuxqpgg2hiWDwZ
-      ndclXclJywna6fk/tr/OQtrtz9fVc08v8KriacukWvopWEaLmfw=
+      gSLFm/F41L+Vb5cYs9BrmUEv+wi4wvym+2ywVa7J0bccNynGOiBcTkBOEHvM
+      IjR3lCtL0IBMRlePXKxJgV6h4bEtfBuf/tRjTVSwD04EfLDlEKufixUuLafV
+      oF1wniUmt5gWPlGYFnu5HkoNhwxfDH9EBswp1uJQS2Yh9hRZjMg=
   - secure: |-
-      Ntc4GU9gELsfcdpFhyIFV3Vw531JsaVMwK5Hdq4v4TddczKlg1tZVyBpyIwe
-      SwOhpt8sDotlLZ5idqHVpiafwk2CpN/lhSKM13y7pgzKaoVVk46IXwHgaNU8
-      DTEaAXMITfQZ6buv5akH/C3gwRYW0RFBoUjXhIfN+U1YqvCmrTE=
+      fnp6ONoUSKxwfxG6UjWyTwnRRoubb9HT/d0DlLncwJ4cKAoLzjmLst8VgNKw
+      r/wUD8JzOkKiG9QHfsmJsY5cAU9z4lDZ4jGE4ZRWFcM2xQv7Vb9Gp7EK4jvB
+      U215fU6SOkJiw3Ms3ZwmxuMZuZ72ov3NeltA+vS5PcQdYoID4nE=
   - secure: |-
-      JW7ZdyAhLYmIyWHsbAcZ5FNw3YiAe93SIYCO/EC+HACfUIotU9YIfSTCJ5EC
-      tMguhzvazxEHtgOhNlITPClZJ3jn+U76Bp4GoSOU+o+Kyus9v6jQl3L/6iY5
-      2F3fnfOTiVyE7t/nnyq2T8b/3Fo37mlTxyouAl7HAXqbxgtAFUw=
+      Xcy0cPsA4HroLoDZOF/R4guvpl64K+1vW7wZunPNmafifn40Fw+bEL9UCa+7
+      fAKntwGa4xZBKKtklDySujS2Il8HHAax8znY1EmwI7R3kXJu93irN3OwLoM9
+      ZxIvuxyMBU9wrjfUnNTa8/PKqTIu83jb/XgXzUCvLKQFYZwspAo=
   - secure: |-
-      IHyYpyWIhCKkI2aYhEWi8+IIff7myLhPEt7T4dUE8N42wcOYQ7x+sxaBWXSs
-      OhiyzHYRuL1CmVRis04W7mbjLRmKLMkVTWhL0IqoXxDp0T8srfZR9xoiIAMk
-      T5kXhw8NknKiviFgq677I+WbBGMWfMijEBbdt9yjM7tVURRAmQ0=
+      ijWUER50lZNdJwx5DPkx40T7AYlKjwAgAQ+DXhuikNcE5MLcrLLDWumlvqdo
+      +rMq5fWJqkNzdamMCxHjI5537JB1G18OHqkM5zz/FAvpkSG8IieqQS8F7YD0
+      x+YljUMrouciBiwh9blsPUwh8gJT22xtVOCBduTdHt7S2sby4sc=
   - secure: |-
-      UbWokZG0xwRiAuKjWPisUArD4yo5JAcPeJWUSxsrD3XPJ4HdlN73gCBi1/5d
-      IA/76CFw8xJ1C8Wn2V6sBygPSAT+n2B/aqU7KjgiYYhB0Cz7U+NHxQVTpeKQ
-      W61HSN/gAFR0r+cfSD2KT2PbRBFNmnuT6vxhiOo/+fTrg3MmB7M=
+      JZ51y/XBGAlNLkgF+xfZGc/QHdkHwXtfSKvCKXYX0wHS4YrH8PXVN6GzwUUu
+      fDwMuIJxw6GVObVoKGc22hjrji+UZUrCwBDjdbQux+xYAK5FEAbqocw76RWi
+      M3MfwjRI/t/HHcJiZiWm5yHCortqsDIUXrKHkRAsHqgUU4rqTa8=
   - secure: |-
-      dgJ72LXNRhsRWE75VE+iUlhyjzWkW6G8ES79V2mFpxjMqEWkJ10/tMRv+Fg5
-      G9ZTb0LoLxeFfLi6+5D0oh7Y9w5Y7w3+yhraL3jm2wGdpjdusUAcim47z+KI
-      uKmvY+PlTwI1UAb7Trw1nxEYwjTjc2i1imMacSeFfjN5If0faJw=
+      Jmgj65LRvukKRpp3I51oN6A0UilA+Hwb0uYIr74TiDFEonNEr1eHWlJvFBBV
+      /Zc0CPSm/w48FSNlUd6vuzQIt9HnW7l6k/zRqO10jz7zzbBYURx1zJxPDVAO
+      mT2/6N/Lzn2U5P26KKSE+uNBTBtKjNHHx0NixL1HmE5FVnzsRn8=
   - secure: |-
-      hae5+ctKuBGAmQ0PdQIzsuGlMGwd/siSUYLvKTXEtw7IyzNeNmGylBsvbSgi
-      H2xRJTVdDkaX1b8fyIC9ANed3WX5wJ+tKY5TwLOG3YP/y0eTwSkVulXJmpMp
-      Boj7/BexjTWTRhFfk2NRGj5QOz82Cwclev6UXkZF43AMybNsQ8U=
+      kRRksnVJHNTSZYm4xlXoUXn/7UjJPIDQoeVSRVBdUVneUelOqj8gsSerpG4O
+      YlUnkRzlQkKbqj6ORKubLWIEGPKkQqWew/6YWdlJmO7dpAlcoD7oz0RB8/ih
+      4Hy0m7P8+RoaoBfGiyJq2g3m6lKBzaJJfDFi2VUZJH+zijYfAkU=
   - secure: |-
-      TbONB5pgsjRboAnmm2v5gsRc47vY7zeOTLWmzeji3zOIBOb/t0B2xwdLAtZN
-      uOj/iCt9hdXSUoPY0n4cwiJNPXgcnlz/otJ4RQNyGAMaWEAg4Ciw4JVYQIZq
-      PSBz6daVlhoty07elK/QMPm5d4a0lTdZXg45oCz9MMPtILkJfaI=
+      XUomyPiFi7Jdr7eEsUUcR3eNlDiInR27OkFJpcgFlIWns8Rc+2YYGZDtNzaH
+      SfcdOG4HYcX6hTKrBgNaTlG/LUrW/Fl6MK7wMnm2KE+I2NOymbkOj3ur0WxP
+      W1krZ1xBhS7L5e+6udfnFwaurCp7UzyAeGGnaF2rnz3GpKQFXX0=
   - secure: |-
-      H2AelCtxz3p4HF3d5XCZv0EyqTZyEzIQ2tuqRth/vRN0lZcKp2D7z8I5fgCO
-      pQt/SM4PfoKzhfehR3Gk4X03FY+MaIBPUxyVR+aSUykyomU1TarwTW9Vvf+j
-      a640RanzViQQehQJ3rurlGkJrPBWHsWmp484tXkekCT3Lm8f4rA=
+      AiMTTP1qFmDpa8w3EFwNjucy3XTir3a5jMhwVhQoBpPfYHy8JrLCoZ545VGh
+      ufOKr5NmIRZK8vnoy0tc6MOpd7qdlR41wHHmsFOzVVJYS3J6jj6Sx9+zv35A
+      yHl03/89WUR+8SQwuh7bJBWhJnoXitVMMPQNB+FZJ/pxnkI9GTE=
+script: python example/manage.py test billing --settings=settings.travis
 install: pip install -r example/requirements.txt
+python: 
+- "2.7"

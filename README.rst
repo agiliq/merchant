@@ -4,8 +4,8 @@ Django-Merchant
 
 |TravisCI|_
 
-.. |TravisCI| image:: https://api.travis-ci.org/tuxcanfly/merchant.png?branch=master
-.. _TravisCI: https://travis-ci.org/tuxcanfly/merchant
+.. |TravisCI| image:: https://api.travis-ci.org/agiliq/merchant.png?branch=master
+.. _TravisCI: https://travis-ci.org/agiliq/merchant
 
 Django-Merchant is a django application that enables you to use
 multiple payment processors from a single API.
