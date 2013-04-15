@@ -1,4 +1,4 @@
-import re
+from xml.dom import minidom
 from urllib2 import urlparse
 
 from django.test import TestCase
@@ -24,9 +24,10 @@ class AmazonFPSTestCase(TestCase):
 
     def testLinkGen(self):
         tmpl = Template("{% load amazon_fps from amazon_fps_tags %}{% amazon_fps obj %}")
-        link = tmpl.render(Context({"obj": self.fps}))
+        html = tmpl.render(Context({"obj": self.fps}))
         # get the integration link url
-        url = re.search('href="(.*)">', link).groups()[0]
+        dom = minidom.parseString(html)
+        url = dom.getElementsByTagName('a')[0].attributes['href'].value
         parsed = urlparse.urlparse(url)
         query_dict = dict(urlparse.parse_qsl(parsed.query))
 

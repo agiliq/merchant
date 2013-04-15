@@ -1,5 +1,3 @@
-import re
-
 from xml.dom.minidom import Document, parseString
 
 from django.conf import settings
@@ -28,11 +26,12 @@ class GoogleCheckoutTestCase(TestCase):
         tmpl = Template("{% load google_checkout from google_checkout_tags %}{% google_checkout obj %}")
         form = tmpl.render(Context({"obj": self.gc}))
 
-        form_action_url = re.search('form action="(.*)" method="post"', form).groups()[0]
-        input_image_src = re.search('<input type="image" .* src="(.*)" height', form).groups()[0]
+        dom = parseString(form)
+        form_action_url = dom.getElementsByTagName('form')[0].attributes['action'].value
+        input_image_src = dom.getElementsByTagName('input')[2].attributes['src'].value
 
         expected_form_action_url = "https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%s" % settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']
-        expected_input_image_src = "http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%s&amp;w=180&amp;h=46&amp;style=white&amp;variant=text&amp;loc=en_US" % settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']
+        expected_input_image_src = "http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%s&w=180&h=46&style=white&variant=text&loc=en_US" % settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']
 
         self.assertEquals(form_action_url, expected_form_action_url)
         self.assertEquals(input_image_src, expected_input_image_src)
