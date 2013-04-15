@@ -28,7 +28,7 @@ THROTTLE_CONTROL_SECONDS = 60
 # 4556969412054203
 
 
-@skipIf(lambda: settings.MERCHANT_SETTINGS.get("paylane", None), "gateway not configured")
+@skipIf(not settings.MERCHANT_SETTINGS.get("paylane", None), "gateway not configured")
 class PaylaneTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("paylane")
