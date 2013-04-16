@@ -142,7 +142,7 @@ class BraintreePaymentsGatewayTestCase(TestCase):
         self.assertEquals(billing_address.postal_code, "110011")
         self.assertEquals(billing_address.street_address, "Street #1")
         self.assertEquals(billing_address.extended_address, "House #2")
-        self.assertEquals(billing_address.city, "Timbuktu")
+        self.assertEquals(billing_address.locality, "Timbuktu")
 
     def testUnstore(self):
         options = {
