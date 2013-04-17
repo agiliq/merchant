@@ -13,6 +13,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Dragonx <https://github.com/dragonx>
 * Daniel Sokolowski <https://github.com/danols>
 * Donald Stufft <https://github.com/dstufft>
+* Dmitry Molotkov <https://github.com/aldarund>
 * Greg McGuire <https://github.com/gmcguire>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
