@@ -7,17 +7,25 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Ashok Raavi <ashok.raavi@gmail.com>
 * Bradley Ayers <bradley.ayers@gmail.com>
 * Celso Pinto <https://github.com/cpinto>
+* Chenhouwu <https://github.com/chenhouwu>
 * Chen Zhe <https://github.com/fruitschen>
 * Chris Glass <https://github.com/chrisglass>
 * Dragonx <https://github.com/dragonx>
 * Daniel Sokolowski <https://github.com/danols>
+* Donald Stufft <https://github.com/dstufft>
+* Dmitry Molotkov <https://github.com/aldarund>
 * Greg McGuire <https://github.com/gmcguire>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
+* Ken Cochrane <https://github.com/kencochrane>
+* Konrad Rotkiewicz <https://github.com/krotkiewicz>
 * Markus Gattol <markus.gattol@sunoano.org>
+* Matt McClanahan <https://github.com/mattmcc>
 * Mikey Ryan <https://github.com/mikery>
 * nmonteiro <https://github.com/nmonteiro>
+* Patrick Altman < https://github.com/paltman>
 * Plaban Nayak <plaban.nayak@gmail.com>
 * Shabda Raaj <shabda@agiliq.com>
 * Si Feng <https://github.com/devfeng>
+* Steve Phillips <https://github.com/elimisteve>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>

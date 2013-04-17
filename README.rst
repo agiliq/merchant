@@ -2,6 +2,11 @@
 Django-Merchant
 ----------------
 
+|TravisCI|_
+
+.. |TravisCI| image:: https://api.travis-ci.org/agiliq/merchant.png?branch=master
+.. _TravisCI: https://travis-ci.org/agiliq/merchant
+
 Django-Merchant is a django application that enables you to use
 multiple payment processors from a single API.
 
@@ -15,7 +20,6 @@ Following gateways are supported:
 * Eway
 * Braintree Payments (Server to Server)
 * Stripe
-* Samurai from Fee Fighters
 * Paylane
 * WePay
 * Beanstream
@@ -30,9 +34,13 @@ Off-Site Processing
 * Amazon FPS
 * Braintree Payments (Transparent Redirect)
 * Stripe.js
-* Samurai
 * eWAY
 * Authorize.net Direct Post Method
+
+Other
+-----
+
+* Bitcoin
 
 Documentation
 --------------

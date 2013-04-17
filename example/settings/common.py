@@ -97,15 +97,10 @@ INSTALLED_APPS = (
     'app',
     'billing',
     'stripe',
-    'samurai'
+    'paypal.pro',
 )
 
 STATIC_URL = "http://merchant.agiliq.com/"
 STATIC_ROOT = os.path.join(os.path.dirname(__file__), "static")
 STATICFILES_FINDER = ("django.contrib.staticfiles.finders.FileSystemFinder",
                       "django.contrib.staticfiles.finders.AppDirectoriesFinder")
-
-try:
-    from localsettings import *
-except ImportError, e:
-    print e.message

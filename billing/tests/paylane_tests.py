@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # vim:tabstop=4:expandtab:sw=4:softtabstop=4
+from unittest import skipIf
+
 from django.test import TestCase
+from django.conf import settings
+
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa, CreditCard
 from billing import get_gateway
@@ -24,6 +28,7 @@ THROTTLE_CONTROL_SECONDS = 60
 # 4556969412054203
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("paylane", None), "gateway not configured")
 class PaylaneTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("paylane")

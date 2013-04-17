@@ -18,10 +18,9 @@ Usage
     MERCHANT_TEST_MODE = True
     MERCHANT_SETTINGS = {
         "eway": {
-            "CUSTOMER_ID": "???", # Only used for live transactions
+            "CUSTOMER_ID": "???",
             "USERNAME": "???",
             "PASSWORD": "???",
-            "TEST_CUSTOMER_ID": "???" # Used for testing
         }
     }
     

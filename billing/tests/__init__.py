@@ -27,12 +27,6 @@ except ImportError:
     pass
     
 try:
-    import samurai
-    from samurai_tests import *
-except ImportError:
-    pass
-
-try:
     import beanstream
     from beanstream_tests import *
 except ImportError:
@@ -40,6 +34,7 @@ except ImportError:
     
 from paylane_tests import *
 from chargebee_tests import *
+from bitcoin_tests import *
 
 if __name__ == "__main__":
     unittest.main()

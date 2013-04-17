@@ -2,7 +2,7 @@ from billing import Gateway, GatewayNotConfigured
 from billing.gateway import InvalidData
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
-    AmericanExpress, Discover
+    AmericanExpress, Discover, CreditCard
 from django.conf import settings
 import braintree
 
@@ -105,6 +105,25 @@ class BraintreePaymentsGateway(Gateway):
     def purchase(self, money, credit_card, options=None):
         if not options:
             options = {}
+        if isinstance(credit_card, CreditCard) and not self.validate_card(credit_card):
+             raise InvalidCard("Invalid Card")
+
+        request_hash = self._build_request_hash(options)
+        request_hash["amount"] = money
+
+        if options.get("merchant_account_id"):
+            request_hash["merchant_account_id"] = options.get("merchant_account_id")
+
+        if isinstance(credit_card, CreditCard):
+            request_hash["credit_card"] = {
+                "number": credit_card.number,
+                "expiration_date": self._cc_expiration_date(credit_card),
+                "cardholder_name": self._cc_cardholder_name(credit_card),
+                "cvv": credit_card.verification_value,
+            }
+        else:
+            request_hash["payment_method_token"] = credit_card
+
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
 
@@ -299,13 +318,13 @@ class BraintreePaymentsGateway(Gateway):
             request_hash.update({
                 "first_name": first_name,
                 "last_name": last_name,
-                "company": options.get("company", ""),
-                "street_address": options.get("address1", ""),
-                "extended_address": options.get("address2", ""),
-                "locality": options.get("city", ""),
-                "region": options.get("state", ""),
-                "postal_code": options.get("zip", ""),
-                "country_name": options.get("country", "")
+                "company":  options["billing_address"].get("company", ""),
+                "street_address":  options["billing_address"].get("address1", ""),
+                "extended_address":  options["billing_address"].get("address2", ""),
+                "locality":  options["billing_address"].get("city", ""),
+                "region":  options["billing_address"].get("state", ""),
+                "postal_code":  options["billing_address"].get("zip", ""),
+                "country_name":  options["billing_address"].get("country", "")
                 })
 
         card_hash = {

@@ -1,7 +1,11 @@
+from xml.dom import minidom
+from urllib2 import urlparse
+
 from django.test import TestCase
-from billing import get_integration
 from django.template import Template, Context
 from django.conf import settings
+
+from billing import get_integration
 
 
 class AmazonFPSTestCase(TestCase):
@@ -9,17 +13,27 @@ class AmazonFPSTestCase(TestCase):
 
     def setUp(self):
         self.fps = get_integration("amazon_fps")
-        fields = {
+        self.fields = {
             "callerReference": "100",
             "paymentReason": "Digital Download",
             "pipelineName": "SingleUse",
-            "transactionAmount": 30,
+            "transactionAmount": '30',
             "returnURL": "http://localhost/fps/fps-return-url/",
-            }
-        self.fps.add_fields(fields)
+        }
+        self.fps.add_fields(self.fields)
 
     def testLinkGen(self):
         tmpl = Template("{% load amazon_fps from amazon_fps_tags %}{% amazon_fps obj %}")
-        link = tmpl.render(Context({"obj": self.fps}))
-        pregen_link = """<a href="https://authorize.payments-sandbox.amazon.com/cobranded-ui/actions/start?callerKey=%(aws_access_key)s&callerReference=100&paymentReason=Digital%%20Download&pipelineName=SingleUse&returnURL=http%%3A%%2F%%2Flocalhost%%2Ffps%%2Ffps-return-url%%2F&signature=oSnkew7oCBPVk0IVZAjO87Ogsp4EO7jRlELaFwtqWzY%%3D&signatureMethod=HmacSHA256&signatureVersion=2&transactionAmount=30"><img src="http://g-ecx.images-amazon.com/images/G/01/cba/b/p3.gif" alt="Amazon Payments" /></a>""" % ({"aws_access_key": settings.MERCHANT_SETTINGS['amazon_fps']['AWS_ACCESS_KEY']})
-        self.assertEquals(pregen_link, link.strip())
+        html = tmpl.render(Context({"obj": self.fps}))
+        # get the integration link url
+        dom = minidom.parseString(html)
+        url = dom.getElementsByTagName('a')[0].attributes['href'].value
+        parsed = urlparse.urlparse(url)
+        query_dict = dict(urlparse.parse_qsl(parsed.query))
+
+        self.assertEquals(parsed.scheme, 'https')
+        self.assertEquals(parsed.netloc, 'authorize.payments-sandbox.amazon.com')
+        self.assertEquals(parsed.path, '/cobranded-ui/actions/start')
+
+        self.assertDictContainsSubset(self.fields, query_dict)
+        self.assertEquals(query_dict['callerKey'], settings.MERCHANT_SETTINGS['amazon_fps']['AWS_ACCESS_KEY'])

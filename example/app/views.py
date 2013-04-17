@@ -11,7 +11,7 @@ from billing.gateway import CardNotSupported
 from app.forms import CreditCardForm
 from app.urls import (authorize_net_obj, google_checkout_obj, world_pay_obj, pay_pal_obj,
                       amazon_fps_obj, fps_recur_obj, braintree_obj,
-                      stripe_obj, samurai_obj)
+                      stripe_obj)
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from billing.utils.paylane import PaylanePaymentCustomer, \
@@ -150,23 +150,6 @@ def stripe(request):
                                              'amount':amount,
                                              'response':response,
                                              'title':'Stripe Payment'})
-
-def samurai(request):
-    amount = 1
-    response= None
-    if request.method == 'POST':
-        form = CreditCardForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            credit_card = CreditCard(**data)
-            merchant = get_gateway("samurai")
-            response = merchant.purchase(amount,credit_card)
-    else:
-        form = CreditCardForm(initial={'number':'4111111111111111'})
-    return render(request, 'app/index.html',{'form': form,
-                                             'amount':amount,
-                                             'response':response,
-                                             'title':'Samurai'})
 
 
 def paylane(request):
@@ -385,11 +368,6 @@ def offsite_stripe(request):
                      "status": status}
     return render(request, "app/stripe.html", template_vars)
 
-def offsite_samurai(request):
-    template_vars = {'title': 'Samurai Integration',
-                     "samurai_obj": samurai_obj}
-    return render(request, "app/samurai.html", template_vars)
-
 
 def offsite_eway(request):
     return_url = request.build_absolute_uri(reverse(offsite_eway_done))
@@ -409,3 +387,33 @@ def offsite_eway_done(request):
     result = eway_obj.check_transaction()
 
     return render(request, "app/eway_done.html", {"result": result}) 
+
+
+def bitcoin(request):
+    amount = 0.01
+    bitcoin_obj = get_gateway("bitcoin")
+    address = request.session.get("bitcoin_address", None)
+    if not address:
+        address = bitcoin_obj.get_new_address()
+        request.session["bitcoin_address"] = address
+    return render(request, "app/bitcoin.html", {
+        "title": "Bitcoin",
+        "amount": amount,
+        "address": address
+    })
+
+def bitcoin_done(request):
+    amount = 0.01
+    bitcoin_obj = get_gateway("bitcoin")
+    address = request.session.get("bitcoin_address", None)
+    if not address:
+        return HttpResponseRedirect(reverse("app_bitcoin"))
+    result = bitcoin_obj.purchase(amount, address)
+    if result['status'] == 'SUCCESS':
+        del request.session["bitcoin_address"]
+    return render(request, "app/bitcoin_done.html", {
+        "title": "Bitcoin",
+        "amount": amount,
+        "address": address,
+        "result": result
+    })

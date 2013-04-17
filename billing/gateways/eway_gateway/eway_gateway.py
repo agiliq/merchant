@@ -132,7 +132,6 @@ class EwayGateway(Gateway):
             return False
     
         return direct_payment_details
-        
 
     @property
     def service_url(self):

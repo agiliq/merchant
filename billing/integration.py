@@ -1,6 +1,6 @@
 from django.utils.importlib import import_module
 from django.conf import settings
-from django.conf.urls.defaults import patterns
+from django.conf.urls import patterns
 
 
 class IntegrationModuleNotFound(Exception):

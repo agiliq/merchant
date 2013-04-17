@@ -2,6 +2,23 @@
 Changes
 ========
 
+0.09
+----
+
+* Removed Samurai gateway and integration
+
+0.08
+-----
+
+* Added bitcoin backend
+* Bugfixes to eWay, paypal integration and authorize.net
+* Google Checkout shipping, tax rate and private data support
+* Changes to Amazon FPS to work with latest boto. Addition of new fields to
+  the FPS response model. A backwards incompatible change
+* Made merchant django v1.5 compatible
+* Fixes in the chargebee gateway broken by changes in the 'requests' api
+* Changes to the example to prevent empty forms from raising a Server Error
+
 0.07
 -----
 
