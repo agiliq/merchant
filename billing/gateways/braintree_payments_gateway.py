@@ -318,13 +318,13 @@ class BraintreePaymentsGateway(Gateway):
             request_hash.update({
                 "first_name": first_name,
                 "last_name": last_name,
-                "company": options.get("company", ""),
-                "street_address": options.get("address1", ""),
-                "extended_address": options.get("address2", ""),
-                "locality": options.get("city", ""),
-                "region": options.get("state", ""),
-                "postal_code": options.get("zip", ""),
-                "country_name": options.get("country", "")
+                "company":  options["billing_address"].get("company", ""),
+                "street_address":  options["billing_address"].get("address1", ""),
+                "extended_address":  options["billing_address"].get("address2", ""),
+                "locality":  options["billing_address"].get("city", ""),
+                "region":  options["billing_address"].get("state", ""),
+                "postal_code":  options["billing_address"].get("zip", ""),
+                "country_name":  options["billing_address"].get("country", "")
                 })
 
         card_hash = {
