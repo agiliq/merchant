@@ -1,10 +1,10 @@
 import requests
-
 from lxml import etree
 from xml.dom.minidom import parseString
+from suds.client import Client, WebFault
 
 from billing.utils.xml_parser import nodeToDic
-from suds.client import Client, WebFault
+
 
 # Token Payments urls( Web Service ) : http://www.eway.com.au/developers/api/token
 HOSTED_TEST_URL = "https://www.eway.com.au/gateway/ManagedPaymentService/test/managedCreditCardPayment.asmx?WSDL"
@@ -19,6 +19,7 @@ DIRECT_PAYMENT_TEST_URL = "https://www.eway.com.au/gateway_cvn/xmltest/testpage.
 DIRECT_PAYMENT_LIVE_URL = "https://www.eway.com.au/gateway_cvn/xmlpayment.asp"
 
 
+
 class DirectPaymentClient(object):
     """
         Wrapper for eway payment gateway's Direct Payment:
@@ -28,64 +29,11 @@ class DirectPaymentClient(object):
     def __init__(self, gateway_url=None):
         self.gateway_url = gateway_url
         
+        
     def process_direct_payment(self, direct_payment_details=None, **kwargs):
         '''
-            Input format : http://www.eway.com.au/developers/api/direct-payments#tab-1
-                {
-                    'ewayCVN': 123,
-                    'ewayCardExpiryMonth': '03',
-                    'ewayCardExpiryYear': '17',
-                    'ewayCardHoldersName': 'TEST CARD',
-                    'ewayCardNumber': 4444333322221111L,
-                    'ewayCustomerAddress': '#43, abc',
-                    'ewayCustomerEmail': 'test@email.com',
-                    'ewayCustomerFirstName': 'test',
-                    'ewayCustomerID': 87654321,
-                    'ewayCustomerInvoiceDescription': 'Direct Payment',
-                    'ewayCustomerInvoiceRef': 'RE423',
-                    'ewayCustomerLastName': 'user',
-                    'ewayCustomerPostcode': 560041,
-                    'ewayOption1': '',
-                    'ewayOption2': '',
-                    'ewayOption3': '',
-                    'ewayTotalAmount': 10,
-                    'ewayTrxnNumber': 987654321
-                 }
-
-            
-            Output format :
-                SUCCESS:
-                {
-                   u'ewayResponse': 
-                   {
-                       u'ewayAuthCode': u'123456',
-                       u'ewayReturnAmount': u'10',
-                       u'ewayTrxnError': u'10,Approved For Partial Amount(Test CVN Gateway)',
-                       u'ewayTrxnNumber': u'20391',
-                       u'ewayTrxnOption1': '',
-                       u'ewayTrxnOption2': '',
-                       u'ewayTrxnOption3': '',
-                       u'ewayTrxnReference': u'987654321',
-                       u'ewayTrxnStatus': u'True'
-                   }
-               }
-               
-               ERROR:
-               {
-                   u'ewayResponse': 
-                   {
-                        u'ewayTrxnReference': '', 
-                        u'ewayReturnAmount': u'100', 
-                        u'ewayTrxnOption1': '', 
-                        u'ewayTrxnOption2': '', 
-                        u'ewayTrxnOption3': '', 
-                        u'ewayTrxnStatus': u'False', 
-                        u'ewayAuthCode': '', 
-                        u'ewayTrxnError': u'Invalid Expiry Date',
-                        u'ewayTrxnNumber': ''
-                  }
-            }
-
+            Eway Direct Payment API Url : http://www.eway.com.au/developers/api/direct-payments#tab-1
+            Input and Output format: https://gist.github.com/2552fcaa2799045a7884
         '''
         if direct_payment_details:
             # Create XML to send
@@ -107,15 +55,16 @@ class DirectPaymentClient(object):
 
 class RebillEwayClient(object):
     """
-    Wrapper for eway payment gateway's managed and rebill webservices
-
-    To create a empty object from the webservice types, call self.client.factory.create('type_name')
-
-    Useful types are
-        CustomerDetails: rebill customer
-        RebillEventDetails: rebill event
-        CreditCard: hosted customer
+        Wrapper for eway payment gateway's managed and rebill webservices
+    
+        To create a empty object from the webservice types, call self.client.factory.create('type_name')
+    
+        Useful types are
+            CustomerDetails: rebill customer
+            RebillEventDetails: rebill event
+            CreditCard: hosted customer
     """
+    
     def __init__(self, customer_id=None, username=None, password=None, url=None):
         self.gateway_url = url
         self.customer_id = customer_id
@@ -124,11 +73,12 @@ class RebillEwayClient(object):
         self.client = Client(self.gateway_url)
         self.set_eway_header()
 
+
     def set_eway_header(self):
         """
-        creates eway header containing login credentials
-
-        required for all api calls
+            creates eway header containing login credentials
+    
+            required for all api calls
         """
         eway_header = self.client.factory.create("eWAYHeader")
         eway_header.eWAYCustomerID = self.customer_id
@@ -136,15 +86,16 @@ class RebillEwayClient(object):
         eway_header.Password = self.password
         self.client.set_options(soapheaders=eway_header)
 
+
     def create_rebill_customer(self, rebill_customer=None, **kwargs):
         """
-        eWay Urls : http://www.eway.com.au/developers/api/recurring
-        Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
-        
-        creates rebill customer with CustomerDetails type from the webservice
-
-        also accepts keyword arguments if CustomerDetails object is not passed
-        return CustomerDetails.RebillCustomerID and CustomerDetails.Result if successfull
+            eWay Urls : http://www.eway.com.au/developers/api/recurring
+            Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
+            
+            creates rebill customer with CustomerDetails type from the webservice
+    
+            also accepts keyword arguments if CustomerDetails object is not passed
+            return CustomerDetails.RebillCustomerID and CustomerDetails.Result if successful
         """
         if rebill_customer:
             response = self.client.service.CreateRebillCustomer(
@@ -170,25 +121,28 @@ class RebillEwayClient(object):
         else:
             return self.client.service.CreateRebillCustomer(**kwargs)
 
+
     def update_rebill_customer(self, **kwargs):
         """
-        same as create, takes CustomerDetails.RebillCustomerID
+            same as create, takes CustomerDetails.RebillCustomerID
         """
         return self.client.service.UpdateRebillCustomer(**kwargs)
 
+
     def delete_rebill_customer(self, rebill_customer_id):
         """
-        deletes a rebill customer based on id
+            deletes a rebill customer based on id
         """
         return self.client.service.DeleteRebillCustomer(rebill_customer_id)
 
+
     def create_rebill_event(self, rebill_event=None, **kwargs):
         """
-        eWay Urls : http://www.eway.com.au/developers/api/recurring
-        Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
-            
-        creates a rebill event based on RebillEventDetails object
-        returns RebillEventDetails.RebillCustomerID and RebillEventDetails.RebillID if successful
+            eWay Urls : http://www.eway.com.au/developers/api/recurring
+            Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
+                
+            creates a rebill event based on RebillEventDetails object
+            returns RebillEventDetails.RebillCustomerID and RebillEventDetails.RebillID if successful
         """
         if rebill_event:
             return self.client.service.CreateRebillEvent(
@@ -210,33 +164,39 @@ class RebillEwayClient(object):
         else:
             return self.client.service.CreateRebillEvent(**kwargs)
 
+
     def delete_rebill_event(self, rebill_customer_id=None, rebill_event_id=None, **kwargs):
         """
-        eWay Urls : http://www.eway.com.au/developers/api/recurring
-        Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
-            
-        Deletes a rebill event based on RebillEventDetails object
-        returns Result as Successful if successful
+            eWay Urls : http://www.eway.com.au/developers/api/recurring
+            Doc       : http://www.eway.com.au/docs/api-documentation/rebill-web-service.pdf?sfvrsn=2
+                
+            Deletes a rebill event based on RebillEventDetails object
+            returns Result as Successful if successful
         """
         if rebill_customer_id and rebill_event_id:
             return self.client.service.DeleteRebillEvent(rebill_customer_id, rebill_event_id)
         else:
             return self.client.service.DeleteRebillEvent(**kwargs)
 
+
     def update_rebill_event(self, **kwargs):
         """
-        same as create, takes RebillEventDetails.RebillCustomerID and RebillEventDetails.RebillID
+            same as create, takes RebillEventDetails.RebillCustomerID and RebillEventDetails.RebillID
         """
         return self.client.service.CreateRebillEvent(**kwargs)
+
 
     def query_next_transaction(self, RebillCustomerID, RebillID):
         return self.client.service.QueryNextTransaction(RebillCustomerID, RebillID)
 
+
     def query_rebill_customer(self, RebillCustomerID):
         return self.client.service.QueryRebillCustomer(RebillCustomerID)
 
+
     def query_rebill_event(self, RebillCustomerID, RebillID):
         return self.client.service.QueryRebillEvent(RebillCustomerID, RebillID)
+
 
     def query_transactions(self, RebillCustomerID, RebillID, startDate=None, endDate=None, status=None):
         try:
@@ -244,14 +204,15 @@ class RebillEwayClient(object):
         except WebFault as wf:
             return wf
 
+
     def create_hosted_customer(self, hosted_customer=None, **kwargs):
         """
-        eWay Urls : http://www.eway.com.au/developers/api/token
-        Doc       : http://www.eway.com.au/docs/api-documentation/token-payments-field-description.pdf?sfvrsn=2
-        
-        creates hosted customer based on CreditCard type details or kwargs
-
-        returns id of newly created customer (112233445566 in test mode)
+            eWay Urls : http://www.eway.com.au/developers/api/token
+            Doc       : http://www.eway.com.au/docs/api-documentation/token-payments-field-description.pdf?sfvrsn=2
+            
+            creates hosted customer based on CreditCard type details or kwargs
+    
+            returns id of newly created customer (112233445566 in test mode)
         """
         try:
             if hosted_customer:
@@ -284,69 +245,45 @@ class RebillEwayClient(object):
             print wf
             return wf
 
+
     def update_hosted_customer(self, **kwargs):
         """
-        Update hosted customer based on kwargs
-
-        returns True or False
+            Update hosted customer based on kwargs
+    
+            returns True or False
         """
         try:
             return self.client.service.UpdateCustomer(**kwargs)
         except WebFault as wf:
             return wf
 
+
     def process_payment(self, managedCustomerID, amount, invoiceReference, invoiceDescription):
         """
-        makes a transaction based on customer id and amount
-
-        returns CCPaymentResponse type object with ewayTrxnStatus, ewayTrxnNumber, ewayAuthCode
+            makes a transaction based on customer id and amount
+    
+            returns CCPaymentResponse type object with ewayTrxnStatus, ewayTrxnNumber, ewayAuthCode
         """
         try:
             return self.client.service.ProcessPayment(managedCustomerID, amount, invoiceReference, invoiceDescription)
         except WebFault as wf:
             return wf
 
+
     def query_customer(self, managedCustomerID):
         return self.client.service.QueryCustomer(managedCustomerID)
 
+
     def query_customer_by_reference(self, CustomerReference):
         """
-        returns customer details based on reference
-
-        not working with test data
+            returns customer details based on reference
+    
+            not working with test data
         """
         return self.client.service.QueryCustomerByReference(CustomerReference)
+
 
     def query_payment(self, managedCustomerID):
         return self.client.service.QueryPayment(managedCustomerID)
         
         
-def main():
-    '''
-        # Create recurring payment
-    '''
-    dpObj = DirectPaymentClient(DIRECT_PAYMENT_TEST_URL)
-    direct_payment_dict = {}
-    direct_payment_dict['ewayCustomerID'] = 87654321
-    direct_payment_dict['ewayTotalAmount'] = 10
-    direct_payment_dict['ewayCustomerFirstName'] = 'test'
-    direct_payment_dict['ewayCustomerLastName'] = 'user'
-    direct_payment_dict['ewayCustomerEmail'] = 'test@email.com'
-    direct_payment_dict['ewayCustomerAddress'] = '#43, abc'
-    direct_payment_dict['ewayCustomerPostcode'] = 560041
-    direct_payment_dict['ewayCustomerInvoiceDescription'] = 'Direct Payment' 
-    direct_payment_dict['ewayCustomerInvoiceRef'] = 'RE423'
-    direct_payment_dict['ewayCardHoldersName'] = 'TEST CARD' 
-    direct_payment_dict['ewayCardNumber'] = 4444333322221111 
-    direct_payment_dict['ewayCardExpiryMonth'] = '03'
-    direct_payment_dict['ewayCardExpiryYear'] = '17'
-    direct_payment_dict['ewayTrxnNumber'] = 987654321
-    direct_payment_dict['ewayOption1'] = ''
-    direct_payment_dict['ewayOption2'] = ''
-    direct_payment_dict['ewayOption3'] = ''
-    direct_payment_dict['ewayCVN'] = 123
-    #print direct_payment_dict
-    return dpObj.process_direct_payment(direct_payment_dict)
-    
-if __name__ == '__main__':
-    main()

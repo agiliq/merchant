@@ -1,10 +1,13 @@
-from django.conf import settings
 from billing import CreditCard
-from eway_api.client import RebillEwayClient, DirectPaymentClient
 from billing import Gateway, GatewayNotConfigured
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import Visa, MasterCard, DinersClub, JCB, AmericanExpress, InvalidCard
+
+from eway_api.client import RebillEwayClient, DirectPaymentClient
 from eway_api.client import REBILL_TEST_URL, REBILL_LIVE_URL, HOSTED_TEST_URL, HOSTED_LIVE_URL, DIRECT_PAYMENT_TEST_URL, DIRECT_PAYMENT_LIVE_URL
+
+from django.conf import settings
+
 
 
 class EwayGateway(Gateway):
@@ -13,6 +16,7 @@ class EwayGateway(Gateway):
     supported_cardtypes = [Visa, MasterCard, AmericanExpress, DinersClub, JCB]
     homepage_url = "https://eway.com.au/"
     display_name = "eWay"
+
 
     def __init__(self):
         self.test_mode = getattr(settings, 'MERCHANT_TEST_MODE', True)
@@ -37,7 +41,9 @@ class EwayGateway(Gateway):
         
 
     def add_creditcard(self, hosted_customer, credit_card):
-        """add credit card details to the request parameters"""
+        """
+            add credit card details to the request parameters
+        """
         hosted_customer.CCNumber = credit_card.number
         hosted_customer.CCNameOnCard = credit_card.name
         hosted_customer.CCExpiryMonth = '%02d' % (credit_card.month)
@@ -45,8 +51,11 @@ class EwayGateway(Gateway):
         hosted_customer.FirstName = credit_card.first_name
         hosted_customer.LastName = credit_card.last_name
 
+
     def add_address(self, hosted_customer, options=None):
-        """add address details to the request parameters"""
+        """
+            add address details to the request parameters
+        """
         if not options:
             options = {}
         address = options.get("billing_address", {})
@@ -66,8 +75,11 @@ class EwayGateway(Gateway):
         hosted_customer.Comments = address.get("comments")
         hosted_customer.URL = address.get("url")
         
+        
     def add_customer_details(self, credit_card, customer_detail, options=None):
-        """add customer details to the request parameters"""
+        """
+            add customer details to the request parameters
+        """
         if not options:
             options = {}
         customer = options.get("customer_details", {})
@@ -91,7 +103,9 @@ class EwayGateway(Gateway):
         
         
     def add_rebill_details(self, rebill_detail, rebile_customer_id, credit_card, rebill_profile):
-        """add customer details to the request parameters"""
+        """
+            add customer details to the request parameters
+        """
         rebill_detail.RebillCustomerID = rebile_customer_id
         rebill_detail.RebillInvRef = rebill_profile.get("rebill_invRef")
         rebill_detail.RebillInvDesc = rebill_profile.get("rebill_invDesc")
@@ -106,6 +120,7 @@ class EwayGateway(Gateway):
         rebill_detail.RebillInterval = rebill_profile.get("rebill_interval")
         rebill_detail.RebillIntervalType = rebill_profile.get("rebill_intervalType")
         rebill_detail.RebillEndDate = rebill_profile.get("rebill_endDate")
+
 
     def add_direct_payment_details(self, credit_card, customer_details, payment_details):
         direct_payment_details = {}
@@ -133,15 +148,19 @@ class EwayGateway(Gateway):
     
         return direct_payment_details
 
+
     @property
     def service_url(self):
         if self.test_mode:
             return HOSTED_TEST_URL
         return HOSTED_LIVE_URL
 
+
     def purchase(self, money, credit_card, options=None):
-        """Using Eway payment gateway , charge the given
-        credit card for specified money"""
+        """
+            Using Eway payment gateway , charge the given
+            credit card for specified money
+        """
         if not options:
             options = {}
         if not self.validate_card(credit_card):
@@ -159,9 +178,9 @@ class EwayGateway(Gateway):
         customer_id = client.create_hosted_customer(hosted_customer)
 
         pymt_response = client.process_payment(customer_id,
-                                                    money,
-                                                    options.get("invoice", 'test'),
-                                                    options.get("description", 'test'))
+                                                money,
+                                                options.get("invoice", 'test'),
+                                                options.get("description", 'test'))
 
         if not hasattr(pymt_response, "ewayTrxnStatus"):
             transaction_was_unsuccessful.send(sender=self,
@@ -180,17 +199,22 @@ class EwayGateway(Gateway):
                                         response=pymt_response)
         return {"status": "SUCCESS", "response": pymt_response}
 
+
     def authorize(self, money, credit_card, options=None):
         raise NotImplementedError
+
 
     def capture(self, money, authorization, options=None):
         raise NotImplementedError
 
+
     def void(self, identification, options=None):
         raise NotImplementedError
 
+
     def credit(self, money, identification, options=None):
         raise NotImplementedError
+
 
     def direct_payment(self, credit_card_details, options=None):
         '''
@@ -330,6 +354,7 @@ class EwayGateway(Gateway):
         
         return {"status": "SUCCESS", "response": rebill_event_response_list} 
 
+
     def recurring_cancel(self, rebill_customer_id, rebill_id):
         """
             Recurring Payment Cancelation (http://www.eway.com.au/developers/api/recurring)
@@ -365,135 +390,10 @@ class EwayGateway(Gateway):
                                         response=delete_rebill_response)
         return {"status": "SUCCESS", "response": delete_rebill_response} 
 
+
     def store(self, creditcard, options=None):
         raise NotImplementedError
 
+
     def unstore(self, identification, options=None):
         raise NotImplementedError
-    
-    
-
-def main():
-#    '''
-#        # Create recurring payment
-#    '''
-#    merchant = get_gateway("eway")
-#    
-#    data = {'number':'4444333322221111',
-#           'verification_value': '000',
-#           'month': 7,
-#           'year': 2012}
-#    credit_card = CreditCard(**data)
-#    print merchant.validate_card(credit_card)
-    ewObj = EwayGateway()
-    # First Parameter: credit_card_details
-    credit_card_details = {
-                            'first_name': 'test fname', 
-                            'last_name': 'test lname', 
-                            'verification_value': '123', 
-                            'number': '4444333322221111', 
-                            'month': '7', 
-                            'card_type': 'visa', 
-                            'year': '2017'
-                         }
-     
-     
-    # Second Parameter: options
-    options = {
-      "customer_details" : {
-            "customer_fname" : "TEST",
-            "customer_lname" : "USER",
-            "customer_address" : "#43, abc",
-            "customer_email" : "abc@test.Com",
-            "customer_postcode" : 560041,
-        },
-      "payment_details" : {
-            "amount" : 100,  # In cents
-            "transaction_number" : 3234,
-            "inv_ref" : 'REF1234',
-                    "inv_desc" : "Please Ship ASASP",
-            }
-    }
-    
-    print ewObj.direct_payment(credit_card_details, options)
-
-    
-#    billing_address = {'salutation': 'Mr.',
-#                               'address1': 'test',
-#                               'address2': ' street',
-#                               'city': 'Sydney',
-#                               'state': 'NSW',
-#                               'company': 'Test Company',
-#                               'zip': '2000',
-#                               'country': 'au',
-#                               'email': 'test@example.com',
-#                               'fax': '0267720000',
-#                               'phone': '0267720000',
-#                               'mobile': '0404085992',
-#                               'customer_ref': 'REF100',
-#                               'job_desc': 'test',
-#                               'comments': 'any',
-#                               'url': 'http://www.google.com.au',
-#                               }
-#    response = merchant.purchase(100, credit_card, options={'billing_address': billing_address})
-#    print response
-#    options = {}
-#    options["customer_details"] = {}
-#    options["customer_details"]["customer_ref"] = 'REF1234'
-#    options["customer_details"]["customer_salutation"] = "Mr./Ms."
-#    options["customer_details"]["customer_company"] = ""
-#    options["customer_details"]["customer_job_desc"] = ""
-#    options["customer_details"]["customer_email"] = "test+eway@gmail.Com"
-#    options["customer_details"]["customer_address1"] = ""
-#    options["customer_details"]["customer_address2"] = ""
-#    options["customer_details"]["customer_city"] = ""
-#    options["customer_details"]["customer_state"] = ""
-#    options["customer_details"]["customer_zip"] = ""
-#    options["customer_details"]["customer_country"] = ""
-#    options["customer_details"]["customer_phone1"] = "0297979797"
-#    options["customer_details"]["customer_phone2"] = ""
-#    options["customer_details"]["customer_fax"] = ""
-#    options["customer_details"]["customer_url"] = "http://www.eway.Com.au"
-#    options["customer_details"]["customer_comments"]= "Please Ship ASASP"
-#    options["customer_rebill_details"] = []
-#    rebill_details = {}
-#    rebill_details["rebill_invRef"] = 'REF12345'
-#    rebill_details["rebill_invDesc"] = "Monthly Recurring payment + Setup 299$"
-#    rebill_details["rebill_initAmt"] = "29900"   # 299$
-#    rebill_details["rebill_initDate"] = "04/01/2013"
-#    rebill_details["rebill_recurAmt"] = "1000"   # 10$
-#    rebill_details["rebill_startDate"] = "04/01/2013"
-#    rebill_details["rebill_interval"] = "1"
-#    rebill_details["rebill_intervalType"] = "3"
-#    rebill_details["rebill_endDate"] = "03/04/2013"
-#    options["customer_rebill_details"].append(rebill_details)
-#    rebill_details = {}
-#    rebill_details["rebill_invRef"] = 'REF12345'
-#    rebill_details["rebill_invDesc"] = "Monthly Recurring payment 10$"
-#    rebill_details["rebill_initAmt"] = "0"
-#    rebill_details["rebill_initDate"] = "04/04/2013"
-#    rebill_details["rebill_recurAmt"] = "1000"
-#    rebill_details["rebill_startDate"] = "04/04/2013"
-#    rebill_details["rebill_interval"] = "1"
-#    rebill_details["rebill_intervalType"] = "3"
-#    rebill_details["rebill_endDate"] = "03/04/2099"
-#    options["customer_rebill_details"].append(rebill_details)
-#
-#    credit_card_data = {'first_name': 'testfname', 
-#                        'last_name': 'testlname', 
-#                        'verification_value': '123', 
-#                        'number': '5105105105105100', 
-#                        'month': '7', 
-#                        'card_type': 'MasterCard', 
-#                        'year': '2017'}
-#    credit_card = CreditCard(**credit_card_data)
-#    eWayGatewayObj = EwayGateway()
-#    create_rebill_response = eWayGatewayObj.recurring(credit_card, options)
-    '''
-        # Cancel recurring payment
-    '''
-#    rebill_details = create_rebill_response['response']
-#    print eWayGatewayObj.recurring_cancel(rebill_details.RebillCustomerID, rebill_details.RebillID)
-        
-if __name__ == '__main__':
-    main()
