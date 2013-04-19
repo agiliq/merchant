@@ -116,28 +116,24 @@ class EwayGateway(Gateway):
 
     def add_direct_payment_details(self, credit_card, customer_details, payment_details):
         direct_payment_details = {}
-        try:
-            direct_payment_details['ewayCustomerID'] = self.customer_id
-            direct_payment_details['ewayCustomerFirstName'] = customer_details.get('customer_fname', '')
-            direct_payment_details['ewayCustomerLastName'] = customer_details.get('customer_lname', '')
-            direct_payment_details['ewayCustomerAddress'] = customer_details.get('customer_address', '')
-            direct_payment_details['ewayCustomerEmail'] = customer_details.get('customer_email', '')
-            direct_payment_details['ewayCustomerPostcode'] = customer_details.get('customer_postcode', None)
-            direct_payment_details['ewayCardNumber'] = credit_card.number
-            direct_payment_details['ewayCardHoldersName'] = credit_card.name
-            direct_payment_details['ewayCardExpiryMonth'] = '%02d' % (credit_card.month)
-            direct_payment_details['ewayCardExpiryYear'] = str(credit_card.year)[-2:]
-            direct_payment_details['ewayCVN'] = credit_card.verification_value
-            direct_payment_details['ewayOption1'] = '',
-            direct_payment_details['ewayOption2'] = '',
-            direct_payment_details['ewayOption3'] = '',
-            direct_payment_details['ewayTrxnNumber'] = payment_details.get('transaction_number', '')
-            direct_payment_details['ewayTotalAmount'] = payment_details['amount']
-            direct_payment_details['ewayCustomerInvoiceRef'] = payment_details.get('inv_ref', '')
-            direct_payment_details['ewayCustomerInvoiceDescription'] = payment_details.get('inv_desc', '')
-        except:
-            return False
-
+        direct_payment_details['ewayCustomerID'] = self.customer_id
+        direct_payment_details['ewayCustomerFirstName'] = customer_details.get('customer_fname', '')
+        direct_payment_details['ewayCustomerLastName'] = customer_details.get('customer_lname', '')
+        direct_payment_details['ewayCustomerAddress'] = customer_details.get('customer_address', '')
+        direct_payment_details['ewayCustomerEmail'] = customer_details.get('customer_email', '')
+        direct_payment_details['ewayCustomerPostcode'] = customer_details.get('customer_postcode', None)
+        direct_payment_details['ewayCardNumber'] = credit_card.number
+        direct_payment_details['ewayCardHoldersName'] = credit_card.name
+        direct_payment_details['ewayCardExpiryMonth'] = '%02d' % (credit_card.month)
+        direct_payment_details['ewayCardExpiryYear'] = str(credit_card.year)[-2:]
+        direct_payment_details['ewayCVN'] = credit_card.verification_value
+        direct_payment_details['ewayOption1'] = '',
+        direct_payment_details['ewayOption2'] = '',
+        direct_payment_details['ewayOption3'] = '',
+        direct_payment_details['ewayTrxnNumber'] = payment_details.get('transaction_number', '')
+        direct_payment_details['ewayTotalAmount'] = payment_details['amount']
+        direct_payment_details['ewayCustomerInvoiceRef'] = payment_details.get('inv_ref', '')
+        direct_payment_details['ewayCustomerInvoiceDescription'] = payment_details.get('inv_desc', '')
         return direct_payment_details
 
     @property
@@ -239,8 +235,6 @@ class EwayGateway(Gateway):
                 # Create direct payment details
             '''
             direct_payment_details = self.add_direct_payment_details(credit_card, customer_details, payment_details)
-            if not direct_payment_details:
-                raise
 
             '''
                 Process Direct Payment.
@@ -252,12 +246,13 @@ class EwayGateway(Gateway):
                 Return value based on eWay Response
             '''
             eway_response = response.get('ewayResponse', None)
-            if eway_response and 'true' == eway_response.get('ewayTrxnStatus', 'false').lower():
+            if eway_response and eway_response.get('ewayTrxnStatus', 'false').lower() == 'true':
                 status = "SUCCESS"
             else:
                 status = "FAILURE"
 
-        except:
+        except Exception as e:
+            error_response['exception'] = e
             return {"status": "FAILURE", "response": error_response}
 
         return {"status": status, "response": response}
@@ -336,7 +331,8 @@ class EwayGateway(Gateway):
             transaction_was_successful.send(sender=self,
                                             type="recurring",
                                             response=rebill_event_response_list)
-        except:
+        except Exception as e:
+            error_response['exception'] = e
             return {"status": "Failure", "response": error_response}
 
         return {"status": "SUCCESS", "response": rebill_event_response_list}
