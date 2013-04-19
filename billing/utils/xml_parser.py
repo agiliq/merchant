@@ -1,6 +1,4 @@
-from xml.dom.minidom import parse, parseString
-from lxml import etree
-import os
+from xml.dom.minidom import parseString
 
 
 class NotTextNodeError:
@@ -26,14 +24,14 @@ def nodeToDic(node):
     """
         nodeToDic() scans through the children of node and makes a
         dictionary from the content. Three cases are differentiated:
-        
+
         - if the node contains no other nodes, it is a text-node
         and {nodeName:text} is merged into the dictionary.
-        
+
         - if the node has the attribute "method" set to "true",
         then it's children will be appended to a list and this
         list is merged to the dictionary in the form: {nodeName:list}.
-        
+
         - else, nodeToDic() will call itself recursively on
         the nodes children (merging {nodeName:nodeToDic()} to
         the dictionary).
@@ -78,12 +76,7 @@ def readConfig(filename):
     dom = parseString(open(filename).read())
     return nodeToDic(dom)
 
-
 if __name__ == "__main__":
-    #import sys
-    #import pprint
-    #pprint.pprint(readConfig(sys.argv[1]))
-    xml = '''<ewayResponse><ewayTrxnStatus>True</ewayTrxnStatus><ewayTrxnNumber>20712</ewayTrxnNumber><ewayTrxnReference>987654321</ewayTrxnReference><ewayTrxnOption1/><ewayTrxnOption2/><ewayTrxnOption3/><ewayAuthCode>123456</ewayAuthCode><ewayReturnAmount>10</ewayReturnAmount><ewayTrxnError>10,Approved For Partial Amount(Test CVN Gateway)</ewayTrxnError></ewayResponse>'''
-    root = etree.XML('''<ewayResponse><ewayTrxnStatus>True</ewayTrxnStatus><ewayTrxnNumber>20712</ewayTrxnNumber><ewayTrxnReference>987654321</ewayTrxnReference><ewayTrxnOption1/><ewayTrxnOption2/><ewayTrxnOption3/><ewayAuthCode>123456</ewayAuthCode><ewayReturnAmount>10</ewayReturnAmount><ewayTrxnError>10,Approved For Partial Amount(Test CVN Gateway)</ewayTrxnError></ewayResponse>''')
-    tree = etree.ElementTree(root)
-    print nodeToDic(root)
+    import sys
+    import pprint
+    pprint.pprint(readConfig(sys.argv[1]))
