@@ -9,14 +9,12 @@ from eway_api.client import REBILL_TEST_URL, REBILL_LIVE_URL, HOSTED_TEST_URL, H
 from django.conf import settings
 
 
-
 class EwayGateway(Gateway):
     default_currency = "AUD"
     supported_countries = ["AU"]
     supported_cardtypes = [Visa, MasterCard, AmericanExpress, DinersClub, JCB]
     homepage_url = "https://eway.com.au/"
     display_name = "eWay"
-
 
     def __init__(self):
         self.test_mode = getattr(settings, 'MERCHANT_TEST_MODE', True)
@@ -25,20 +23,18 @@ class EwayGateway(Gateway):
             raise GatewayNotConfigured("The '%s' gateway is not correctly "
                                        "configured." % self.display_name)
         eway_settings = merchant_settings["eway"]
-        if self.test_mode: 
-            self.customer_id = eway_settings['TEST_CUSTOMER_ID']
+        self.customer_id = eway_settings['CUSTOMER_ID']
+        if self.test_mode:
             self.rebill_url = REBILL_TEST_URL
             self.hosted_url = HOSTED_TEST_URL
             self.direct_payment_url = DIRECT_PAYMENT_TEST_URL
         else:
-            self.customer_id = eway_settings['CUSTOMER_ID']
             self.rebill_url = REBILL_LIVE_URL
             self.hosted_url = HOSTED_LIVE_URL
             self.direct_payment_url = DIRECT_PAYMENT_LIVE_URL
-        
+
         self.eway_username = eway_settings['USERNAME']
         self.eway_password = eway_settings['PASSWORD']
-        
 
     def add_creditcard(self, hosted_customer, credit_card):
         """
@@ -50,7 +46,6 @@ class EwayGateway(Gateway):
         hosted_customer.CCExpiryYear = str(credit_card.year)[-2:]
         hosted_customer.FirstName = credit_card.first_name
         hosted_customer.LastName = credit_card.last_name
-
 
     def add_address(self, hosted_customer, options=None):
         """
@@ -74,8 +69,7 @@ class EwayGateway(Gateway):
         hosted_customer.JobDesc = address.get("job_desc")
         hosted_customer.Comments = address.get("comments")
         hosted_customer.URL = address.get("url")
-        
-        
+
     def add_customer_details(self, credit_card, customer_detail, options=None):
         """
             add customer details to the request parameters
@@ -100,8 +94,7 @@ class EwayGateway(Gateway):
         customer_detail.CustomerFax = customer.get("customer_fax", "")
         customer_detail.CustomerURL = customer.get("customer_url")
         customer_detail.CustomerComments = customer.get("customer_comments", "")
-        
-        
+
     def add_rebill_details(self, rebill_detail, rebile_customer_id, credit_card, rebill_profile):
         """
             add customer details to the request parameters
@@ -120,7 +113,6 @@ class EwayGateway(Gateway):
         rebill_detail.RebillInterval = rebill_profile.get("rebill_interval")
         rebill_detail.RebillIntervalType = rebill_profile.get("rebill_intervalType")
         rebill_detail.RebillEndDate = rebill_profile.get("rebill_endDate")
-
 
     def add_direct_payment_details(self, credit_card, customer_details, payment_details):
         direct_payment_details = {}
@@ -145,16 +137,14 @@ class EwayGateway(Gateway):
             direct_payment_details['ewayCustomerInvoiceDescription'] = payment_details.get('inv_desc', '')
         except:
             return False
-    
-        return direct_payment_details
 
+        return direct_payment_details
 
     @property
     def service_url(self):
         if self.test_mode:
             return HOSTED_TEST_URL
         return HOSTED_LIVE_URL
-
 
     def purchase(self, money, credit_card, options=None):
         """
@@ -165,22 +155,24 @@ class EwayGateway(Gateway):
             options = {}
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
-        
-        client = RebillEwayClient(customer_id = self.customer_id,
-                                  username = self.eway_username,
-                                  password = self.eway_password,
+
+        client = RebillEwayClient(customer_id=self.customer_id,
+                                  username=self.eway_username,
+                                  password=self.eway_password,
                                   url=self.service_url,
                                   )
         hosted_customer = client.client.factory.create("CreditCard")
-        
+
         self.add_creditcard(hosted_customer, credit_card)
         self.add_address(hosted_customer, options)
         customer_id = client.create_hosted_customer(hosted_customer)
 
-        pymt_response = client.process_payment(customer_id,
-                                                money,
-                                                options.get("invoice", 'test'),
-                                                options.get("description", 'test'))
+        pymt_response = client.process_payment(
+            customer_id,
+            money,
+            options.get("invoice", 'test'),
+            options.get("description", 'test')
+        )
 
         if not hasattr(pymt_response, "ewayTrxnStatus"):
             transaction_was_unsuccessful.send(sender=self,
@@ -199,47 +191,42 @@ class EwayGateway(Gateway):
                                         response=pymt_response)
         return {"status": "SUCCESS", "response": pymt_response}
 
-
     def authorize(self, money, credit_card, options=None):
         raise NotImplementedError
-
 
     def capture(self, money, authorization, options=None):
         raise NotImplementedError
 
-
     def void(self, identification, options=None):
         raise NotImplementedError
 
-
     def credit(self, money, identification, options=None):
         raise NotImplementedError
-
 
     def direct_payment(self, credit_card_details, options=None):
         '''
             Function that implement Direct Payment functionality provided by eWay.
                 (Reference: http://www.eway.com.au/developers/api/direct-payments)
-            
-            Input Parameters: 
+
+            Input Parameters:
                 ( Please find the details here in this Gist: https://gist.github.com/08893221533daad49388 )
                 credit_card   :    Customer Credit Card details
                 options       :    Customer and Recurring Payment details
-                
+
             Output Paramters:
                 status: 'SUCCESS' or 'FAILURE'
                 response : eWay Response in Dictionary format.
         '''
         error_response = {}
         try:
-            if options and options.get('customer_details', False) and \
-                        options.get('payment_details', False):
+            if (options and options.get('customer_details', False) and
+                    options.get('payment_details', False)):
                 customer_details = options.get('customer_details')
                 payment_details = options.get('payment_details')
-            else: 
-                error_response = {"reason" : "Not enough information Available!"}
+            else:
+                error_response = {"reason": "Not enough information Available!"}
                 raise
-            
+
             '''
                 # Validate Entered credit card details.
             '''
@@ -247,67 +234,67 @@ class EwayGateway(Gateway):
             is_valid = self.validate_card(credit_card)
             if not is_valid:
                 raise InvalidCard("Invalid Card")
-            
+
             '''
                 # Create direct payment details
             '''
             direct_payment_details = self.add_direct_payment_details(credit_card, customer_details, payment_details)
             if not direct_payment_details:
                 raise
-            
+
             '''
                 Process Direct Payment.
             '''
             dpObj = DirectPaymentClient(self.direct_payment_url)
             response = dpObj.process_direct_payment(direct_payment_details)
-            
+
             '''
                 Return value based on eWay Response
             '''
             eway_response = response.get('ewayResponse', None)
-            if  eway_response and 'true' == eway_response.get('ewayTrxnStatus', 'false').lower():
+            if eway_response and 'true' == eway_response.get('ewayTrxnStatus', 'false').lower():
                 status = "SUCCESS"
             else:
                 status = "FAILURE"
-            
+
         except:
-            return {"status": "FAILURE", "response": error_response}  
-        
-        return {"status": status, "response": response} 
-    
-    
+            return {"status": "FAILURE", "response": error_response}
+
+        return {"status": status, "response": response}
+
     def recurring(self, credit_card_details, options=None):
         """
             Recurring Payment Implementation using eWay recurring API (http://www.eway.com.au/developers/api/recurring)
-            
-            Input Parameters: 
+
+            Input Parameters:
                 ( Please find the details here in this Gist: https://gist.github.com/df67e02f7ffb39f415e6 )
                 credit_card   :    Customer Credit Card details
                 options       :    Customer and Recurring Payment details
-            
+
             Output Dict:
                 status: 'SUCCESS' or 'FAILURE'
-                response : Response list of rebill event request in order of provided input 
+                response : Response list of rebill event request in order of provided input
                            in options["customer_rebill_details"] list.
         """
         error_response = {}
         try:
             if not options:
-                error_response = {"reason" : "Not enough information Available!"}
+                error_response = {"reason": "Not enough information Available!"}
                 raise
-            
+
             '''
                 # Validate Entered credit card details.
             '''
             credit_card = CreditCard(**credit_card_details)
             if not self.validate_card(credit_card):
                 raise InvalidCard("Invalid Card")
-            
-            rebillClient = RebillEwayClient(customer_id = self.customer_id,
-                                          username = self.eway_username,
-                                          password = self.eway_password,
-                                          url=self.rebill_url,
-                                          )
+
+            rebillClient = RebillEwayClient(
+                customer_id=self.customer_id,
+                username=self.eway_username,
+                password=self.eway_password,
+                url=self.rebill_url,
+            )
             # CustomerDetails : To create rebill Customer
             customer_detail = rebillClient.client.factory.create("CustomerDetails")
             self.add_customer_details(credit_card, customer_detail, options)
@@ -315,7 +302,7 @@ class EwayGateway(Gateway):
                 # Create Rebill customer and retrieve customer rebill ID.
             '''
             rebill_customer_response = rebillClient.create_rebill_customer(customer_detail)
-            
+
             # Handler error in create_rebill_customer response
             if rebill_customer_response.ErrorSeverity:
                 transaction_was_unsuccessful.send(sender=self,
@@ -323,7 +310,7 @@ class EwayGateway(Gateway):
                                                   response=rebill_customer_response)
                 error_response = rebill_customer_response
                 raise
-    
+
             rebile_customer_id = rebill_customer_response.RebillCustomerID
             '''
                 For Each rebill profile
@@ -333,9 +320,9 @@ class EwayGateway(Gateway):
             for each_rebill_profile in options.get("customer_rebill_details", []):
                 rebill_detail = rebillClient.client.factory.create("RebillEventDetails")
                 self.add_rebill_details(rebill_detail, rebile_customer_id, credit_card, each_rebill_profile)
-                
+
                 rebill_event_response = rebillClient.create_rebill_event(rebill_detail)
-                
+
                 # Handler error in create_rebill_event response
                 if rebill_event_response.ErrorSeverity:
                     transaction_was_unsuccessful.send(sender=self,
@@ -343,57 +330,55 @@ class EwayGateway(Gateway):
                                                       response=rebill_event_response)
                     error_response = rebill_event_response
                     raise
-    
+
                 rebill_event_response_list.append(rebill_event_response)
-                
+
             transaction_was_successful.send(sender=self,
                                             type="recurring",
-                                            response=rebill_event_response_list) 
+                                            response=rebill_event_response_list)
         except:
             return {"status": "Failure", "response": error_response}
-        
-        return {"status": "SUCCESS", "response": rebill_event_response_list} 
 
+        return {"status": "SUCCESS", "response": rebill_event_response_list}
 
     def recurring_cancel(self, rebill_customer_id, rebill_id):
         """
             Recurring Payment Cancelation (http://www.eway.com.au/developers/api/recurring)
-            
-            Input Parameters: 
-                - rebill_customer_id, 
+
+            Input Parameters:
+                - rebill_customer_id,
                 - rebill_id  ( Output of recurring method)
-            
+
             Output Dict:
                 status : 'SUCCESS' or 'FAILURE'
                 response : Rebill/Recurring Cancelation Response from eWay Web service.
         """
-        rebillDeleteClient = RebillEwayClient(customer_id = self.customer_id,
-                                  username = self.eway_username,
-                                  password = self.eway_password,
-                                  url=self.rebill_url,
-                                  )
+        rebillDeleteClient = RebillEwayClient(
+            customer_id=self.customer_id,
+            username=self.eway_username,
+            password=self.eway_password,
+            url=self.rebill_url,
+        )
 
         '''
             # Delete Rebill Event, using customer create rebill detail.
         '''
         delete_rebill_response = rebillDeleteClient.delete_rebill_event(rebill_customer_id, rebill_id)
-        
+
         # Handler error in delete_rebill_customer response
         if delete_rebill_response.ErrorSeverity:
             transaction_was_unsuccessful.send(sender=self,
                                               type="recurringDeleteRebill",
                                               response=delete_rebill_response)
             return {"status": "FAILURE", "response": delete_rebill_response}
-        
+
         transaction_was_successful.send(sender=self,
                                         type="recurring",
                                         response=delete_rebill_response)
-        return {"status": "SUCCESS", "response": delete_rebill_response} 
-
+        return {"status": "SUCCESS", "response": delete_rebill_response}
 
     def store(self, creditcard, options=None):
         raise NotImplementedError
-
 
     def unstore(self, identification, options=None):
         raise NotImplementedError
