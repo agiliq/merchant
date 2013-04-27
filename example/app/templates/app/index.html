@@ -1,20 +1,32 @@
 {% extends 'app/base.html' %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
-<p> pay ${{ amount }}</p>
+
+<h3>Bill amount: ${{ amount }}</h3>
 
 {% if response %}
-  <b>{{ response }} </b>
+<div class="row">
+    <div class="span10">
+        <div class="alert alert-block">
+            <a class="close">×</a>
+            <h4 class="alert-heading">Response:</h4>
+            <p>{{ response }} </p>
+        </div>
+    </div>
+</div>
 {% endif %}
 
-<form method='post'>
-  {% csrf_token %}
-  <table>
-    {{ form }}
-    <tr>
-      <th>&nbsp;</th>
-      <td><input type='submit' value='Submit' /></td>
-    </tr>
-  </table>
+<form class="form-horizontal well" method="post" action="{{ integration.service_url }}">
+    {% csrf_token %}
+    <fieldset>
+        <legend>Using Payment Backend: {{ title }}</legend>
+        {{ form|crispy }}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn">Cancel</button>
+        </div>
+    </fieldset>
 </form>
 {% endblock %}
