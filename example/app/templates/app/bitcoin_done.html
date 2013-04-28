@@ -1,21 +1,34 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-Paying {{ amount }} BTC  to address: {{ address }}
-<br />
+<form class="form-horizontal well" method="post" action="/bitcoin/done/">
+    {% csrf_token %}
+    <fieldset>
+        <legend>Using Payment Backend: {{ title }}</legend>
+        <p>
+            <div class="row">
+                <div class="span9">
+                    <div class="alert alert-block">
+                        <a class="close">×</a>
+                        <h4 class="alert-heading">Result: {{ result.status }}</h4>
+                    </div>
+                </div>
+            </div>
 
-<strong>Result</strong>: {{ result.status }}
+            Paying {{ amount }} BTC  to address: {{ address }}
+            <br />
 
-<ol>
-    {% for txn in result.response %}
-    <li>Received: {{ txn.amount }} BTC - transaction id: {{ txn.txid }}</li>
-    {% empty %}
-    <li>No transactions to this address so far.</li>
-    <form action="." method="POST">
-        {% csrf_token %}
-        <input type="submit" name="retry" value="Retry" />
-    </form>
-    {% endfor %}
-</ol>
-
+            <ol>
+                {% for txn in result.response %}
+                <li>Received: {{ txn.amount }} BTC - transaction id: {{ txn.txid }}</li>
+                {% empty %}
+                <li>No transactions to this address so far.</li>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Retry</button>
+                </div>
+                {% endfor %}
+            </ol>
+        </p>
+    </fieldset>
+</form>
 {% endblock %}
