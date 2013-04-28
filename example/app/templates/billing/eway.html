@@ -1,0 +1,12 @@
+{% load crispy_forms_tags %}
+
+<form class="form-horizontal well" method="post" action="{{ integration.service_url }}">
+    <fieldset>
+        <legend>Using Payment Backend: {{ title }}</legend>
+        {{ integration.generate_form|crispy }}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn">Cancel</button>
+        </div>
+    </fieldset>
+</form>
