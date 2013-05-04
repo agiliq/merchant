@@ -125,7 +125,7 @@ class PayPalWebsiteStandardsTestCase(TestCase):
         self.assertEquals(parsed.path, '/cgi-bin/webscr')
 
     def testRenderForm(self):
-        tmpl = Template("{% load paypal from paypal_tags %}{% paypal obj %}")
+        tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
         form = tmpl.render(Context({"obj": self.pws}))
         fields = self.pws.fields.copy()
         fields.update({

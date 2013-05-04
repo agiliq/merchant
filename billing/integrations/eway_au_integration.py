@@ -80,6 +80,7 @@ def attr_update(object_, dict_):
 class EwayAuIntegration(Integration):
     display_name = "eWAY"
     service_url = "https://au.ewaygateway.com/mh/payment"
+    template = "billing/eway.html"
     urls = ()
 
     def __init__(self, access_code=None):

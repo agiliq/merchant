@@ -1,5 +1,5 @@
 {% extends 'app/base.html' %}
-{% load world_pay from world_pay_tags %}
+{% load render_integration from billing_tags %}
 
 {% block content %}
     Expected Parameters from the view
@@ -32,5 +32,5 @@
         </li>
     </ul>
     
-    {% world_pay wp_obj %}
+    {% render_integration wp_obj %}
 {% endblock %}

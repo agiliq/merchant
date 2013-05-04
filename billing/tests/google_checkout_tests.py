@@ -23,7 +23,7 @@ class GoogleCheckoutTestCase(TestCase):
         self.gc.add_fields(fields)
 
     def testFormGen(self):
-        tmpl = Template("{% load google_checkout from google_checkout_tags %}{% google_checkout obj %}")
+        tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
         form = tmpl.render(Context({"obj": self.gc}))
 
         dom = parseString(form)

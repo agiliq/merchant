@@ -1,6 +1,6 @@
 {% extends "app/base.html" %}
-{% load braintree_payments from braintree_payments_tags %}
+{% load render_integration from billing_tags %}
 
 {% block content %}
-{% braintree_payments bp_obj %}
+{% render_integration bp_obj %}
 {% endblock %}

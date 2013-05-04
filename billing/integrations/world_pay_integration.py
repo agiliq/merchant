@@ -26,6 +26,7 @@ class WorldPayIntegration(Integration):
     currency: ISO 3-character currency
     """
     display_name = "RBS World Pay"
+    template = "billing/world_pay.html"
 
     def __init__(self, options=None):
         if not options:

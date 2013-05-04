@@ -48,7 +48,7 @@ class WorldPayTestCase(TestCase):
     def testFormGen(self):
         # Since the secret key cannot be distributed
         settings.WORLDPAY_MD5_SECRET_KEY = "test"
-        tmpl = Template("{% load world_pay from world_pay_tags %}{% world_pay obj %}")
+        tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
         form = tmpl.render(Context({"obj": self.wp}))
         self.assertFormIsCorrect(form, self.wp.fields)
 
@@ -57,6 +57,6 @@ class WorldPayTestCase(TestCase):
         settings.WORLDPAY_MD5_SECRET_KEY = "test"
         self.wp.add_field("signatureFields", "instId:amount:currency:cartId")
         self.wp.fields.pop("signature", None)
-        tmpl = Template("{% load world_pay from world_pay_tags %}{% world_pay obj %}")
+        tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
         form = tmpl.render(Context({"obj": self.wp}))
         self.assertFormIsCorrect(form, self.wp.fields)

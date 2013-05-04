@@ -38,9 +38,9 @@ class MerchantTestCase(TestCase):
             }
 
         # Raises TemplateSyntaxError: Invalid Block Tag
-        self.assertRaises(TemplateSyntaxError, lambda: Template("{% load google_checkout from google_checkout_tags %}{% stripe obj %}"))
+        self.assertRaises(TemplateSyntaxError, lambda: Template("{% load render_integration from billing_tags %}{% stripe obj %}"))
 
-        tmpl = Template("{% load google_checkout from google_checkout_tags %}{% google_checkout obj %}")
+        tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
         gc = get_integration("google_checkout")
         fields = {"items": [{
                     "name": "name of the item",

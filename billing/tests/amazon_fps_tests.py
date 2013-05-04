@@ -23,7 +23,7 @@ class AmazonFPSTestCase(TestCase):
         self.fps.add_fields(self.fields)
 
     def testLinkGen(self):
-        tmpl = Template("{% load amazon_fps from amazon_fps_tags %}{% amazon_fps obj %}")
+        tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
         html = tmpl.render(Context({"obj": self.fps}))
         # get the integration link url
         dom = minidom.parseString(html)

@@ -9,6 +9,7 @@ from paypal.standard.forms import PayPalPaymentsForm, PayPalEncryptedPaymentsFor
 
 class PayPalIntegration(Integration):
     display_name = "PayPal IPN"
+    template = "billing/paypal.html"
 
     def __init__(self):
         merchant_settings = getattr(settings, "MERCHANT_SETTINGS")

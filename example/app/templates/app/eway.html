@@ -1,6 +1,6 @@
 {% extends 'app/base.html' %}
-{% load eway_tags %}
+{% load render_integration from billing_tags %}
 
 {% block content %}
-{% eway eway_obj %}
+{% render_integration eway_obj %}
 {% endblock %}
