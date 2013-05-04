@@ -23,6 +23,9 @@ class Integration(object):
     # Name of the integration.
     display_name = 'Base Integration'
 
+    # Template rendered by the templatetag 'billing'
+    template = ''
+
     def __init__(self, options=None):
         if not options:
             options = {}

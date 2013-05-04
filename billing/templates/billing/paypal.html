@@ -1,5 +1,5 @@
 {% if integration.test_mode %}
-    {{ form.sandbox }}
+    {{ integration.generate_form.sandbox }}
 {% else %}
-    {{ form.render }}
+    {{ integration.generate_form.render }}
 {% endif %}

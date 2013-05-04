@@ -13,6 +13,7 @@ from django.template import RequestContext
 
 class BraintreePaymentsIntegration(Integration):
     display_name = "Braintree Transparent Redirect"
+    template = "billing/braintree_payments.html"
 
     def __init__(self, options=None):
         if not options:

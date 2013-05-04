@@ -6,6 +6,7 @@ from billing.forms.stripe_forms import StripeForm
 
 class StripeIntegration(Integration):
     display_name = "Stripe"
+    template = "billing/stripe.html"
 
     def __init__(self):
         super(StripeIntegration, self).__init__()

@@ -33,6 +33,7 @@ class AmazonFpsIntegration(Integration):
     """
 
     display_name = "Amazon Flexible Payment Service"
+    template = "billing/amazon_fps.html"
 
     def __init__(self, options=None):
         if not options:

@@ -1,6 +1,6 @@
 {% extends 'app/base.html' %}
-{% load authorize_net_dpm from authorize_net_dpm_tags %}
+{% load render_integration from billing_tags %}
 
 {% block content %}
-    {% authorize_net_dpm obj %}
+    {% render_integration obj %}
 {% endblock %}
