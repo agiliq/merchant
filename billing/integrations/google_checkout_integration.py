@@ -24,6 +24,7 @@ require_POST_m = method_decorator(require_POST)
 
 class GoogleCheckoutIntegration(Integration):
     display_name = 'Google Checkout'
+    template = "billing/google_checkout.html"
 
     def __init__(self, options=None):
         if not options:

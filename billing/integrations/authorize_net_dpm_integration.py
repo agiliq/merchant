@@ -20,6 +20,7 @@ require_POST_m = method_decorator(require_POST)
 
 class AuthorizeNetDpmIntegration(Integration):
     display_name = "Authorize.Net Direct Post Method"
+    template = "billing/authorize_net_dpm.html"
 
     def __init__(self):
         super(AuthorizeNetDpmIntegration, self).__init__()

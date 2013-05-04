@@ -8,7 +8,7 @@ from suds.cache import ObjectCache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from billing import Gateway
+from billing import Gateway, GatewayNotConfigured
 from billing.models import PaylaneTransaction, PaylaneAuthorization
 from billing.utils.credit_card import CreditCard, InvalidCard, Visa, MasterCard
 from billing.utils.paylane import PaylaneError
