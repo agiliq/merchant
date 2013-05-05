@@ -10,16 +10,36 @@ from billing import get_integration
 class GoogleCheckoutTestCase(TestCase):
     def setUp(self):
         self.gc = get_integration("google_checkout")
-        fields = {"items": [{
+        target_url_name = "example.com/offsite/my_content/"
+        target_url = 'http://' + target_url_name
+        fields = {
+            "items": [
+                {
                     "name": "name of the item",
                     "description": "Item description",
-                    "amount": 1,
+                    "amount": 0.00,
                     "id": "999AXZ",
                     "currency": "USD",
                     "quantity": 1,
-                    }],
-                  "return_url": "http://127.0.0.1:8000/offsite/google-checkout/",
-                  }
+                    "subscription": {
+                        "type": "merchant",                     # valid choices is ["merchant", "google"]
+                        "period": "YEARLY",                     # valid choices is ["DAILY", "WEEKLY", "SEMI_MONTHLY", "MONTHLY", "EVERY_TWO_MONTHS"," QUARTERLY", "YEARLY"]
+                        "payments": [
+                            {
+                                "maximum-charge": 9.99,         # Item amount must be "0.00"
+                                "currency": "USD"
+                            }
+                        ]
+                    },
+                    "digital-content": {
+                        "display-disposition": "OPTIMISTIC",    # valid choices is ['OPTIMISTIC', 'PESSIMISTIC']
+                        "description": "Congratulations! Your subscription is being set up. Feel free to log onto &amp;lt;a href='%s'&amp;gt;%s&amp;lt;/a&amp;gt; and try it out!" % (target_url, target_url_name)
+                    },
+                },
+            ],
+            "return_url": "http://127.0.0.1:8000/offsite/google-checkout/",
+            'private_data': "test@example.com",
+         }
         self.gc.add_fields(fields)
 
     def testFormGen(self):
@@ -39,7 +59,7 @@ class GoogleCheckoutTestCase(TestCase):
 
     def testBuildXML(self):
         xml = self.gc.build_xml()
-        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">1</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id></item></items><merchant-private-data></merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""
+        good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">0.0</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id><subscription period="YEARLY" type="merchant"><payments><subscription-payment><maximum-charge currency="USD">9.99</maximum-charge></subscription-payment></payments></subscription><digital-content><display-disposition>OPTIMISTIC</display-disposition><description>Congratulations! Your subscription is being set up. Feel free to log onto &amp;amp;lt;a href=\'http://example.com/offsite/my_content/\'&amp;amp;gt;example.com/offsite/my_content/&amp;amp;lt;/a&amp;amp;gt; and try it out!</description></digital-content></item></items><merchant-private-data>test@example.com</merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""
         self.assertEquals(xml, good_xml)
 
 
