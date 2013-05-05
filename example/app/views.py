@@ -293,14 +293,29 @@ def offsite_paypal(request):
 
 def offsite_google_checkout(request):
     return_url = request.build_absolute_uri(reverse('app_offsite_google_checkout_done'))
-    fields = {'items': [{'amount': 1,
-                         'name': 'name of the item',
-                         'description': 'Item description',
-                         'id': '999AXZ',
-                         'currency': 'USD',
-                         'quantity': 1,
-                        }],
-              'return_url': return_url,}
+    fields = {
+            'items': [{
+                'amount': 1,
+                'name': 'name of the item',
+                'description': 'Item description',
+                'id': '999AXZ',
+                'currency': 'USD',
+                'quantity': 1,
+                "subscription": {
+                "type": "merchant",                     # valid choices is ["merchant", "google"]
+                "period": "YEARLY",                     # valid choices is ["DAILY", "WEEKLY", "SEMI_MONTHLY", "MONTHLY", "EVERY_TWO_MONTHS"," QUARTERLY", "YEARLY"]
+                "payments": [{
+                        "maximum-charge": 9.99,         # Item amount must be "0.00"
+                        "currency": "USD"
+                }]
+            },
+            "digital-content": {
+                "display-disposition": "OPTIMISTIC",    # valid choices is ['OPTIMISTIC', 'PESSIMISTIC']
+                "description": "Congratulations! Your subscription is being set up. Continue: {return_url}".format(return_url=return_url)
+            },
+        }],
+        'return_url': return_url
+    }
     google_checkout_obj.add_fields(fields)
     template_vars = {'title': 'Google Checkout', "gc_obj": google_checkout_obj}
 
