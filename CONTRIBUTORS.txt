@@ -15,6 +15,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Donald Stufft <https://github.com/dstufft>
 * Dmitry Molotkov <https://github.com/aldarund>
 * Greg McGuire <https://github.com/gmcguire>
+* igorn <https://github.com/igonef>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
 * Ken Cochrane <https://github.com/kencochrane>
