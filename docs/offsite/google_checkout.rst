@@ -90,6 +90,14 @@ Item
 ^^^^
 You can do the same thing on items as well using the private-item-data field on item. (see view.py example above)
 
+Digital Content:
+----------------
+The following digital goods identifying are supported: email delivery, key/URL delivery, description-based delivery
+
+Subscriptions:
+--------------
+The following subscriptions types are supported: google-handled, merchant-handled
+
 Taxes:
 ------
 The following tax methods are supported: default-tax-table and alternate-tax-tables
