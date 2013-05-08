@@ -2,6 +2,8 @@ import urllib
 import urllib2
 import datetime
 
+from collections import namedtuple
+
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -17,6 +19,14 @@ DELIM_CHAR = ','
 ENCAP_CHAR = '$'
 APPROVED, DECLINED, ERROR, FRAUD_REVIEW = 1, 2, 3, 4
 RESPONSE_CODE, RESPONSE_REASON_CODE, RESPONSE_REASON_TEXT = 0, 2, 3
+
+MockAuthorizeAIMResponse = namedtuple(
+    'AuthorizeAIMResponse', [
+        'response_code',
+        'response_reason_code',
+        'response_reason_text'
+    ]
+)
 
 
 def save_authorize_response(response):
@@ -177,8 +187,8 @@ class AuthorizeNetGateway(Gateway):
         try:
             open_conn = urllib2.urlopen(conn)
             response = open_conn.read()
-        except urllib2.URLError:
-            return (5, '1', 'Could not talk to payment gateway.')
+        except urllib2.URLError as e:
+            return MockAuthorizeAIMResponse(5, '1', str(e))
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
         return save_authorize_response(fields)
 
@@ -337,8 +347,8 @@ class AuthorizeNetGateway(Gateway):
         try:
             open_conn = urllib2.urlopen(conn)
             xml_response = open_conn.read()
-        except urllib2.URLError:
-            return (5, '1', 'Could not talk to payment gateway.')
+        except urllib2.URLError as e:
+            return MockAuthorizeAIMResponse(5, '1', str(e))
 
         response = nodeToDic(parseString(xml_response))['ARBCreateSubscriptionResponse']
         # successful response

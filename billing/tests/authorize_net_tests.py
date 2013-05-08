@@ -1,8 +1,13 @@
+import mock
+import urllib2
+
 from django.test import TestCase
+
 from billing import get_gateway, CreditCard
 from billing.signals import *
 from billing.models import AuthorizeAIMResponse
 from billing.gateway import CardNotSupported
+from billing.gateways.authorize_net_gateway import MockAuthorizeAIMResponse
 from billing.utils.credit_card import Visa
 
 
@@ -61,3 +66,14 @@ class AuthorizeNetAIMGatewayTestCase(TestCase):
     def testCreditCardExpired(self):
         resp = self.merchant.purchase(8, self.credit_card)
         self.assertNotEquals(resp["status"], "SUCCESS")
+
+    def testPurchaseURLError(self):
+        with mock.patch('billing.gateways.authorize_net_gateway.urllib2.urlopen') as mock_urlopen:
+            error_text = "Something bad happened :("
+            mock_urlopen.side_effect = urllib2.URLError(error_text)
+            resp = self.merchant.purchase(1, self.credit_card)
+            self.assertEquals(resp["status"], "FAILURE")
+            self.assertEquals(resp["response"].response_code, 5)
+            self.assertEquals(resp["response"].response_reason_code, '1')
+            self.assertTrue(error_text in resp["response"].response_reason_text)
+            self.assertTrue(isinstance(resp["response"], MockAuthorizeAIMResponse))
