@@ -14,6 +14,7 @@ def deploy():
 
     with prefix("workon merchant"):
         with cd("/home/agiliq/envs/merchant/src/merchant/example"):
+            run("pip install -r requirements.txt")
             run("python manage.py validate")
             run("python manage.py syncdb")
 
