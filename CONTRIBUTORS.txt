@@ -24,6 +24,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Markus Gattol <markus.gattol@sunoano.org>
 * Matt McClanahan <https://github.com/mattmcc>
 * Mikey Ryan <https://github.com/mikery>
+* Nickolas Whiting <https://github.com/prggmr>
 * nmonteiro <https://github.com/nmonteiro>
 * Patrick Altman < https://github.com/paltman>
 * Plaban Nayak <plaban.nayak@gmail.com>
