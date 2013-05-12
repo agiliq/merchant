@@ -134,7 +134,7 @@ class AuthorizeNetGateway(Gateway):
         """add customer details to the request parameters"""
         if 'email' in options:
             post['email'] = options['email']
-            post['email_customer'] = True
+            post['email_customer'] = bool(options.get('email_customer', True))
 
         if 'customer' in options:
             post['cust_id'] = options['customer']
