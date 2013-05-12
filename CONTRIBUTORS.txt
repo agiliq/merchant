@@ -18,6 +18,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * igorn <https://github.com/igonef>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
+* Julio Carlos Menendez <https://github.com/juliomenendez>
 * Ken Cochrane <https://github.com/kencochrane>
 * Konrad Rotkiewicz <https://github.com/krotkiewicz>
 * Lalit Chandnani <https://github.com/lalitchandnani>
