@@ -18,13 +18,13 @@ $(document).ready(function() {
       for (var ii=0; ii < 12; ii++) {
           redactedCCNum += "x";
       }
-      redactedCCNum += $("#stripe-form input[name=credit_card_number]").val()[:4];
+      var originalCCNum = $("#stripe-form input[name=credit_card_number]").val();
+      redactedCCNum += originalCCNum.substring(originalCCNum.length-4, originalCCNum.length);
       $("#payment-form input[name=redactedCCNum]").val(redactedCCNum);
       var expMonth = $("#stripe-form input[name=credit_card_expiration_month]").val();
       var expYear = $("#stripe-form input[name=credit_card_expiration_year]").val();
       $("#payment-form input[name=credit_card_expiration_month]").val(expMonth);
       $("#payment-form input[name=credit_card_expiration_year]").val(expYear);
-      $("#payment-form").attr("action", "{% url 'stripe_transaction' %}");
       $("#payment-form").get(0).submit();
     }
   }
@@ -53,7 +53,7 @@ $(document).ready(function() {
     </fieldset>
 </form>
 
-<form method="post" style="display:none;">{% csrf_token %}
+<form method="post" style="display:none;" action="{% url 'stripe_transaction' %}" id="payment-form">{% csrf_token %}
   <input type="hidden" name="credit_card_expiration_month" value="" />
   <input type="hidden" name="credit_card_expiration_year" value="" />
   <input type="hidden" name="redactedCCNumber" value="" />
