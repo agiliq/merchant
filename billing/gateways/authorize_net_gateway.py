@@ -136,6 +136,9 @@ class AuthorizeNetGateway(Gateway):
             post['email'] = options['email']
             post['email_customer'] = True
 
+        if 'email_customer' in options:
+            post['email_customer'] = bool(options['email_customer'])
+
         if 'customer' in options:
             post['cust_id'] = options['customer']
 
