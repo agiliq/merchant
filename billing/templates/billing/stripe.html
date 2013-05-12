@@ -11,15 +11,25 @@ $(document).ready(function() {
     if (response.error) {
       $(".payment-errors").html(response.error.message);
     } else {
-console.log(response);
+      console.log(response);
       var token = response['id'];
       $("#payment-form input[name=stripeToken]").val(token);
+      var redactedCCNum = "";
+      for (var ii=0; ii < 12; ii++) {
+          redactedCCNum += "x";
+      }
+      redactedCCNum += $("#stripe-form input[name=credit_card_number]").val()[:4];
+      $("#payment-form input[name=redactedCCNum]").val(redactedCCNum);
+      var expMonth = $("#stripe-form input[name=credit_card_expiration_month]").val();
+      var expYear = $("#stripe-form input[name=credit_card_expiration_year]").val();
+      $("#payment-form input[name=credit_card_expiration_month]").val(expMonth);
+      $("#payment-form input[name=credit_card_expiration_year]").val(expYear);
       $("#payment-form").attr("action", "{% url 'stripe_transaction' %}");
       $("#payment-form").get(0).submit();
     }
   }
 
-  $("#payment-form").submit(function(event) {
+  $("#stripe-form").submit(function(event) {
     $('.submit-button').attr("disabled", "disabled");
     var amount = $('#id_amount').val(); //amount you want to charge in cents
     Stripe.createToken({
@@ -32,14 +42,20 @@ console.log(response);
   });
 });
 </script>
-<form class="form-horizontal well" method="post" id="payment-form">{% csrf_token %}
+<form class="form-horizontal well" method="post" id="stripe-form">
     <fieldset>
         <legend>Using Payment Backend: {{ title }}</legend>
         {{ integration.generate_form|crispy }}
-        <input type="hidden" name="stripeToken" value="" />
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Submit</button>
             <button type="reset" class="btn">Cancel</button>
         </div>
     </fieldset>
+</form>
+
+<form method="post" style="display:none;">{% csrf_token %}
+  <input type="hidden" name="credit_card_expiration_month" value="" />
+  <input type="hidden" name="credit_card_expiration_year" value="" />
+  <input type="hidden" name="redactedCCNumber" value="" />
+  <input type="hidden" name="stripeToken" value="" />
 </form>
