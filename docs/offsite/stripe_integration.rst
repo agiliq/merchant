@@ -74,9 +74,8 @@ Example:
       
    In the template::
 
-      {% load stripe_payment from stripe_tags %}
-
-      {% stripe_payment stripe_obj %}
+      {% load render_integration from billing_tags %}
+      {% render_integration stripe_obj %}
 
 
 .. _`Stripe Payment`: https://stripe.com

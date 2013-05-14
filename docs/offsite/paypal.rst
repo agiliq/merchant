@@ -74,8 +74,8 @@ In views.py::
 
 In some_template.html::
 
-  {% load paypal from paypal_tags %}
-  {% paypal obj %}
+  {% load render_integration from billing_tags %}
+  {% render_integration obj %}
 
 
 Template renders to something like below::

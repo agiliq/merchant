@@ -73,9 +73,8 @@ Example:
       
    In the template::
 
-      {% load authorize_net_dpm from authorize_net_dpm_tags %}
-
-      {% authorize_net_dpm adp %}
+      {% load render_integration from billing_tags %}
+      {% render_integration adp %}
 
 
 .. _`Authorize.Net Direct Post Method`: http://developer.authorize.net/api/dpm
