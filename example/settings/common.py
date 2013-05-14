@@ -76,13 +76,13 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'example.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__), "templates"),
+    "templates",
 )
 
 INSTALLED_APPS = (
@@ -96,20 +96,12 @@ INSTALLED_APPS = (
 
     'app',
     'billing',
-    'paypal.standard',
-    'paypal.pro',
-    'paypal.standard.ipn',
     'stripe',
-    'samurai',
-    'django_ogone'
+    'paypal.pro',
+    'crispy_forms',
 )
 
-STATIC_URL = "http://merchant.agiliq.com/"
+STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(os.path.dirname(__file__), "static")
 STATICFILES_FINDER = ("django.contrib.staticfiles.finders.FileSystemFinder",
                       "django.contrib.staticfiles.finders.AppDirectoriesFinder")
-
-try:
-    from localsettings import *
-except ImportError, e:
-    print e.message

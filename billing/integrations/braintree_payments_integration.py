@@ -2,15 +2,18 @@ from billing import Integration, IntegrationNotConfigured
 from django.conf import settings
 from django.views.decorators.http import require_GET
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
-from django.conf.urls.defaults import patterns, url
-import braintree, urllib
+from django.conf.urls import patterns, url
+import braintree
+import urllib
 from django.core.urlresolvers import reverse
 from billing.forms.braintree_payments_forms import BraintreePaymentsForm
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
+
 class BraintreePaymentsIntegration(Integration):
     display_name = "Braintree Transparent Redirect"
+    template = "billing/braintree_payments.html"
 
     def __init__(self, options=None):
         if not options:
@@ -53,12 +56,12 @@ class BraintreePaymentsIntegration(Integration):
         return self.braintree_failure_handler(request, result)
 
     def braintree_success_handler(self, request, response):
-        return render_to_response("billing/braintree_success.html", 
+        return render_to_response("billing/braintree_success.html",
                                   {"response": response},
                                   context_instance=RequestContext(request))
 
     def braintree_failure_handler(self, request, response):
-        return render_to_response("billing/braintree_failure.html", 
+        return render_to_response("billing/braintree_failure.html",
                                   {"response": response},
                                   context_instance=RequestContext(request))
 
@@ -72,7 +75,7 @@ class BraintreePaymentsIntegration(Integration):
             if isinstance(val, dict):
                 new_params = {}
                 for k in val:
-                    new_params["%s__%s" %(key, k)] = val[k]
+                    new_params["%s__%s" % (key, k)] = val[k]
                 self.add_fields(new_params)
             else:
                 self.add_field(key, val)
@@ -82,10 +85,10 @@ class BraintreePaymentsIntegration(Integration):
         tr_data_dict["transaction"]["type"] = self.fields["transaction__type"]
         tr_data_dict["transaction"]["order_id"] = self.fields["transaction__order_id"]
         if self.fields.get("transaction__customer_id"):
-            tr_data_dict["transaction"]["customer_id"] = fields["transaction__customer__id"]
+            tr_data_dict["transaction"]["customer_id"] = self.fields["transaction__customer__id"]
         if self.fields.get("transaction__customer__id"):
             tr_data_dict["transaction"]["customer"] = {"id": self.fields["transaction__customer__id"]}
-        tr_data_dict["transaction"]["options"] = {"submit_for_settlement": 
+        tr_data_dict["transaction"]["options"] = {"submit_for_settlement":
                                                   self.fields.get("transaction__options__submit_for_settlement", True)}
         if self.fields.get("transaction__payment_method_token"):
             tr_data_dict["transaction"]["payment_method_token"] = self.fields["transaction__payment_method_token"]
@@ -93,12 +96,15 @@ class BraintreePaymentsIntegration(Integration):
             tr_data_dict["transaction"]["credit_card"] = {"token": self.fields["transaction__credit_card__token"]}
         if self.fields.get("transaction__amount"):
             tr_data_dict["transaction"]["amount"] = self.fields["transaction__amount"]
-        notification_url = "%s%s" %(self.fields["site"], reverse("braintree_notify_handler"))
+        notification_url = "%s%s" % (self.fields["site"], reverse("braintree_notify_handler"))
         tr_data = braintree.Transaction.tr_data_for_sale(tr_data_dict, notification_url)
         return tr_data
+
+    def form_class(self):
+        return BraintreePaymentsForm
 
     def generate_form(self):
         initial_data = self.fields
         initial_data.update({"tr_data": self.generate_tr_data()})
-        form = BraintreePaymentsForm(initial=initial_data)
+        form = self.form_class()(initial=initial_data)
         return form

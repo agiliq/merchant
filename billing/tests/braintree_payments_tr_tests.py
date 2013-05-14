@@ -7,6 +7,7 @@ from billing import get_integration
 from django.template import Template, Context
 from django.conf import settings
 
+
 class BraintreePaymentsIntegrationTestCase(TestCase):
     urls = "billing.tests.test_urls"
 
@@ -27,7 +28,7 @@ class BraintreePaymentsIntegrationTestCase(TestCase):
         self.bp.add_fields(fields)
 
     def testFormFields(self):
-        self.assertEquals(self.bp.fields, {"transaction__type" : "sale",
+        self.assertEquals(self.bp.fields, {"transaction__type": "sale",
                                            "transaction__amount": "10.00",
                                            "transaction__order_id": 1,
                                            "transaction__customer__first_name": "John",

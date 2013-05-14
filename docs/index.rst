@@ -22,8 +22,12 @@ Contents:
     * :doc:`Braintree Payments Server to Server <gateways/braintree_payments>`
     * :doc:`eWay <gateways/eway_gateway>`
     * :doc:`PayPal <gateways/paypal_gateway>`
-    * :doc:`Samurai Payment <gateways/samurai_gateway>`
     * :doc:`Stripe Payments  <gateways/stripe_payment>`
+    * :doc:`Paylane  <gateways/paylane_gateway>`
+    * :doc:`WePay  <gateways/we_pay_gateway>`
+    * :doc:`Beanstream  <gateways/beanstream_gateway>`
+    * :doc:`Chargebee  <gateways/chargebee_gateway>`
+    * :doc:`Bitcoin <gateways/bitcoin_gateway>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 
@@ -33,7 +37,8 @@ Contents:
     * :doc:`Amazon FPS <offsite/amazon_fps>`
     * :doc:`Braintree Payments Transparent Redirect <offsite/braintree_payments>`
     * :doc:`Stripe  <offsite/stripe_integration>`
-    * :doc:`Samurai  <offsite/samurai_integration>`
+    * :doc:`eWAY <offsite/eway_au>`
+    * :doc:`Authorize.Net Direct Post Method <offsite/authorize_net_dpm>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`

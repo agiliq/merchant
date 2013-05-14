@@ -1,11 +1,12 @@
 from billing import Integration, get_gateway, IntegrationNotConfigured
 from django.conf import settings
-from django.conf.urls.defaults import patterns, url
-from billing.forms.stripe_forms  import StripeForm
+from django.conf.urls import patterns, url
+from billing.forms.stripe_forms import StripeForm
 
 
 class StripeIntegration(Integration):
     display_name = "Stripe"
+    template = "billing/stripe.html"
 
     def __init__(self):
         super(StripeIntegration, self).__init__()
@@ -17,9 +18,12 @@ class StripeIntegration(Integration):
         self.gateway = get_gateway("stripe")
         self.publishable_key = stripe_settings['PUBLISHABLE_KEY']
 
+    def form_class(self):
+        return StripeForm
+
     def generate_form(self):
         initial_data = self.fields
-        form = StripeForm(initial=initial_data)
+        form = self.form_class()(initial=initial_data)
         return form
 
     def transaction(self, request):

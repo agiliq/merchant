@@ -10,7 +10,7 @@ class StripeGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("stripe")
         self.credit_card = CreditCard(first_name="Test", last_name="User",
-                                      month=10, year=2012,
+                                      month=10, year=2020,
                                       number="4242424242424242",
                                       verification_value="100")
         stripe.api_key = self.merchant.stripe.api_key
@@ -28,6 +28,10 @@ class StripeGatewayTestCase(TestCase):
 
     def testPurchase(self):
         resp = self.merchant.purchase(1, self.credit_card)
+        self.assertEquals(resp["status"], "SUCCESS")
+
+    def testPurchaseDecimalAmount(self):
+        resp = self.merchant.purchase(1.99, self.credit_card)
         self.assertEquals(resp["status"], "SUCCESS")
 
     def testStoreMissingCustomer(self):
@@ -78,9 +82,8 @@ class StripeGatewayTestCase(TestCase):
         self.assertEquals(response["status"], "SUCCESS")
 
     def testPurchaseWithToken(self):
-        # Somewhat similar to capture but testing for the 
+        # Somewhat similar to capture but testing for the
         # purpose of the stripe integration
         resp = self.merchant.authorize(1, self.credit_card)
         resp = self.merchant.purchase(1, resp["response"].id)
         self.assertEquals(resp["status"], "SUCCESS")
-

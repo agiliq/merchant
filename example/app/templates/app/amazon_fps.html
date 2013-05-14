@@ -1,15 +1,15 @@
 {% extends 'app/base.html' %}
-{% load billing_tags %}
+{% load render_integration from billing_tags %}
 
 {% block content %}
 <div>
   <p>You are going to be charged $100 in the 
   <a href="https://payments.amazon.com/sdui/sdui/helpTab/Amazon-Flexible-Payments-Service/Technical-Resources/Amazon-FPS-Sandbox">Amazon FPS Sandbox</a>.</p>
-  <p>{% amazon_fps fps_obj %}</p>
+  <p>{% render_integration fps_obj %}</p>
 </div>
 <div>
   <p>(Recurring payments) You are going to be charged $100 every hour in the 
   <a href="https://payments.amazon.com/sdui/sdui/helpTab/Amazon-Flexible-Payments-Service/Technical-Resources/Amazon-FPS-Sandbox">Amazon FPS Sandbox</a>.</p>
-  <p>{% amazon_fps fps_recur_obj %}</p>
+  <p>{% render_integration fps_recur_obj %}</p>
 </div>
 {% endblock %}

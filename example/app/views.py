@@ -3,29 +3,25 @@ import datetime
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.http import HttpResponse, HttpResponseRedirect
 
-from billing import CreditCard, get_gateway
+from billing import CreditCard, get_gateway, get_integration
 from billing.gateway import CardNotSupported
 
 from app.forms import CreditCardForm
-
-
-from app.urls import (google_checkout_obj, world_pay_obj,
-                      pay_pal_obj, amazon_fps_obj,
-                      fps_recur_obj, braintree_obj,
-                      stripe_obj, samurai_obj, ogone_obj)
-
+from app.urls import (authorize_net_obj, google_checkout_obj, world_pay_obj, pay_pal_obj,
+                      amazon_fps_obj, fps_recur_obj, braintree_obj,
+                      stripe_obj)
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
-
+from billing.utils.paylane import PaylanePaymentCustomer, \
+    PaylanePaymentCustomerAddress
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
 
-
 def index(request, gateway=None):
     return authorize(request)
-
 
 def authorize(request):
     amount = 1
@@ -109,7 +105,7 @@ def eway(request):
                                }
             response = merchant.purchase(amount, credit_card, options={'request': request, 'billing_address': billing_address})
     else:
-        form = CreditCardForm(initial={'number': '4444333322221111',
+        form = CreditCardForm(initial={'number':'4444333322221111',
                                        'verification_value': '000',
                                        'month': 7,
                                        'year': 2012})
@@ -117,7 +113,6 @@ def eway(request):
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Eway'})
-
 
 def braintree(request):
     amount = 1
@@ -134,32 +129,87 @@ def braintree(request):
                 response = "Credit Card Not Supported"
             response = merchant.purchase(amount, credit_card)
     else:
-        form = CreditCardForm(initial={'number': '4111111111111111'})
+        form = CreditCardForm(initial={'number':'4111111111111111'})
     return render(request, 'app/index.html', {'form': form,
                                               'amount': amount,
                                               'response': response,
                                               'title': 'Braintree Payments (S2S)'})
-
-
 def stripe(request):
     amount = 1
-    response = None
+    response= None
     if request.method == 'POST':
         form = CreditCardForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             credit_card = CreditCard(**data)
             merchant = get_gateway("stripe")
-            response = merchant.purchase(amount, credit_card)
+            response = merchant.purchase(amount,credit_card)
     else:
-        form = CreditCardForm(initial={'number': '4242424242424242'})
+        form = CreditCardForm(initial={'number':'4242424242424242'})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount':amount,
+                                             'response':response,
+                                             'title':'Stripe Payment'})
+
+
+def paylane(request):
+    amount = 1
+    response= None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("paylane")
+            customer = PaylanePaymentCustomer()
+            customer.name = "%s %s" %(data['first_name'], data['last_name'])
+            customer.email = "testuser@example.com"
+            customer.ip_address = "127.0.0.1"
+            options = {}
+            address = PaylanePaymentCustomerAddress()
+            address.street_house = 'Av. 24 de Julho, 1117'
+            address.city = 'Lisbon'
+            address.zip_code = '1700-000'
+            address.country_code = 'PT'
+            customer.address = address
+            options['customer'] = customer
+            options['product'] = {}
+            response = merchant.purchase(amount, credit_card, options = options)
+    else:
+        form = CreditCardForm(initial={'number':'4111111111111111'})
     return render(request, 'app/index.html', {'form': form,
-                                             'amount': amount,
-                                             'response': response,
-                                             'title': 'Stripe Payment'})
+                                              'amount':amount,
+                                              'response':response,
+                                              'title':'Paylane Gateway'})
 
 
-def samurai(request):
+def we_pay(request):
+    wp = get_gateway("we_pay")
+    form = None
+    amount = 10
+    response = wp.purchase(10, None, {
+            "description": "Test Merchant Description", 
+            "type": "SERVICE",
+            "redirect_uri": request.build_absolute_uri(reverse('app_we_pay_redirect'))
+            })
+    if response["status"] == "SUCCESS":
+        return HttpResponseRedirect(response["response"]["checkout_uri"])
+    return render(request, 'app/index.html', {'form': form,
+                                              'amount':amount,
+                                              'response':response,
+                                              'title':'WePay Payment'})
+
+def we_pay_redirect(request):
+    checkout_id = request.GET.get("checkout_id", None)
+    return render(request, 'app/we_pay_success.html', {"checkout_id": checkout_id})
+
+
+def we_pay_ipn(request):
+    # Just a dummy view for now.
+    return render(request, 'app/index.html', {})
+
+
+def beanstream(request):
     amount = 1
     response = None
     if request.method == 'POST':
@@ -167,15 +217,62 @@ def samurai(request):
         if form.is_valid():
             data = form.cleaned_data
             credit_card = CreditCard(**data)
-            merchant = get_gateway("samurai")
-            response = merchant.purchase(amount, credit_card)
+            merchant = get_gateway("beanstream")
+            response = merchant.purchase(amount, credit_card,
+                                         {"billing_address": {
+                        "name": "%s %s" % (data["first_name"], data["last_name"]),
+                        # below are hardcoded just for the sake of the example
+                        # you can make these optional by toggling the customer name
+                        # and address in the account dashboard.
+                        "email": "test@example.com",
+                        "phone": "555-555-555-555",
+                        "address1": "Addr1",
+                        "address2": "Addr2",
+                        "city": "Hyd",
+                        "state": "AP",
+                        "country": "IN"
+                        }
+                                          })
     else:
-        form = CreditCardForm(initial={'number': '4111111111111111'})
-    return render(request, 'app/index.html', {'form': form,
+        form = CreditCardForm(initial={'number':'4030000010001234',
+                                       'card_type': 'visa',
+                                       'verification_value': 123})
+    return render(request, 'app/index.html',{'form': form,
                                              'amount': amount,
                                              'response': response,
-                                             'title': 'Samurai'})
+                                             'title': 'Beanstream'})
 
+def chargebee(request):
+    amount = 1
+    response = None
+    if request.method == 'POST':
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            credit_card = CreditCard(**data)
+            merchant = get_gateway("chargebee")
+            response = merchant.purchase(amount, credit_card,
+                                         {"plan_id": "professional",
+                                          "description": "Quick Purchase"})
+    else:
+        form = CreditCardForm(initial={'number':'4111111111111111',
+                                       'card_type': 'visa',
+                                       'verification_value': 100})
+    return render(request, 'app/index.html',{'form': form,
+                                             'amount': amount,
+                                             'response': response,
+                                             'title': 'Chargebee'})
+
+def offsite_authorize_net(request):
+    params = {'x_amount': 1,
+              'x_fp_sequence': datetime.datetime.now().strftime('%Y%m%d%H%M%S'),
+              'x_fp_timestamp': datetime.datetime.now().strftime('%s'),
+              'x_recurring_bill': 'F',
+              }
+    authorize_net_obj.add_fields(params)
+    template_vars = {"obj": authorize_net_obj, 'title': authorize_net_obj.display_name}
+    return render(request, 'app/offsite_authorize_net.html', template_vars)
+    
 
 def offsite_paypal(request):
     invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -194,33 +291,45 @@ def offsite_paypal(request):
     template_vars = {"obj": pay_pal_obj, 'title': 'PayPal Offsite'}
     return render(request, 'app/offsite_paypal.html', template_vars)
 
-
 def offsite_google_checkout(request):
     return_url = request.build_absolute_uri(reverse('app_offsite_google_checkout_done'))
-    fields = {'items': [{'amount': 1,
-                         'name': 'name of the item',
-                         'description': 'Item description',
-                         'id': '999AXZ',
-                         'currency': 'USD',
-                         'quantity': 1,
-                        }],
-              'return_url': return_url, }
+    fields = {
+            'items': [{
+                'amount': 1,
+                'name': 'name of the item',
+                'description': 'Item description',
+                'id': '999AXZ',
+                'currency': 'USD',
+                'quantity': 1,
+                "subscription": {
+                "type": "merchant",                     # valid choices is ["merchant", "google"]
+                "period": "YEARLY",                     # valid choices is ["DAILY", "WEEKLY", "SEMI_MONTHLY", "MONTHLY", "EVERY_TWO_MONTHS"," QUARTERLY", "YEARLY"]
+                "payments": [{
+                        "maximum-charge": 9.99,         # Item amount must be "0.00"
+                        "currency": "USD"
+                }]
+            },
+            "digital-content": {
+                "display-disposition": "OPTIMISTIC",    # valid choices is ['OPTIMISTIC', 'PESSIMISTIC']
+                "description": "Congratulations! Your subscription is being set up. Continue: {return_url}".format(return_url=return_url)
+            },
+        }],
+        'return_url': return_url
+    }
     google_checkout_obj.add_fields(fields)
     template_vars = {'title': 'Google Checkout', "gc_obj": google_checkout_obj}
 
     return render(request, 'app/google_checkout.html', template_vars)
 
-
 def offsite_world_pay(request):
-    fields = {"instId": settings.WORLDPAY_INSTALLATION_ID_TEST,
+    fields = {"instId": settings.MERCHANT_SETTINGS["world_pay"]["INSTALLATION_ID_TEST"],
               "cartId": "TEST123",
               "currency": "USD",
               "amount": 1,
-              "desc": "Test Item", }
+              "desc": "Test Item",}
     world_pay_obj.add_fields(fields)
     template_vars = {'title': 'WorldPay', "wp_obj": world_pay_obj}
     return render(request, 'app/world_pay.html', template_vars)
-
 
 def offsite_amazon_fps(request):
     url_scheme = "http"
@@ -250,7 +359,6 @@ def offsite_amazon_fps(request):
                      "fps_obj": amazon_fps_obj}
     return render(request, 'app/amazon_fps.html', template_vars)
 
-
 def offsite_braintree(request):
     fields = {"transaction": {
             "order_id": datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
@@ -259,14 +367,13 @@ def offsite_braintree(request):
                 "submit_for_settlement": True
                 },
             },
-              "site": "%s://%s" % ("https" if request.is_secure() else "http",
-                                  RequestSite(request).domain)
-              }
+            "site": "%s://%s" % ("https" if request.is_secure() else "http",
+                                RequestSite(request).domain)
+            }
     braintree_obj.add_fields(fields)
     template_vars = {'title': 'Braintree Payments Transparent Redirect',
                      "bp_obj": braintree_obj}
     return render(request, "app/braintree_tr.html", template_vars)
-
 
 def offsite_stripe(request):
     status = request.GET.get("status")
@@ -277,14 +384,51 @@ def offsite_stripe(request):
     return render(request, "app/stripe.html", template_vars)
 
 
-def offsite_samurai(request):
-    template_vars = {'title': 'Samurai Integration',
-                     "samurai_obj": samurai_obj}
-    return render(request, "app/samurai.html", template_vars)
+def offsite_eway(request):
+    return_url = request.build_absolute_uri(reverse(offsite_eway_done))
+    eway_obj = get_integration("eway_au")
+    customer = eway_obj.request_access_code(
+            return_url=return_url, customer={},
+            payment={"total_amount": 100})
+    request.session["eway_access_code"] = eway_obj.access_code
+    template_vars = {"title": "eWAY",
+                     "eway_obj": eway_obj}
+    return render(request, "app/eway.html", template_vars)
 
 
-def offsite_ogone(request):
-    template_vars = {'title': 'Ogone Integration',
-                     'og_obj': ogone_obj}
-    print ogone_obj.generate_form
-    return render(request, "app/ogone.html", template_vars)
+def offsite_eway_done(request):
+    access_code = request.session["eway_access_code"]
+    eway_obj = get_integration("eway_au", access_code=access_code)
+    result = eway_obj.check_transaction()
+
+    return render(request, "app/eway_done.html", {"result": result}) 
+
+
+def bitcoin(request):
+    amount = 0.01
+    bitcoin_obj = get_gateway("bitcoin")
+    address = request.session.get("bitcoin_address", None)
+    if not address:
+        address = bitcoin_obj.get_new_address()
+        request.session["bitcoin_address"] = address
+    return render(request, "app/bitcoin.html", {
+        "title": "Bitcoin",
+        "amount": amount,
+        "address": address
+    })
+
+def bitcoin_done(request):
+    amount = 0.01
+    bitcoin_obj = get_gateway("bitcoin")
+    address = request.session.get("bitcoin_address", None)
+    if not address:
+        return HttpResponseRedirect(reverse("app_bitcoin"))
+    result = bitcoin_obj.purchase(amount, address)
+    if result['status'] == 'SUCCESS':
+        del request.session["bitcoin_address"]
+    return render(request, "app/bitcoin_done.html", {
+        "title": "Bitcoin",
+        "amount": amount,
+        "address": address,
+        "result": result
+    })

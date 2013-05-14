@@ -1,0 +1,7 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<h3>Success! Your transaction succeeded.</h3>
+<p>{{ response.response }}</p>
+<p>Transaction Id: {{ response.transaction_id }}</p>
+{% endblock %}

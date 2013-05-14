@@ -1,0 +1,6 @@
+{% extends 'app/base.html' %}
+{% load render_integration from billing_tags %}
+
+{% block content %}
+{% render_integration eway_obj %}
+{% endblock %}

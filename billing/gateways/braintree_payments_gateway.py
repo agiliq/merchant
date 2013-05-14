@@ -2,16 +2,15 @@ from billing import Gateway, GatewayNotConfigured
 from billing.gateway import InvalidData
 from billing.signals import *
 from billing.utils.credit_card import InvalidCard, Visa, MasterCard, \
-    AmericanExpress, Discover
+    AmericanExpress, Discover, CreditCard
 from django.conf import settings
 import braintree
+
 
 class BraintreePaymentsGateway(Gateway):
     supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
     supported_countries = ["US"]
     default_currency = "USD"
-
-    supported_cardtypes = [Visa, MasterCard, AmericanExpress, Discover]
     homepage_url = "http://www.braintreepayments.com/"
     display_name = "Braintree Payments"
 
@@ -34,10 +33,10 @@ class BraintreePaymentsGateway(Gateway):
             )
 
     def _cc_expiration_date(self, credit_card):
-        return "%s/%s" %(credit_card.month, credit_card.year)
+        return "%s/%s" % (credit_card.month, credit_card.year)
 
     def _cc_cardholder_name(self, credit_card):
-        return "%s %s" %(credit_card.first_name, credit_card.last_name)
+        return "%s %s" % (credit_card.first_name, credit_card.last_name)
 
     def _build_request_hash(self, options):
         request_hash = {
@@ -103,9 +102,28 @@ class BraintreePaymentsGateway(Gateway):
                 })
         return request_hash
 
-    def purchase(self, money, credit_card, options = None):
+    def purchase(self, money, credit_card, options=None):
         if not options:
             options = {}
+        if isinstance(credit_card, CreditCard) and not self.validate_card(credit_card):
+             raise InvalidCard("Invalid Card")
+
+        request_hash = self._build_request_hash(options)
+        request_hash["amount"] = money
+
+        if options.get("merchant_account_id"):
+            request_hash["merchant_account_id"] = options.get("merchant_account_id")
+
+        if isinstance(credit_card, CreditCard):
+            request_hash["credit_card"] = {
+                "number": credit_card.number,
+                "expiration_date": self._cc_expiration_date(credit_card),
+                "cardholder_name": self._cc_cardholder_name(credit_card),
+                "cvv": credit_card.verification_value,
+            }
+        else:
+            request_hash["payment_method_token"] = credit_card
+
         if not self.validate_card(credit_card):
             raise InvalidCard("Invalid Card")
 
@@ -125,7 +143,7 @@ class BraintreePaymentsGateway(Gateway):
         response = braintree.Transaction.sale(request_hash)
         if response.is_success:
             status = "SUCCESS"
-            transaction_was_successful.send(sender=self, 
+            transaction_was_successful.send(sender=self,
                                             type="purchase",
                                             response=response)
         else:
@@ -135,7 +153,7 @@ class BraintreePaymentsGateway(Gateway):
                                               response=response)
         return {"status": status, "response": response}
 
-    def authorize(self, money, credit_card, options = None):
+    def authorize(self, money, credit_card, options=None):
         if not options:
             options = {}
         if not self.validate_card(credit_card):
@@ -157,7 +175,7 @@ class BraintreePaymentsGateway(Gateway):
         response = braintree.Transaction.sale(request_hash)
         if response.is_success:
             status = "SUCCESS"
-            transaction_was_successful.send(sender=self, 
+            transaction_was_successful.send(sender=self,
                                             type="authorize",
                                             response=response)
         else:
@@ -167,7 +185,7 @@ class BraintreePaymentsGateway(Gateway):
                                               response=response)
         return {"status": status, "response": response}
 
-    def capture(self, money, authorization, options = None):
+    def capture(self, money, authorization, options=None):
         response = braintree.Transaction.submit_for_settlement(authorization, money)
         if response.is_success:
             status = "SUCCESS"
@@ -181,7 +199,7 @@ class BraintreePaymentsGateway(Gateway):
                                               response=response)
         return {"status": status, "response": response}
 
-    def void(self, identification, options = None):
+    def void(self, identification, options=None):
         response = braintree.Transaction.void(identification)
         if response.is_success:
             status = "SUCCESS"
@@ -195,7 +213,7 @@ class BraintreePaymentsGateway(Gateway):
                                               response=response)
         return {"status": status, "response": response}
 
-    def credit(self, money, identification, options = None):
+    def credit(self, money, identification, options=None):
         response = braintree.Transaction.refund(identification, money)
         if response.is_success:
             status = "SUCCESS"
@@ -209,8 +227,8 @@ class BraintreePaymentsGateway(Gateway):
                                               response=response)
         return {"status": status, "response": response}
 
-    def recurring(self, money, credit_card, options = None):
-        resp = self.store(credit_card, options = options)
+    def recurring(self, money, credit_card, options=None):
+        resp = self.store(credit_card, options=options)
         if resp["status"] == "FAILURE":
             transaction_was_unsuccessful.send(sender=self,
                                               type="recurring",
@@ -234,7 +252,7 @@ class BraintreePaymentsGateway(Gateway):
                                               response=response)
         return {"status": status, "response": response}
 
-    def store(self, credit_card, options = None):
+    def store(self, credit_card, options=None):
         if not options:
             options = {}
 
@@ -278,10 +296,10 @@ class BraintreePaymentsGateway(Gateway):
                 "company": customer.get("company", ""),
                 "email": customer.get("email", options.get("email", "")),
                 "phone": customer.get("phone", ""),
-                "credit_card": card_hash, 
+                "credit_card": card_hash,
                 }
             result = braintree.Customer.create(request_hash)
-            if not result.is_success: 
+            if not result.is_success:
                 transaction_was_unsuccessful.send(sender=self,
                                                   type="store",
                                                   response=result)
@@ -300,13 +318,13 @@ class BraintreePaymentsGateway(Gateway):
             request_hash.update({
                 "first_name": first_name,
                 "last_name": last_name,
-                "company": options.get("company", ""),
-                "street_address": options.get("address1", ""),
-                "extended_address": options.get("address2", ""),
-                "locality": options.get("city", ""),
-                "region": options.get("state", ""),
-                "postal_code": options.get("zip", ""),
-                "country_name": options.get("country", "")
+                "company":  options["billing_address"].get("company", ""),
+                "street_address":  options["billing_address"].get("address1", ""),
+                "extended_address":  options["billing_address"].get("address2", ""),
+                "locality":  options["billing_address"].get("city", ""),
+                "region":  options["billing_address"].get("state", ""),
+                "postal_code":  options["billing_address"].get("zip", ""),
+                "country_name":  options["billing_address"].get("country", "")
                 })
 
         card_hash = {
@@ -337,8 +355,8 @@ class BraintreePaymentsGateway(Gateway):
                                               type="store",
                                               response=response)
         return {"status": status, "response": response}
-            
-    def unstore(self, identification, options = None):
+
+    def unstore(self, identification, options=None):
         response = braintree.CreditCard.delete(identification)
         if response.is_success:
             status = "SUCCESS"

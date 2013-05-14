@@ -1,5 +1,5 @@
 {% extends 'app/base.html' %}
-{% load billing_tags %}
+{% load render_integration from billing_tags %}
 
 {% block content %}
     Required Parameters from the view
@@ -8,7 +8,5 @@
         <li> amount </li>
         <li> return_url </li>
     </ul>
-    {% google_checkout gc_obj %}
-    
-    {# Link: {% google_checkout %} #}
+    {% render_integration gc_obj %}
 {% endblock %}

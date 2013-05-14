@@ -1,12 +1,15 @@
 from billing import Integration, IntegrationNotConfigured
 from django.conf import settings
 from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
-from django.conf.urls.defaults import patterns, include
+from django.conf.urls import patterns, include
 from paypal.standard.ipn.signals import payment_was_flagged, payment_was_successful
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
+from paypal.standard.forms import PayPalPaymentsForm, PayPalEncryptedPaymentsForm
+
 
 class PayPalIntegration(Integration):
     display_name = "PayPal IPN"
+    template = "billing/paypal.html"
 
     def __init__(self):
         merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
@@ -14,6 +17,9 @@ class PayPalIntegration(Integration):
             raise IntegrationNotConfigured("The '%s' integration is not correctly "
                                        "configured." % self.display_name)
         pay_pal_settings = merchant_settings["pay_pal"]
+        self.encrypted = False
+        if pay_pal_settings.get("ENCRYPTED"):
+            self.encrypted = True
         # Required Fields. Just a template for the user
         self.fields = {"business": pay_pal_settings['RECEIVER_EMAIL'],
                        "item_name": "",
@@ -36,10 +42,20 @@ class PayPalIntegration(Integration):
             )
         return urlpatterns
 
+    def form_class(self):
+        if self.encrypted:
+            return PayPalEncryptedPaymentsForm
+        return PayPalPaymentsForm
+
+    def generate_form(self):
+        return self.form_class()(initial=self.fields)
+
+
 def unsuccessful_txn_handler(sender, **kwargs):
     transaction_was_unsuccessful.send(sender=sender.__class__,
                                       type="purchase",
                                       response=sender)
+
 
 def successful_txn_handler(sender, **kwargs):
     transaction_was_successful.send(sender=sender.__class__,

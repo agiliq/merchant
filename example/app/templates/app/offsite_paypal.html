@@ -1,5 +1,5 @@
 {% extends 'app/base.html' %}
-{% load billing_tags %}
+{% load render_integration from billing_tags %}
 
 {% block content %}
     Required Parameters from the view
@@ -11,5 +11,5 @@
         <li> return_url </li>
         <li> cancel_return </li>
     </ul>
-    {% paypal obj %}
+    {% render_integration obj %}
 {% endblock %}

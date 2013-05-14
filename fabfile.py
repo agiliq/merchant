@@ -7,15 +7,15 @@ env.user = "agiliq"
 
 def describe():
     print "This is a fab file to automate deployments for the merchant server."
-   
+
 def deploy():
-    with cd("/home/agiliq/Work/merchant"):
+    with cd("/home/agiliq/envs/merchant/src/merchant"):
         run("git pull")
 
-    with cd("/home/agiliq/Work/merchant/example"):
-        run("python manage.py validate")
-        run("python manage.py syncdb")
+    with prefix("workon merchant"):
+        with cd("/home/agiliq/envs/merchant/src/merchant/example"):
+            run("pip install -r requirements.txt")
+            run("python manage.py validate")
+            run("python manage.py syncdb")
 
-    # run("merchant-restart")
-    run('/home/agiliq/scripts/restart_merchant.sh')
-   
+    run('/home/agiliq/scripts/merchant_restart.sh')

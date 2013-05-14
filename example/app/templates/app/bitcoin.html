@@ -1,0 +1,26 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<form class="form-horizontal well" method="post" action="/bitcoin/done/">
+    {% csrf_token %}
+    <fieldset>
+        <legend>Using Payment Backend: {{ title }}</legend>
+        <p>
+            Please pay {{ amount }} BTC to the following address from your bitcoin wallet:
+            <br />
+            <strong>{{ address }}</strong>
+
+            <br />
+            Click continue when done.
+
+            <br />
+            <i>Psst</i> Use a <a href="http://testnet.mojocoin.com/" target="_blank">testnet faucet</a> for testing.
+        </p>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Continue</button>
+            <button type="reset" class="btn">Cancel</button>
+        </div>
+    </fieldset>
+</form>
+
+{% endblock %}

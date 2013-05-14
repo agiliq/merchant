@@ -1,9 +1,9 @@
 from django.test import TestCase
 from billing.utils.credit_card import CreditCard
-from billing import get_gateway, GatewayNotConfigured, \
-    get_integration, IntegrationNotConfigured
+from billing import get_gateway, GatewayNotConfigured, get_integration, IntegrationNotConfigured
 from django.conf import settings
 from django.template import Template, Context, TemplateSyntaxError
+
 
 class MerchantTestCase(TestCase):
     def testCorrectClassLoading(self):
@@ -18,8 +18,8 @@ class MerchantTestCase(TestCase):
         original_settings = settings.MERCHANT_SETTINGS
         settings.MERCHANT_SETTINGS = {
             "google_checkout": {
-                "MERCHANT_ID" : '' ,
-                "MERCHANT_KEY" : ''
+                "MERCHANT_ID": '',
+                "MERCHANT_KEY": ''
                 }
             }
 
@@ -32,21 +32,21 @@ class MerchantTestCase(TestCase):
         original_settings = settings.MERCHANT_SETTINGS
         settings.MERCHANT_SETTINGS = {
             "google_checkout": {
-                "MERCHANT_ID" : '' ,
-                "MERCHANT_KEY" : ''
+                "MERCHANT_ID": '',
+                "MERCHANT_KEY": ''
                 }
             }
 
         # Raises TemplateSyntaxError: Invalid Block Tag
-        self.assertRaises(TemplateSyntaxError, lambda: Template("{% load google_checkout from google_checkout_tags %}{% stripe obj %}"))
+        self.assertRaises(TemplateSyntaxError, lambda: Template("{% load render_integration from billing_tags %}{% stripe obj %}"))
 
-        tmpl = Template("{% load google_checkout from google_checkout_tags %}{% google_checkout obj %}")
+        tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
         gc = get_integration("google_checkout")
         fields = {"items": [{
                     "name": "name of the item",
                     "description": "Item description",
                     "amount": 1,
-                    "id": "999AXZ", 
+                    "id": "999AXZ",
                     "currency": "USD",
                     "quantity": 1,
                     }],

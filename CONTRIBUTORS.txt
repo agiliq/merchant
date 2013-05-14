@@ -3,14 +3,33 @@ Contributors to the project:
 
 Thanks go out to all the contributors listed in alphabetical order:
 
+* Andy Zhang <https://github.com/andyiso>
 * Ashok Raavi <ashok.raavi@gmail.com>
+* Bradley Ayers <bradley.ayers@gmail.com>
+* Celso Pinto <https://github.com/cpinto>
+* Chenhouwu <https://github.com/chenhouwu>
+* Chen Zhe <https://github.com/fruitschen>
 * Chris Glass <https://github.com/chrisglass>
+* Dragonx <https://github.com/dragonx>
 * Daniel Sokolowski <https://github.com/danols>
+* Donald Stufft <https://github.com/dstufft>
+* Dmitry Molotkov <https://github.com/aldarund>
+* Greg McGuire <https://github.com/gmcguire>
+* igorn <https://github.com/igonef>
 * Issac Kelly <http://www.issackelly.com/>
 * Javed Khan <javed@agiliq.com>
+* Julio Carlos Menendez <https://github.com/juliomenendez>
+* Ken Cochrane <https://github.com/kencochrane>
+* Konrad Rotkiewicz <https://github.com/krotkiewicz>
+* Lalit Chandnani <https://github.com/lalitchandnani>
 * Markus Gattol <markus.gattol@sunoano.org>
+* Matt McClanahan <https://github.com/mattmcc>
 * Mikey Ryan <https://github.com/mikery>
+* Nickolas Whiting <https://github.com/prggmr>
 * nmonteiro <https://github.com/nmonteiro>
+* Patrick Altman < https://github.com/paltman>
 * Plaban Nayak <plaban.nayak@gmail.com>
 * Shabda Raaj <shabda@agiliq.com>
+* Si Feng <https://github.com/devfeng>
+* Steve Phillips <https://github.com/elimisteve>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>

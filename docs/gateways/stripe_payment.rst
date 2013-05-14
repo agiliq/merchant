@@ -33,6 +33,7 @@ Example:
 
   Simple usage::
 
+    >>> from billing import get_gateway, CreditCard
     >>> stripe = get_gateway("stripe")
     >>> credit_card = CreditCard(first_name="Test", last_name="User",
                                  month=10, year=2012, 

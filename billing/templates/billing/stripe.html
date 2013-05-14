@@ -1,4 +1,6 @@
-<div class="payment-errors"></div>
+{% load crispy_forms_tags %}
+
+<div class="payment-errors"></div>{% load future %}
 <script type="text/javascript" src="//code.jquery.com/jquery.min.js"></script>
 <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
 <script type="text/javascript">
@@ -9,15 +11,25 @@ $(document).ready(function() {
     if (response.error) {
       $(".payment-errors").html(response.error.message);
     } else {
-console.log(response);
+      console.log(response);
       var token = response['id'];
       $("#payment-form input[name=stripeToken]").val(token);
-      $("#payment-form").attr("action", "{% url stripe_transaction %}");
+      var redactedCCNum = "";
+      for (var ii=0; ii < 12; ii++) {
+          redactedCCNum += "x";
+      }
+      var originalCCNum = $("#stripe-form input[name=credit_card_number]").val();
+      redactedCCNum += originalCCNum.substring(originalCCNum.length-4, originalCCNum.length);
+      $("#payment-form input[name=redactedCCNum]").val(redactedCCNum);
+      var expMonth = $("#stripe-form input[name=credit_card_expiration_month]").val();
+      var expYear = $("#stripe-form input[name=credit_card_expiration_year]").val();
+      $("#payment-form input[name=credit_card_expiration_month]").val(expMonth);
+      $("#payment-form input[name=credit_card_expiration_year]").val(expYear);
       $("#payment-form").get(0).submit();
     }
   }
 
-  $("#payment-form").submit(function(event) {
+  $("#stripe-form").submit(function(event) {
     $('.submit-button').attr("disabled", "disabled");
     var amount = $('#id_amount').val(); //amount you want to charge in cents
     Stripe.createToken({
@@ -30,8 +42,20 @@ console.log(response);
   });
 });
 </script>
-<form method="post" id="payment-form">{% csrf_token %}
-  {{ integration.generate_form.as_p }}
+<form class="form-horizontal well" method="post" id="stripe-form">
+    <fieldset>
+        <legend>Using Payment Backend: {{ title }}</legend>
+        {{ integration.generate_form|crispy }}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn">Cancel</button>
+        </div>
+    </fieldset>
+</form>
+
+<form method="post" style="display:none;" action="{% url 'stripe_transaction' %}" id="payment-form">{% csrf_token %}
+  <input type="hidden" name="credit_card_expiration_month" value="" />
+  <input type="hidden" name="credit_card_expiration_year" value="" />
+  <input type="hidden" name="redactedCCNumber" value="" />
   <input type="hidden" name="stripeToken" value="" />
-<input type="submit" value="Pay" class="submit-button"/>
 </form>

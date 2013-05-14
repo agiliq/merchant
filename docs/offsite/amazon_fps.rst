@@ -16,9 +16,7 @@ The documentation for the service is available at `Amazon FPS Docs`_.
 
 .. note::
 
-   This integration has a dependency on ``boto``, a popular AWS library for python. But
-   because of support lacking for FPS, there is a fork available for it here_ with the
-   required features.
+   This integration has a dependency on ``boto``, a popular AWS library for python.
 
 Settings attributes required for this integration are:
 
@@ -89,6 +87,7 @@ should be available under ``<app>/integrations/<integration_name>_integration.py
 
 In urls.py::
 
+    from billing import get_integration
     amazon_fps = get_integration("fps")
     urlpatterns += patterns('',
       (r'^amazon_fps/', include(amazon_fps.urls)),
@@ -99,6 +98,7 @@ In urls.py::
 
 In views.py::
 
+    from billing import get_integration
     def productPage(request):
        amazon_fps = get_integration("fps")
        url_scheme = "http"

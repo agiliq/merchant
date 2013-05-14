@@ -1,9 +1,11 @@
 from django import forms
-import decimal, datetime
+import decimal
+import datetime
 
 curr_year = datetime.datetime.now().year
 month_choices = ((ii, ii) for ii in range(1, 13))
 year_choices = ((ii, ii) for ii in range(curr_year, curr_year + 7))
+
 
 class StripeForm(forms.Form):
     # Small value to prevent non-zero values. Might need a relook

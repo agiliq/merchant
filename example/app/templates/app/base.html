@@ -1,33 +1,116 @@
-
+<!doctype html>{% load future %}
 <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Django Merchant Demo | Agiliq</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="django-merchant - pluggable payments app">
 
-<head>
-  <title>merchant example</title>
-</head>
+        <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
 
-<body>
-  <h2>example project</h2>
-  Card:
-    <a href='{% url app_authorize %}'>Authorize</a>
-    <a href='{% url app_eway %}'>Eway</a>
-    <a href='{% url app_paypal %}'>Paypal</a>
-    <a href='{% url app_braintree %}'>Braintree Payments (S2S)</a>
-    <a href='{% url app_stripe %}'>Stripe Payment</a>
-    <a href='{% url app_samurai %}'>Samurai</a>
-  <br/><br/>
-  Offsite:
-    <a href='{% url app_offsite_paypal %}'>Paypal</a>
-    <a href='{% url app_offsite_google_checkout %}'>Google Checkout</a>
-    <a href='{% url app_offsite_world_pay %}'>WorldPay</a>
-    <a href='{% url app_offsite_amazon_fps %}'>Amazon FPS</a>
-    <a href='{% url app_offsite_braintree %}'>Braintree Payments (TR)</a>
-    <a href='{% url app_offsite_stripe %}'>Stripe</a>
-    <a href='{% url app_offsite_samurai %}'>Samurai</a>
-    <a href='{% url app_offsite_ogone %}'>Ogone</a>
+        <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+     </head>
+     <body>
 
-  <h1>{{ title }} </h1>
-  {% block content %}
+         <div class="container">
 
-  {% endblock %}
-</body>
+             <!-- Navbar
+             ================================================== -->
+             <div class="navbar navbar-fixed-top">
+                 <div class="navbar-inner">
+                     <div class="container">
+                         <a class="brand" href="/">Django Merchant</a>
+                         <div class="nav-collapse collapse" id="main-menu">
+                             <ul class="nav" id="main-menu-left">
+                                 <li class="dropdown">
+                                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Card <b class="caret"></b></a>
+                                     <ul class="dropdown-menu" id="swatch-menu">
+                                         <li><a href="{% url 'app.views.authorize' %}">Authorize</a></li>
+                                         <li><a href="{% url 'app.views.eway' %}">Eway</a></li>
+                                         <li><a href="{% url 'app.views.paypal' %}">Paypal</a></li>
+                                         <li><a href="{% url 'app.views.braintree' %}">Braintree Payments (S2S)</a></li>
+                                         <li><a href="{% url 'app.views.stripe' %}">Stripe Payment</a></li>
+                                         <li><a href="{% url 'app.views.paylane' %}">Paylane</a></li>
+                                         <li><a href="{% url 'app.views.we_pay' %}">WePay</a></li>
+                                         <li><a href="{% url 'app.views.beanstream' %}">Beanstream</a></li>
+                                         <li><a href="{% url 'app.views.chargebee' %}">Chargebee</a></li>
+                                     </ul>
+                                 </li>
+                                 <li class="dropdown">
+                                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Offsite <b class="caret"></b></a>
+                                     <ul class="dropdown-menu" id="swatch-menu">
+                                         <li><a href="{% url 'app.views.offsite_authorize_net' %}">Authorize.Net DPM</a></li>
+                                         <li><a href="{% url 'app.views.offsite_paypal' %}">Paypal</a></li>
+                                         <li><a href="{% url 'app.views.offsite_google_checkout' %}">Google Checkout</a></li>
+                                         <li><a href="{% url 'app.views.offsite_world_pay' %}">WorldPay</a></li>
+                                         <li><a href="{% url 'app.views.offsite_amazon_fps' %}">Amazon FPS</a></li>
+                                         <li><a href="{% url 'app.views.offsite_braintree' %}">Braintree Payments (TR)</a></li>
+                                         <li><a href="{% url 'app.views.offsite_stripe' %}">Stripe</a></li>
+                                         <li><a href="{% url 'app.views.offsite_eway' %}">eWAY</a></li>
+                                     </ul>
+                                 </li>
+                                 <li class="dropdown">
+                                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Others <b class="caret"></b></a>
+                                     <ul class="dropdown-menu" id="swatch-menu">
+                                         <li><a href="{% url 'app.views.bitcoin' %}">Bitcoin</a></li>
+                                     </ul>
+                                 </li>
+                             </ul>
+                             <ul class="nav pull-right" id="main-menu-right">
+                                 <li><a target="_blank" href="https://github.com/agiliq/merchant/">django-merchant on GitHub <i class="icon-share-alt"></i></a></li>
+                             </ul>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <br />
+             <br />
+             <br />
+
+            <!-- Forms
+            ================================================== -->
+            <section id="forms">
+                <div class="page-header">
+                    <h1>Payment Form
+                        <div class="about-star pull-right">
+                            <iframe src="http://ghbtns.com/github-btn.html?user=agiliq&amp;repo=merchant&amp;type=watch&amp;count=true&amp;size=large" allowtransparency="true" frameborder="0" height="30px" scrolling="0" width="152px"></iframe>
+                        </div>
+                    </h1>
+                </div>
+
+                <div class="row">
+                    <div class="span10 offset1">
+                        {% block content %}
+
+                        {% endblock %}
+                    </div>
+                </div>
+
+            </section>
+
+             <!-- Footer
+             ================================================== -->
+             <hr>
+
+             <footer id="footer">
+                 <p class="pull-right"><a href="#top">Back to top</a></p>
+                 <p>Made by people at <a href="http://agiliq.com" target="_blank">Agiliq</a>
+                 with help from <a href="https://github.com/agiliq/merchant/blob/master/CONTRIBUTORS.txt" target="_blank">many others</a></p>
+                 <p>Demo based on <a href="http://twitter.github.com/bootstrap/" target="_blank">Bootstrap</a>, theme <a href="http://bootswatch.com/cerulean/" target="_blank">Cerulean</a></p>
+            </footer>
+
+             <!-- Le javascript
+             ================================================== -->
+             <!-- Placed at the end of the document so the pages load faster -->
+             <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+             <script src="{{ STATIC_URL }}js/jquery.smooth-scroll.min.js"></script>
+             <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+         </div>
+
+     </body>
 </html>
