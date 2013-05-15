@@ -100,6 +100,15 @@ MERCHANT_SETTINGS = {
         "ACCOUNT": "",
         "MINCONF": 1,
     },
+
+    "ogone_payments": {
+        "SHA_PRE_SECRET": 'test1234',
+        "SHA_POST_SECRET": 'test12345',
+        "HASH_METHOD": 'sha512',
+        "PSPID": 'mypspid',
+        "OGONE_TEST_URL": 'https://secure.ogone.com/ncol/test/orderstandard.asp',
+        "OGONE_PROD_URL": 'https://secure.ogone.com/ncol/prod/orderstandard.asp'
+    }
 }
 
 # Special case for PayPal because we rely on django-paypal
