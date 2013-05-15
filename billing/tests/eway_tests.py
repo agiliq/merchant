@@ -22,9 +22,22 @@ fake_options = {
         "job_desc": "Job",
         "comments": "comments",
         "url": "http://google.com.au/",
-        },
+    },
     "invoice": "1234",
     "description": "Blah Blah!",
+    "customer_details": {
+        "customer_fname": "TEST",
+        "customer_lname": "USER",
+        "customer_address": "#43, abc",
+        "customer_email": "abc@test.Com",
+        "customer_postcode": 560041,
+    },
+    "payment_details": {
+        "amount": 100,  # In cents
+        "transaction_number": 3234,
+        "inv_ref": 'REF1234',
+        "inv_desc": "Please Ship ASASP",
+    }
 }
 
 
@@ -61,6 +74,23 @@ class EWayGatewayTestCase(TestCase):
                           "1,Do Not Honour(Test Gateway)")
         self.assertNotEquals(resp["response"].ewayTrxnNumber, "0")
         self.assertTrue(resp["response"].ewayReturnAmount, "1")
+
+    def testDirectPayment(self):
+        credit_card_details = {
+            'first_name': 'test fname',
+            'last_name': 'test lname',
+            'verification_value': '123',
+            'number': '4444333322221111',
+            'month': '7',
+            'card_type': 'visa',
+            'year': '2017'
+        }
+        resp = self.merchant.direct_payment(credit_card_details,
+                                            options=fake_options)
+        self.assertEquals(resp["status"], "SUCCESS")
+        eway_response = resp["response"]["ewayResponse"]
+        self.assertEquals(eway_response['ewayTrxnStatus'], 'True')
+        self.assertEquals(eway_response["ewayReturnAmount"], "100")
 
     def testPaymentSuccessfulSignal(self):
         # Since in the test mode, all transactions are

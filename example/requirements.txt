@@ -7,7 +7,6 @@ boto==2.8.0
 braintree==2.20.0
 wepay==0.1.5
 suds==0.4
-lxml==3.1.0
 requests==1.2.0
 django-crispy-forms==1.2.5
 mock==1.0.1
