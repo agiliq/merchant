@@ -3,7 +3,7 @@ import datetime
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect  # , HttpResponse
 
 from billing import CreditCard, get_gateway, get_integration
 from billing.gateway import CardNotSupported
@@ -11,7 +11,7 @@ from billing.gateway import CardNotSupported
 from app.forms import CreditCardForm
 from app.urls import (authorize_net_obj, google_checkout_obj, world_pay_obj, pay_pal_obj,
                       amazon_fps_obj, fps_recur_obj, braintree_obj,
-                      stripe_obj)
+                      stripe_obj, ogone_obj)
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from billing.utils.paylane import PaylanePaymentCustomer, \
@@ -432,3 +432,7 @@ def bitcoin_done(request):
         "address": address,
         "result": result
     })
+
+
+def offsite_ogone(request):
+    return render(request, "app/ogone.html", {"og_obj": ogone_obj})
