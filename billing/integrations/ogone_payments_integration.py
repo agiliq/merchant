@@ -7,6 +7,7 @@ from django.template import RequestContext
 from django.conf.urls import patterns, url
 from django_ogone.status_codes import get_status_category, get_status_description
 from django_ogone.signals import ogone_payment_accepted, ogone_payment_failed, ogone_payment_cancelled
+from django.core.urlresolvers import reverse
 
 
 class OgonePaymentsIntegration(Integration):
@@ -28,7 +29,7 @@ class OgonePaymentsIntegration(Integration):
     def service_url(self):
         return Ogone.get_action()
 
-    # orderID=26&currency=INR&amount=5%2E79&PM=CreditCard&ACCEPTANCE=test123&STATUS=5&CARDNO=XXXXXXXXXXXX1111&ED=0314&CN=Ramana+C&TRXDATE=05%2F15%2F13&PAYID=21604838&NCERROR=0&BRAND=VISA&IP=202%2E65%2E155%2E202&SHASIGN=FF9B8F20CAA6F9E8BA803C560BCF24111EF557A3118DFCD6CFBFE08CAA5BD6EB738803466D81C93E10DF8DEE07F0F6B46996BF7E99596B4920272D89DC9E933B
+    # Sample Response query params: orderID=26&currency=INR&amount=5%2E79&PM=CreditCard&ACCEPTANCE=test123&STATUS=5&CARDNO=XXXXXXXXXXXX1111&ED=0314&CN=Ramana+C&TRXDATE=05%2F15%2F13&PAYID=21604838&NCERROR=0&BRAND=VISA&IP=202%2E65%2E155%2E202&SHASIGN=FF9B8F20CAA6F9E8BA803C560BCF24111EF557A3118DFCD6CFBFE08CAA5BD6EB738803466D81C93E10DF8DEE07F0F6B46996BF7E99596B4920272D89DC9E933B
     def ogone_notify_handler(self, request):
         fpath = request.get_full_path()
         query_string = fpath.split("?", 1)[1]
@@ -50,17 +51,17 @@ class OgonePaymentsIntegration(Integration):
         if status and get_status_category(int(status)) == 'success':
             ogone_payment_accepted.send(sender=self, order_id=orderid, \
                 amount=amount, currency=currency, pay_id=payid, status=status, ncerror=ncerror)
-            return self.ogone_success_handler(request, response=result, description=get_status_description(status))
+            return self.ogone_success_handler(request, response=result, description=get_status_description(int(status)))
 
         if status and get_status_category(int(status)) == 'cancel':
             ogone_payment_cancelled.send(sender=self, order_id=orderid, \
                 amount=amount, currency=currency, pay_id=payid, status=status, ncerror=ncerror)
-            return self.ogone_cancel_handler(request, response=result, description=get_status_description(status))
+            return self.ogone_cancel_handler(request, response=result, description=get_status_description(int(status)))
 
         if status and get_status_category(int(status)) == 'decline' or 'exception':
             ogone_payment_failed.send(sender=self, order_id=orderid, \
                 amount=amount, currency=currency, pay_id=payid, status=status, ncerror=ncerror)
-            return self.ogone_failure_handler(request, response=result, description=get_status_description(status))
+            return self.ogone_failure_handler(request, response=result, description=get_status_description(int(status)))
 
     def ogone_success_handler(self, request, response=None, description=''):
         return render_to_response("billing/ogone_success.html",
@@ -92,10 +93,10 @@ class OgonePaymentsIntegration(Integration):
             'amount': u'100',
             'language': 'en_US',
             # Optional:
-            'exceptionurl': u'http://127.0.0.1:8000/offsite/ogone/failure/',
-            'declineurl': u'http://127.0.0.1:8000/offsite/ogone/failure/',
-            'cancelurl': u'http://127.0.0.1:8000/offsite/ogone/failure/',
-            'accepturl': u'http://127.0.0.1:8000/offsite/ogone/success/',
+            'exceptionurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
+            'declineurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
+            'cancelurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
+            'accepturl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
             # 'homeurl': u'http://127.0.0.1:8000/',
             # 'catalogurl': u'http://127.0.0.1:8000/',
             # 'ownerstate': u'',
