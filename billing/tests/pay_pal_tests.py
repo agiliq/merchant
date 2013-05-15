@@ -26,7 +26,7 @@ fake_options = {
         "state": "CA",
         "country": "US",
         "zip": "94043"
-        },
+    },
 }
 
 
@@ -42,7 +42,8 @@ class PayPalGatewayTestCase(TestCase):
     def testCardSupported(self):
         self.credit_card.number = "5019222222222222"
         self.assertRaises(CardNotSupported,
-                          lambda: self.merchant.purchase(1000, self.credit_card))
+                          lambda: self.merchant.purchase(1000,
+                                                         self.credit_card))
 
     def testCardValidated(self):
         self.merchant.test_mode = False
@@ -113,7 +114,8 @@ class PayPalWebsiteStandardsTestCase(TestCase):
         inputs = dom.getElementsByTagName('input')
         values_dict = {}
         for el in inputs:
-            if el.attributes['type'].value == 'hidden' and el.hasAttribute('value'):
+            if (el.attributes['type'].value == 'hidden'
+                    and el.hasAttribute('value')):
                 values_dict[el.attributes['name'].value] = el.attributes['value'].value
         self.assertDictContainsSubset(values_dict, fields)
 
@@ -125,7 +127,10 @@ class PayPalWebsiteStandardsTestCase(TestCase):
         self.assertEquals(parsed.path, '/cgi-bin/webscr')
 
     def testRenderForm(self):
-        tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
+        tmpl = Template("""
+            {% load render_integration from billing_tags %}
+            {% render_integration obj %}
+        """)
         form = tmpl.render(Context({"obj": self.pws}))
         fields = self.pws.fields.copy()
         fields.update({
@@ -134,6 +139,25 @@ class PayPalWebsiteStandardsTestCase(TestCase):
             'return': 'http://localhost/offsite/paypal/done/',
             'no_shipping': '1',
         })
+        self.assertFormIsCorrect(form, fields)
+
+    def testRenderFormMultipleItems(self):
+        fields = self.pws.fields.copy()
+        fields.update({
+            'amount_1': '10',
+            'item_name_1': 'Test Item 1',
+            'amount_2': '20',
+            'item_name_2': 'Test Item 2',
+            'charset': 'utf-8',
+            'currency_code': 'USD',
+            'return': 'http://localhost/offsite/paypal/done/',
+            'no_shipping': '1',
+        })
+        tmpl = Template("""
+            {% load render_integration from billing_tags %}
+            {% render_integration obj %}
+        """)
+        form = tmpl.render(Context({"obj": self.pws}))
         self.assertFormIsCorrect(form, fields)
 
     def testIPNURLSetup(self):

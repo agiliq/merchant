@@ -188,7 +188,7 @@ def we_pay(request):
     form = None
     amount = 10
     response = wp.purchase(10, None, {
-            "description": "Test Merchant Description", 
+            "description": "Test Merchant Description",
             "type": "SERVICE",
             "redirect_uri": request.build_absolute_uri(reverse('app_we_pay_redirect'))
             })
@@ -272,7 +272,7 @@ def offsite_authorize_net(request):
     authorize_net_obj.add_fields(params)
     template_vars = {"obj": authorize_net_obj, 'title': authorize_net_obj.display_name}
     return render(request, 'app/offsite_authorize_net.html', template_vars)
-    
+
 
 def offsite_paypal(request):
     invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -280,13 +280,16 @@ def offsite_paypal(request):
     cancel_return = request.build_absolute_uri(request.META['PATH_INFO'])
     notify_url = request.build_absolute_uri(reverse('paypal-ipn'))
 
-    paypal_params = {'amount': 1,
-                     'item_name': "name of the item",
-                     'invoice': invoice_id,
-                     'notify_url': notify_url,
-                     'return_url': return_url,
-                     'cancel_return': cancel_return,
-                     }
+    paypal_params = {
+        'amount_1': 1,
+        'item_name_1': "Item 1",
+        'amount_2': 2,
+        'item_name_2': "Item 2",
+        'invoice': invoice_id,
+        'notify_url': notify_url,
+        'return_url': return_url,
+        'cancel_return': cancel_return,
+    }
     pay_pal_obj.add_fields(paypal_params)
     template_vars = {"obj": pay_pal_obj, 'title': 'PayPal Offsite'}
     return render(request, 'app/offsite_paypal.html', template_vars)
@@ -401,7 +404,7 @@ def offsite_eway_done(request):
     eway_obj = get_integration("eway_au", access_code=access_code)
     result = eway_obj.check_transaction()
 
-    return render(request, "app/eway_done.html", {"result": result}) 
+    return render(request, "app/eway_done.html", {"result": result})
 
 
 def bitcoin(request):
