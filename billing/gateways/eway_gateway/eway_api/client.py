@@ -1,6 +1,6 @@
 import requests
-from lxml import etree
 from xml.dom.minidom import parseString
+from xml.etree.ElementTree import Element, tostring
 from suds.client import Client, WebFault
 
 from billing.utils.xml_parser import nodeToDic
@@ -29,19 +29,19 @@ class DirectPaymentClient(object):
         self.gateway_url = gateway_url
 
     def process_direct_payment(self, direct_payment_details=None, **kwargs):
-        '''
+        """
             Eway Direct Payment API Url : http://www.eway.com.au/developers/api/direct-payments#tab-1
             Input and Output format: https://gist.github.com/2552fcaa2799045a7884
-        '''
+        """
         if direct_payment_details:
             # Create XML to send
-            payment_xml_root = etree.Element("ewaygateway")
+            payment_xml_root = Element("ewaygateway")
             for each_field in direct_payment_details:
-                field = etree.Element(each_field)
+                field = Element(each_field)
                 field.text = str(direct_payment_details.get(each_field))
                 payment_xml_root.append(field)
             # pretty string
-            payment_xml_string = etree.tostring(payment_xml_root, pretty_print=True)
+            payment_xml_string = tostring(payment_xml_root)
             response = requests.post(self.gateway_url, data=payment_xml_string)
             response_xml = parseString(response.text)
             response_dict = nodeToDic(response_xml)

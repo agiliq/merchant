@@ -200,7 +200,7 @@ class EwayGateway(Gateway):
         raise NotImplementedError
 
     def direct_payment(self, credit_card_details, options=None):
-        '''
+        """
             Function that implement Direct Payment functionality provided by eWay.
                 (Reference: http://www.eway.com.au/developers/api/direct-payments)
 
@@ -212,7 +212,7 @@ class EwayGateway(Gateway):
             Output Paramters:
                 status: 'SUCCESS' or 'FAILURE'
                 response : eWay Response in Dictionary format.
-        '''
+        """
         error_response = {}
         try:
             if (options and options.get('customer_details', False) and
@@ -223,28 +223,28 @@ class EwayGateway(Gateway):
                 error_response = {"reason": "Not enough information Available!"}
                 raise
 
-            '''
+            """
                 # Validate Entered credit card details.
-            '''
+            """
             credit_card = CreditCard(**credit_card_details)
             is_valid = self.validate_card(credit_card)
             if not is_valid:
                 raise InvalidCard("Invalid Card")
 
-            '''
+            """
                 # Create direct payment details
-            '''
+            """
             direct_payment_details = self.add_direct_payment_details(credit_card, customer_details, payment_details)
 
-            '''
+            """
                 Process Direct Payment.
-            '''
+            """
             dpObj = DirectPaymentClient(self.direct_payment_url)
             response = dpObj.process_direct_payment(direct_payment_details)
 
-            '''
+            """
                 Return value based on eWay Response
-            '''
+            """
             eway_response = response.get('ewayResponse', None)
             if eway_response and eway_response.get('ewayTrxnStatus', 'false').lower() == 'true':
                 status = "SUCCESS"
@@ -277,9 +277,9 @@ class EwayGateway(Gateway):
                 error_response = {"reason": "Not enough information Available!"}
                 raise
 
-            '''
+            """
                 # Validate Entered credit card details.
-            '''
+            """
             credit_card = CreditCard(**credit_card_details)
             if not self.validate_card(credit_card):
                 raise InvalidCard("Invalid Card")
@@ -293,9 +293,9 @@ class EwayGateway(Gateway):
             # CustomerDetails : To create rebill Customer
             customer_detail = rebillClient.client.factory.create("CustomerDetails")
             self.add_customer_details(credit_card, customer_detail, options)
-            '''
+            """
                 # Create Rebill customer and retrieve customer rebill ID.
-            '''
+            """
             rebill_customer_response = rebillClient.create_rebill_customer(customer_detail)
 
             # Handler error in create_rebill_customer response
@@ -307,10 +307,10 @@ class EwayGateway(Gateway):
                 raise
 
             rebile_customer_id = rebill_customer_response.RebillCustomerID
-            '''
+            """
                 For Each rebill profile
                 # Create Rebill events using rebill customer ID and customer rebill details.
-            '''
+            """
             rebill_event_response_list = []
             for each_rebill_profile in options.get("customer_rebill_details", []):
                 rebill_detail = rebillClient.client.factory.create("RebillEventDetails")
@@ -356,9 +356,9 @@ class EwayGateway(Gateway):
             url=self.rebill_url,
         )
 
-        '''
+        """
             # Delete Rebill Event, using customer create rebill detail.
-        '''
+        """
         delete_rebill_response = rebillDeleteClient.delete_rebill_event(rebill_customer_id, rebill_id)
 
         # Handler error in delete_rebill_customer response

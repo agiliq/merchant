@@ -216,8 +216,8 @@ HTML form directly to eWAY. The helper tag ``{% eway %}`` makes this trivial:
 
 .. code-block:: django
 
-    {% load eway from eway_tags %}
-    {% eway integration %}
+    {% load render_integration from billing_tags %}
+    {% render_integration integration %}
 
 For a more configurable form, use the following pattern:
 
