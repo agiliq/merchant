@@ -40,7 +40,7 @@ class OgonePaymentsIntegration(Integration):
             result[k] = v
 
         # Default transaction feedback parameters
-        status = result.get('status', False)
+        status = result.get('STATUS', False)
         orderid = result.get('orderID', '')
         payid = result.get('PAYID', '')
         ncerror = result.get('NCERROR', '')
@@ -88,9 +88,9 @@ class OgonePaymentsIntegration(Integration):
 
     def generate_tr_data(self):
         data = {
-            'orderID': 30,
+            'orderID': 31,
             'currency': u'INR',
-            'amount': u'100',
+            'amount': u'10000',
             'language': 'en_US',
             # Optional:
             'exceptionurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
