@@ -1,0 +1,9 @@
+{% extends "app/base.html" %}
+
+{% block content %}
+The transaction was cancelled!
+<hr />
+Status: {{ message }}
+<hr />
+PAY ID: {{ response.PAYID }}
+{% endblock %}

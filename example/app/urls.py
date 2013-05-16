@@ -11,6 +11,7 @@ fps_recur_obj = get_integration("fps")
 world_pay_obj = get_integration("world_pay")
 braintree_obj = get_integration("braintree_payments")
 stripe_obj = get_integration("stripe_example")
+ogone_obj = get_integration("ogone_payments")
 
 urlpatterns = patterns('app.views',
     url(r'^$', 'index', name='app_index'),
@@ -39,6 +40,7 @@ urlpatterns += patterns('app.views',
 
     # redirect handler
     url(r'offsite/eway/done/$', 'offsite_eway_done'),
+    url(r'offsite/ogone/$', 'offsite_ogone', name='app_offsite_ogone'),
 )
 
 urlpatterns += patterns('',
@@ -60,6 +62,7 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
     (r'^braintree/', include(braintree_obj.urls)),
 )
+
 urlpatterns += patterns('',
     (r'^stripe/', include(stripe_obj.urls)),
 )
@@ -77,4 +80,8 @@ urlpatterns += patterns('app.views',
     url(r'^we_pay/$', 'we_pay', name="app_we_pay"),
     url(r'we_pay_redirect/$', 'we_pay_redirect', name="app_we_pay_redirect"),
     url(r'^we_pay_ipn/$', 'we_pay_ipn', name="app_we_pay_ipn"),
+)
+
+urlpatterns += patterns('',
+    (r'^ogone/', include(ogone_obj.urls)),
 )
