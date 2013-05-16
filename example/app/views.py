@@ -438,4 +438,34 @@ def bitcoin_done(request):
 
 
 def offsite_ogone(request):
+    from billing.utils.utilities import randomword
+    fields = {
+        # Required
+        # orderID needs to be unique per transaction.
+        'orderID': randomword(6),
+        'currency': u'INR',
+        'amount': u'10000',  # 100.00
+        'language': 'en_US',
+
+        # Optional; Can be configured in Ogone Account:
+
+        'exceptionurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
+        'declineurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
+        'cancelurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
+        'accepturl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
+
+        # Optional fields which can be used for billing:
+
+        # 'homeurl': u'http://127.0.0.1:8000/',
+        # 'catalogurl': u'http://127.0.0.1:8000/',
+        # 'ownerstate': u'',
+        # 'cn': u'Venkata Ramana',
+        # 'ownertown': u'Hyderabad',
+        # 'ownercty': u'IN',
+        # 'ownerzip': u'Postcode',
+        # 'owneraddress': u'Near Madapur PS',
+        # 'com': u'Order #21: Venkata Ramana',
+        # 'email': u'ramana@agiliq.com'
+    }
+    ogone_obj.add_fields(fields)
     return render(request, "app/ogone.html", {"og_obj": ogone_obj})
