@@ -30,7 +30,7 @@ class OgonePaymentsIntegration(Integration):
 
     @property
     def service_url(self):
-        return Ogone.get_action()
+        return Ogone.get_action(production=not settings.MERCHANT_TEST_MODE)
 
     def ogone_notify_handler(self, request):
         response = Ogone(request=request, settings=self.settings)
