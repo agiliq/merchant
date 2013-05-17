@@ -1,15 +1,19 @@
 # -*- coding: utf-8 *-*
 from billing import Integration, IntegrationNotConfigured
 from django.conf import settings
-from django_ogone.ogone import Ogone
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+
 from django.conf.urls import patterns, url
-from django_ogone.status_codes import get_status_category, get_status_description
-from django_ogone.signals import ogone_payment_accepted, ogone_payment_failed, ogone_payment_cancelled
+from django.template import RequestContext
 from django.http import HttpResponse
-from billing.utils.utilities import Bunch
+from django.shortcuts import render_to_response
+
+from django_ogone.ogone import Ogone
 from billing.forms.ogone_payments_forms import OgonePaymentsForm
+from django_ogone.status_codes import get_status_category, get_status_description, \
+SUCCESS_STATUS, DECLINE_STATUS, EXCEPTION_STATUS, CANCEL_STATUS
+from django_ogone.signals import ogone_payment_accepted, ogone_payment_failed, ogone_payment_cancelled
+
+from billing.utils.utilities import Bunch
 
 
 class OgonePaymentsIntegration(Integration):
@@ -30,7 +34,7 @@ class OgonePaymentsIntegration(Integration):
 
     @property
     def service_url(self):
-        return Ogone.get_action(production=not settings.MERCHANT_TEST_MODE)
+        return Ogone.get_action(production=self.settings.PRODUCTION)
 
     def ogone_notify_handler(self, request):
         response = Ogone(request=request, settings=self.settings)
@@ -52,17 +56,17 @@ class OgonePaymentsIntegration(Integration):
             amount = result.get('amount', '')
             currency = result.get('currency', '')
 
-            if status and get_status_category(int(status)) == 'success':
+            if status and get_status_category(int(status)) == SUCCESS_STATUS:
                 ogone_payment_accepted.send(sender=self, order_id=orderid, \
                     amount=amount, currency=currency, pay_id=payid, status=status, ncerror=ncerror)
                 return self.ogone_success_handler(request, response=result, description=get_status_description(int(status)))
 
-            if status and get_status_category(int(status)) == 'cancel':
+            if status and get_status_category(int(status)) == CANCEL_STATUS:
                 ogone_payment_cancelled.send(sender=self, order_id=orderid, \
                     amount=amount, currency=currency, pay_id=payid, status=status, ncerror=ncerror)
                 return self.ogone_cancel_handler(request, response=result, description=get_status_description(int(status)))
 
-            if status and get_status_category(int(status)) == 'decline' or 'exception':
+            if status and get_status_category(int(status)) == DECLINE_STATUS or EXCEPTION_STATUS:
                 ogone_payment_failed.send(sender=self, order_id=orderid, \
                     amount=amount, currency=currency, pay_id=payid, status=status, ncerror=ncerror)
                 return self.ogone_failure_handler(request, response=result, description=get_status_description(int(status)))
@@ -86,7 +90,8 @@ class OgonePaymentsIntegration(Integration):
 
     def get_urls(self):
         urlpatterns = patterns('',
-           url('^ogone_notify_handler/$', self.ogone_notify_handler, name="ogone_notify_handler"),)
+            url('^ogone_notify_handler/$', self.ogone_notify_handler, name="ogone_notify_handler"),
+        )
         return urlpatterns
 
     def add_fields(self, params):
