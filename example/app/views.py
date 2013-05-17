@@ -438,7 +438,7 @@ def bitcoin_done(request):
 
 
 def offsite_ogone(request):
-    from billing.utils.utilities import randomword
+    from utils import randomword
     fields = {
         # Required
         # orderID needs to be unique per transaction.
@@ -449,10 +449,10 @@ def offsite_ogone(request):
 
         # Optional; Can be configured in Ogone Account:
 
-        'exceptionurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
-        'declineurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
-        'cancelurl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
-        'accepturl': u'%s%s' % ('http://127.0.0.1:8000', reverse("ogone_notify_handler")),
+        'exceptionurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'declineurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'cancelurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'accepturl': request.build_absolute_uri(reverse("ogone_notify_handler")),
 
         # Optional fields which can be used for billing:
 

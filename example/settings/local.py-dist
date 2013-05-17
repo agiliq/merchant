@@ -105,6 +105,7 @@ MERCHANT_SETTINGS = {
         "SHA_PRE_SECRET": 'test1234',
         "SHA_POST_SECRET": 'test12345',
         "HASH_METHOD": 'sha512',
+        "PRODUCTION": not MERCHANT_TEST_MODE,
         "PSPID": 'mypspid',
         "OGONE_TEST_URL": 'https://secure.ogone.com/ncol/test/orderstandard.asp',
         "OGONE_PROD_URL": 'https://secure.ogone.com/ncol/prod/orderstandard.asp'
