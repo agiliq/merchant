@@ -104,12 +104,6 @@ class OgonePaymentsIntegration(Integration):
             else:
                 self.add_field(key, val)
 
-    def form_class(self):
-        return OgonePaymentsForm
-
     def generate_form(self):
-        # form = self.form_class()(initial=self.fields)
-        # The above form has SHASIGN field which needs to be calculated.
-        # It's easier to use the Ogone module's get_form method which takes care of that.
         form = Ogone.get_form(self.fields, settings=self.settings)
         return form
