@@ -3,7 +3,7 @@ language: python
 python:
 - '2.7'
 script: python example/manage.py test billing --settings=settings.travis
-install: pip install -r example/requirements.txt
+install: pip install -i https://simple.crate.io -r example/requirements.txt
 env:
   global:
   - secure: ! 'ZNudS+n9oaFFDA2U23GhZjEeYnsjIZvChiqGuYI6Hrjo9cEE7O7pJFmKlu84
