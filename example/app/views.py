@@ -438,7 +438,7 @@ def bitcoin_done(request):
 
 
 def offsite_ogone(request):
-    from billing.utils.utilities import randomword
+    from utils import randomword
     fields = {
         # Required
         # orderID needs to be unique per transaction.
