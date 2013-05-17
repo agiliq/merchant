@@ -449,10 +449,10 @@ def offsite_ogone(request):
 
         # Optional; Can be configured in Ogone Account:
 
-        'exceptionurl': u'%s%s' % (request.build_absolute_uri(), reverse("ogone_notify_handler")),
-        'declineurl': u'%s%s' % (request.build_absolute_uri(), reverse("ogone_notify_handler")),
-        'cancelurl': u'%s%s' % (request.build_absolute_uri(), reverse("ogone_notify_handler")),
-        'accepturl': u'%s%s' % (request.build_absolute_uri(), reverse("ogone_notify_handler")),
+        'exceptionurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'declineurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'cancelurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'accepturl': request.build_absolute_uri(reverse("ogone_notify_handler")),
 
         # Optional fields which can be used for billing:
 
