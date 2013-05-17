@@ -8,7 +8,6 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 
 from django_ogone.ogone import Ogone
-from billing.forms.ogone_payments_forms import OgonePaymentsForm
 from django_ogone.status_codes import get_status_category, get_status_description, \
 SUCCESS_STATUS, DECLINE_STATUS, EXCEPTION_STATUS, CANCEL_STATUS
 from django_ogone.signals import ogone_payment_accepted, ogone_payment_failed, ogone_payment_cancelled
