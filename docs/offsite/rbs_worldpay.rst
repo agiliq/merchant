@@ -54,8 +54,8 @@ In views.py::
 
 In some_template.html::
 
-  {% load billing_tags %}
-  {% world_pay obj %}
+  {% load render_integration from billing_tags %}
+  {% render_integration obj %}
 
 Template renders to something like below::
 

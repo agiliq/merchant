@@ -3,7 +3,7 @@ import datetime
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect  # , HttpResponse
 
 from billing import CreditCard, get_gateway, get_integration
 from billing.gateway import CardNotSupported
@@ -11,7 +11,7 @@ from billing.gateway import CardNotSupported
 from app.forms import CreditCardForm
 from app.urls import (authorize_net_obj, google_checkout_obj, world_pay_obj, pay_pal_obj,
                       amazon_fps_obj, fps_recur_obj, braintree_obj,
-                      stripe_obj)
+                      stripe_obj, ogone_obj)
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from billing.utils.paylane import PaylanePaymentCustomer, \
@@ -188,7 +188,7 @@ def we_pay(request):
     form = None
     amount = 10
     response = wp.purchase(10, None, {
-            "description": "Test Merchant Description", 
+            "description": "Test Merchant Description",
             "type": "SERVICE",
             "redirect_uri": request.build_absolute_uri(reverse('app_we_pay_redirect'))
             })
@@ -272,7 +272,7 @@ def offsite_authorize_net(request):
     authorize_net_obj.add_fields(params)
     template_vars = {"obj": authorize_net_obj, 'title': authorize_net_obj.display_name}
     return render(request, 'app/offsite_authorize_net.html', template_vars)
-    
+
 
 def offsite_paypal(request):
     invoice_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -280,13 +280,16 @@ def offsite_paypal(request):
     cancel_return = request.build_absolute_uri(request.META['PATH_INFO'])
     notify_url = request.build_absolute_uri(reverse('paypal-ipn'))
 
-    paypal_params = {'amount': 1,
-                     'item_name': "name of the item",
-                     'invoice': invoice_id,
-                     'notify_url': notify_url,
-                     'return_url': return_url,
-                     'cancel_return': cancel_return,
-                     }
+    paypal_params = {
+        'amount_1': 1,
+        'item_name_1': "Item 1",
+        'amount_2': 2,
+        'item_name_2': "Item 2",
+        'invoice': invoice_id,
+        'notify_url': notify_url,
+        'return_url': return_url,
+        'cancel_return': cancel_return,
+    }
     pay_pal_obj.add_fields(paypal_params)
     template_vars = {"obj": pay_pal_obj, 'title': 'PayPal Offsite'}
     return render(request, 'app/offsite_paypal.html', template_vars)
@@ -401,7 +404,7 @@ def offsite_eway_done(request):
     eway_obj = get_integration("eway_au", access_code=access_code)
     result = eway_obj.check_transaction()
 
-    return render(request, "app/eway_done.html", {"result": result}) 
+    return render(request, "app/eway_done.html", {"result": result})
 
 
 def bitcoin(request):
@@ -432,3 +435,37 @@ def bitcoin_done(request):
         "address": address,
         "result": result
     })
+
+
+def offsite_ogone(request):
+    from utils import randomword
+    fields = {
+        # Required
+        # orderID needs to be unique per transaction.
+        'orderID': randomword(6),
+        'currency': u'INR',
+        'amount': u'10000',  # 100.00
+        'language': 'en_US',
+
+        # Optional; Can be configured in Ogone Account:
+
+        'exceptionurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'declineurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'cancelurl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+        'accepturl': request.build_absolute_uri(reverse("ogone_notify_handler")),
+
+        # Optional fields which can be used for billing:
+
+        # 'homeurl': u'http://127.0.0.1:8000/',
+        # 'catalogurl': u'http://127.0.0.1:8000/',
+        # 'ownerstate': u'',
+        # 'cn': u'Venkata Ramana',
+        # 'ownertown': u'Hyderabad',
+        # 'ownercty': u'IN',
+        # 'ownerzip': u'Postcode',
+        # 'owneraddress': u'Near Madapur PS',
+        # 'com': u'Order #21: Venkata Ramana',
+        # 'email': u'ramana@agiliq.com'
+    }
+    ogone_obj.add_fields(fields)
+    return render(request, "app/ogone.html", {"og_obj": ogone_obj})

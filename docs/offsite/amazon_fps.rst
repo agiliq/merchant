@@ -126,8 +126,8 @@ In views.py::
 
 In some_template.html::
 
-    {% load amazon_fps from amazon_fps_tags %}
-    {% amazon_fps fps %}
+    {% load render_integration from billing_tags %}
+    {% render_integration fps %}
 
 The above template renders the following code::
 

@@ -1,0 +1,17 @@
+{% extends 'app/base.html' %}
+{% load render_integration from billing_tags %}
+
+{% block content %}
+<div class="well">
+    Required Parameters from the view
+        <ul>
+            <li> language </li>
+            <li> order id </li>
+            <li> amount </li>
+            <li> currency </li>
+        </ul>
+        You are going to be charged Rs 100 under <a href="http://ogone.com/">Ogone Offsite Payment</a>.
+        <hr />
+    {% render_integration og_obj %}
+</div>
+{% endblock %}

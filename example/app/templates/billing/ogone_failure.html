@@ -1,0 +1,15 @@
+{% extends "app/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="span10">
+        <div class="alert alert-block">
+            <a class="close">×</a>
+            <h4 class="alert-heading">Response:</h4>
+            <p>{{ message }} </p>
+            <p>Pay ID: {{ response.PAYID }}</p>
+        </div>
+    </div>
+</div>
+{{ block.super }}
+{% endblock %}

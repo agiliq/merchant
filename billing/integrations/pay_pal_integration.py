@@ -1,10 +1,15 @@
-from billing import Integration, IntegrationNotConfigured
 from django.conf import settings
-from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
 from django.conf.urls import patterns, include
-from paypal.standard.ipn.signals import payment_was_flagged, payment_was_successful
-from billing.signals import transaction_was_successful, transaction_was_unsuccessful
-from paypal.standard.forms import PayPalPaymentsForm, PayPalEncryptedPaymentsForm
+
+from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
+from paypal.standard.ipn.signals import (payment_was_flagged,
+                                         payment_was_successful)
+
+from billing import Integration, IntegrationNotConfigured
+from billing.forms.paypal_forms import (MerchantPayPalPaymentsForm,
+                                        MerchantPayPalEncryptedPaymentsForm)
+from billing.signals import (transaction_was_successful,
+                             transaction_was_unsuccessful)
 
 
 class PayPalIntegration(Integration):
@@ -14,8 +19,8 @@ class PayPalIntegration(Integration):
     def __init__(self):
         merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
         if not merchant_settings or not merchant_settings.get("pay_pal"):
-            raise IntegrationNotConfigured("The '%s' integration is not correctly "
-                                       "configured." % self.display_name)
+            raise IntegrationNotConfigured("The '%s' integration is not \
+                                    correctly configured." % self.display_name)
         pay_pal_settings = merchant_settings["pay_pal"]
         self.encrypted = False
         if pay_pal_settings.get("ENCRYPTED"):
@@ -37,15 +42,13 @@ class PayPalIntegration(Integration):
         return POSTBACK_ENDPOINT
 
     def get_urls(self):
-        urlpatterns = patterns('',
-           (r'^', include('paypal.standard.ipn.urls')),
-            )
+        urlpatterns = patterns('', (r'^', include('paypal.standard.ipn.urls')))
         return urlpatterns
 
     def form_class(self):
         if self.encrypted:
-            return PayPalEncryptedPaymentsForm
-        return PayPalPaymentsForm
+            return MerchantPayPalEncryptedPaymentsForm
+        return MerchantPayPalPaymentsForm
 
     def generate_form(self):
         return self.form_class()(initial=self.fields)

@@ -51,7 +51,7 @@ class GoogleCheckoutTestCase(TestCase):
         input_image_src = dom.getElementsByTagName('input')[2].attributes['src'].value
 
         expected_form_action_url = "https://sandbox.google.com/checkout/api/checkout/v2/checkout/Merchant/%s" % settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']
-        expected_input_image_src = "http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%s&w=180&h=46&style=white&variant=text&loc=en_US" % settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']
+        expected_input_image_src = "https://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=%s&w=180&h=46&style=white&variant=text&loc=en_US" % settings.MERCHANT_SETTINGS['google_checkout']['MERCHANT_ID']
 
         self.assertEquals(form_action_url, expected_form_action_url)
         self.assertEquals(input_image_src, expected_input_image_src)

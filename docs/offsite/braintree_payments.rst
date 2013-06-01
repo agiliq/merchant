@@ -82,9 +82,8 @@ Example:
       
    In the template::
 
-      {% load braintree_payments from braintree_payments_tags %}
-
-      {% braintree_payments bp %}
+      {% load render_integration from billing_tags %}
+      {% render_integration bp %}
 
 
 .. _`Braintree Payments Transparent Redirect`: http://www.braintreepayments.com/gateway/api
