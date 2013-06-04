@@ -32,7 +32,10 @@ class CreditCard(object):
     def is_luhn_valid(self):
         """Checks the validity of card number by using Luhn Algorithm.
         Please see http://en.wikipedia.org/wiki/Luhn_algorithm for details."""
-        num = [int(x) for x in str(self.number)]
+        try:
+            num = [int(x) for x in str(self.number)]
+        except ValueError:
+            return False
         return not sum(num[::-2] + [sum(divmod(d * 2, 10)) for d in num[-2::-2]]) % 10
 
     def is_expired(self):
