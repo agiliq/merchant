@@ -1,5 +1,9 @@
+try:
+    import json
+except ImportError:
+    from django.utils import simplejson as json
+
 import pprint
-import simplejson
 import requests
 
 from django.conf import settings
@@ -42,7 +46,7 @@ class PinGateway(Gateway):
         uri = "https://%s/%s%s" % (self.endpoint, self.version, url)
         auth = (self.secret_key, '')
         headers = {'content-type': 'application/json'}
-        resp = request_method(uri, data=simplejson.dumps(data), auth=auth, headers=headers)
+        resp = request_method(uri, data=json.dumps(data), auth=auth, headers=headers)
         return resp.json()
 
     def _pin_response(self, resp, signal_type):
