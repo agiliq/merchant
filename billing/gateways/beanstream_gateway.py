@@ -1,5 +1,6 @@
 from beanstream.gateway import Beanstream
 from beanstream.billing import CreditCard
+from beanstream.process_transaction import Adjustment
 
 from django.conf import settings
 
@@ -177,7 +178,7 @@ class BeanstreamGateway(Gateway):
 
     def unauthorize(self, money, authorization, options=None):
         """Cancel a previously authorized transaction"""
-        txn = self.beangw.cancel_preauth(authorization)
+        txn = Adjustment(self.beangw, Adjustment.PREAUTH_COMPLETION, authorization, money)
 
         resp = self._parse_resp(txn.commit())
         if resp["status"] == "SUCCESS":

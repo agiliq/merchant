@@ -218,9 +218,9 @@ class BeanstreamGatewayTestCase(TestCase):
                     "country": "IN",
                     "address1": "ABCD"}})
         self.assertEquals(response["status"], "SUCCESS")
-        txnid = response["response"].resp["trnId"]
+        txnid = response["response"].resp["trnId"][0]
         self.assertIsNotNone(txnid)
-        response = self.merchant.unauthorize(None, txnid)
+        response = self.merchant.unauthorize('0.5', txnid)
         self.assertEquals(response["status"], "SUCCESS")
 
     def testCreateProfile(self):
