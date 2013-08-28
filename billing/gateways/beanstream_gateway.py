@@ -73,7 +73,7 @@ class BeanstreamGateway(Gateway):
         login_company = kwargs.pop("login_company", beanstream_settings["LOGIN_COMPANY"])
         login_user = kwargs.pop("login_user", beanstream_settings["LOGIN_USER"])
         login_password = kwargs.pop("login_password", beanstream_settings["LOGIN_PASSWORD"])
-        kwargs["payment_profile_passcode"] = beanstream_settings["PAYMENT_PROFILE_PASSCODE"]
+        kwargs["payment_profile_passcode"] = beanstream_settings.get("PAYMENT_PROFILE_PASSCODE", None)
 
         if hash_validation:
             if not kwargs.get("hash_algorithm"):
