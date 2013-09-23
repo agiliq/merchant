@@ -106,11 +106,6 @@ class PaylaneTestCase(TestCase):
         self.assertTrue('transaction' in bill1['response'])
         self.assertTrue('authorization' in bill1['response'])
 
-        bill2 = self.merchant.bill_recurring(12.0, bill1['response']['authorization'], 'OK recurring')
-        self.assertEqual(bill2['status'], 'SUCCESS', unicode(bill2['response']))
-        self.assertTrue('transaction' in bill2['response'])
-        self.assertTrue('authorization' in bill2['response'])
-
     def testRecurringBillingFailWithChargeback(self):
         credit_card = Visa(first_name='Celso', last_name='Pinto', month=10, year=2020, number='4111111111111111', verification_value=435)
         options = {}
