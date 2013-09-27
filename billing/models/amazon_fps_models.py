@@ -33,6 +33,3 @@ class AmazonFPSResponse(models.Model):
 
     def __unicode__(self):
         return "%s : %s" % (self.transactionId, self.statusCode)
-
-    class Meta:
-        app_label = __name__.split(".")[0]

@@ -152,31 +152,3 @@ class PinGateway(Gateway):
 
     def unstore(self, identification, options=None):
         raise NotImplementedError
-
-if __name__ == '__main__':
-    gateway = PinGateway()
-    card = {
-        'first_name': "Test", 
-        'last_name': "User",
-        'month': 1, 
-        'year': 2020,
-        'number': "4200000000000000",
-        'verification_value': "481",
-    }
-    options = {
-        "email": "test@test.com",
-        "description": "Test transaction",
-        "currency": "AUD",
-        "ip": "203.206.167.31",
-        "billing_address": {
-            "address1": "392 Sussex St",
-            "city": "Sydney",
-            "zip": "2000",
-            "state": "NSW",
-            "country": "Australia",
-        },
-    }
-    credit_card = CreditCard(**card)
-    resp = gateway.store(credit_card, options=options)
-    token = resp['response']['token']
-    resp = gateway.capture(56.60, token, options=options)
