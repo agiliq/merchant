@@ -8,8 +8,8 @@ from billing.models.world_pay_models import WorldPayResponse
 from django.utils.decorators import method_decorator
 from billing.forms.world_pay_forms import WPHostedPaymentForm
 
-RBS_HOSTED_URL_TEST = "https://select-test.wp3.rbsworldpay.com/wcc/purchase"
-RBS_HOSTED_URL_LIVE = "https://secure.wp3.rbsworldpay.com/wcc/purchase"
+RBS_HOSTED_URL_TEST = "https://select-test.worldpay.com/wcc/purchase"
+RBS_HOSTED_URL_LIVE = "https://secure.worldpay.com/wcc/purchase"
 
 # http://www.rbsworldpay.com/support/bg/index.php?page=development&sub=integration&c=WW
 

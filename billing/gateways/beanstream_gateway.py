@@ -1,5 +1,6 @@
 from beanstream.gateway import Beanstream
 from beanstream.billing import CreditCard
+from beanstream.process_transaction import Adjustment
 
 from django.conf import settings
 
@@ -72,6 +73,7 @@ class BeanstreamGateway(Gateway):
         login_company = kwargs.pop("login_company", beanstream_settings["LOGIN_COMPANY"])
         login_user = kwargs.pop("login_user", beanstream_settings["LOGIN_USER"])
         login_password = kwargs.pop("login_password", beanstream_settings["LOGIN_PASSWORD"])
+        kwargs["payment_profile_passcode"] = beanstream_settings.get("PAYMENT_PROFILE_PASSCODE", None)
 
         if hash_validation:
             if not kwargs.get("hash_algorithm"):
@@ -177,7 +179,7 @@ class BeanstreamGateway(Gateway):
 
     def unauthorize(self, money, authorization, options=None):
         """Cancel a previously authorized transaction"""
-        txn = self.beangw.cancel_preauth(authorization)
+        txn = Adjustment(self.beangw, Adjustment.PREAUTH_COMPLETION, authorization, money)
 
         resp = self._parse_resp(txn.commit())
         if resp["status"] == "SUCCESS":

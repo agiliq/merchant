@@ -42,7 +42,7 @@ class WorldPayTestCase(TestCase):
         parsed = urlparse.urlparse(form_action_url)
 
         self.assertEquals(parsed.scheme, 'https')
-        self.assertEquals(parsed.netloc, 'select-test.wp3.rbsworldpay.com')
+        self.assertEquals(parsed.netloc, 'select-test.worldpay.com')
         self.assertEquals(parsed.path, '/wcc/purchase')
 
     def testFormGen(self):

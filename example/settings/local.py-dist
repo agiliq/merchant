@@ -71,7 +71,7 @@ MERCHANT_SETTINGS = {
     "we_pay": {
         "CLIENT_ID": "",
         "CLIENT_SECRET": "",
-        # Below two are optional if are passed as 
+        # Below two are optional if are passed as
         # extra option items. Useful for marketplace
         "ACCOUNT_ID": "",
         "ACCESS_TOKEN": "",
@@ -102,13 +102,17 @@ MERCHANT_SETTINGS = {
     },
 
     "ogone_payments": {
-        "SHA_PRE_SECRET": 'test1234',
-        "SHA_POST_SECRET": 'test12345',
+        "SHA_PRE_SECRET": '',
+        "SHA_POST_SECRET": '',
         "HASH_METHOD": 'sha512',
         "PRODUCTION": not MERCHANT_TEST_MODE,
         "PSPID": 'mypspid',
         "OGONE_TEST_URL": 'https://secure.ogone.com/ncol/test/orderstandard.asp',
         "OGONE_PROD_URL": 'https://secure.ogone.com/ncol/prod/orderstandard.asp'
+    },
+
+    "pin": {
+        "SECRET": ""
     }
 }
 
