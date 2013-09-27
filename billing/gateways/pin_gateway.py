@@ -1,11 +1,13 @@
 import pprint
 import simplejson
 import requests
+from copy import copy
 from django.conf import settings
 from billing import CreditCard
 from billing import Gateway, GatewayNotConfigured
 from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 from billing.utils.credit_card import Visa, MasterCard, DinersClub, JCB, AmericanExpress, InvalidCard
+from billing.models.pin_models import *
 
 SSIG = {
     True:  ('SUCCESS', transaction_was_successful),
@@ -42,7 +44,7 @@ class PinGateway(Gateway):
         resp = request_method(uri, data=simplejson.dumps(data), auth=auth, headers=headers)
         return resp.json()
 
-    def _pin_response(self, resp, signal_type):
+    def _pin_response(self, resp, signal_type, obj=None):
         success = False
         if 'response' in resp:
             resp = resp['response']
@@ -51,15 +53,15 @@ class PinGateway(Gateway):
         signal.send(sender=self, type=signal_type, response=resp)
         if settings.DEBUG:
             pprint.pprint(resp)
-        return {'status': status, 'response': resp}
+        return {'status': status, 'response': resp, 'obj': obj}
 
     def _pin_base(self, money, options):
         return {
             'amount': str(int(money*100)),
-            'email': options['email'],
-            'description': options['description'],
+            'email': options.get('email', ''),
+            'description': options.get('description', ''),
             'currency': options.get('currency', self.default_currency),
-            'ip_address': options['ip'],
+            'ip_address': options.get('ip', ''),
         }
 
     def _pin_card(self, credit_card, options=None):
@@ -69,7 +71,7 @@ class PinGateway(Gateway):
             "expiry_month": "%02d" % credit_card.month,
             "expiry_year": str(credit_card.year),
             "cvc": credit_card.verification_value,
-            "name": credit_card.name,
+            "name": '%s %s' % (credit_card.first_name, credit_card.last_name),
             "address_line1": address['address1'],
             "address_line2": address.get('address2', ''),
             "address_city": address['city'],
@@ -78,18 +80,35 @@ class PinGateway(Gateway):
             "address_country": address['country'],
         }
 
-    def purchase(self, money, credit_card, options=None):
+    def purchase(self, money, credit_card, options=None, commit=True):
+        "Charge (without token)"
         data = self._pin_base(money, options)
         data['card'] = self._pin_card(credit_card, options)
         resp = self._pin_request('post', '/charges', data)
-        return self._pin_response(resp, 'purchase')
+        charge = None
+        if commit and 'response' in resp:
+            response = copy(resp['response'])
+            del response['card']['name']
+            card = PinCard(**response['card'])
+            card.first_name = credit_card.first_name
+            card.last_name = credit_card.last_name
+            card.save()
+            charge = PinCharge(card=card)
+            for key, value in response.items():
+                if key != 'card':
+                    setattr(charge, key, value)
+            charge.save()
+        return self._pin_response(resp, 'purchase', charge)
 
     def authorize(self, money, credit_card, options=None):
+        "Card tokens"
         data = self._pin_card(credit_card, options)
         resp = self._pin_request('post', '/cards', data)
-        return self._pin_response(resp, 'authorize')
+        # TODO: save model
+        return self._pin_response(resp, 'authorize', obj=card)
 
     def capture(self, money, authorization, options=None):
+        "Charge (with card/customer token)"
         # authorization is a card/customer token from authorize/store
         data = self._pin_base(money, options)
         if authorization.startswith('cus_'):
@@ -97,20 +116,24 @@ class PinGateway(Gateway):
         elif authorization.startswith('card_'):
             data['card_token'] = authorization
         resp = self._pin_request('post', '/charges', data)
+        # TODO: save model
         return self._pin_response(resp, 'capture')
 
     def void(self, identification, options=None):
         raise NotImplementedError
 
     def credit(self, money, identification, options=None):
+        "Refunds"
         url = '/%s/refunds' % identification
         resp = self._pin_request('post', url, {})
+        # TODO: save model
         return self._pin_response(resp, 'credit')
 
     def recurring(self, money, credit_card, options=None):
         raise NotImplementedError
 
     def store(self, credit_card, options=None):
+        "Customers"
         data = {
             'email': options['email'],
             'card': self._pin_card(credit_card, options),
@@ -120,6 +143,7 @@ class PinGateway(Gateway):
         else:
             url = '/customers'
         resp = self._pin_request('post', url, data)
+        # TODO: save model
         return self._pin_response(resp, 'store')
 
     def unstore(self, identification, options=None):
