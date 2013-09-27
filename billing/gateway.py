@@ -1,7 +1,7 @@
-import os.path, pkgutil
-from django.utils.importlib import import_module
+import import_module
 from django.conf import settings
 from .utils.credit_card import CardNotSupported
+from .utils.modules import get_module_names
 
 gateway_cache = {}
 
@@ -133,9 +133,9 @@ def get_gateway(gateway, *args, **kwargs):
 def list_gateways(active_only=False):
     from billing import gateways
     gateway_list = []
-    for member in get_module_names(gateways):
-        if member.find('_gateway') > 0:
-            gateway = member.replace('_gateway', '')
+    for module_name in get_module_names(gateways):
+        if module_name.find('_gateway') > 0:
+            gateway = module_name.replace('_gateway', '')
             if not active_only or get_gateway(gateway):
                 gateway_list.append(gateway)
     return gateway_list
