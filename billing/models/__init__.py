@@ -10,6 +10,4 @@ for module_name in get_module_names(__name__):
     if not MODELS or gateway in MODELS:
         module = __import__('%s.%s' % (__name__, module_name), fromlist="*")
         for model in get_models(module):
-            if model._meta.app_label.startswith('models.'):
-                model._meta.app_label = __name__.split(".")[0]
             globals()[model.__name__] = model

@@ -23,6 +23,9 @@ class PinCard(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name='pin_cards', blank=True, null=True)
 
+    class Meta:
+        app_label = 'billing'
+
     def __unicode__(self):
         return 'Card %s' % self.display_number
 
@@ -32,6 +35,9 @@ class PinCustomer(models.Model):
     email = models.EmailField()
     created_at = models.DateTimeField()
     user = models.OneToOneField(User, related_name='pin_customer', blank=True, null=True)
+
+    class Meta:
+        app_label = 'billing'
 
     def __unicode__(self):
         return 'Customer %s' % self.email
@@ -45,11 +51,14 @@ class PinCharge(models.Model):
     currency = models.CharField(max_length=3)
     description = models.CharField(max_length=255)
     email = models.EmailField()
-    ip_address = models.IPAddressField()
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
     created_at = models.DateTimeField()
     status_message = models.CharField(max_length=255)
     error_message = models.CharField(max_length=255)
     user = models.ForeignKey(User, related_name='pin_charges', blank=True, null=True)
+
+    class Meta:
+        app_label = 'billing'
 
     def __unicode__(self):
         return 'Charge %s' % self.email
@@ -64,6 +73,9 @@ class PinRefund(models.Model):
     status_message = models.CharField(max_length=255)
     error_message = models.CharField(max_length=255)
     user = models.ForeignKey(User, related_name='pin_refunds', blank=True, null=True)
+
+    class Meta:
+        app_label = 'billing'
 
     def __unicode__(self):
         return 'Refund %s' % self.charge.email
