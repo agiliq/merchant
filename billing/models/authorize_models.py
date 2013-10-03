@@ -71,4 +71,4 @@ class AuthorizeAIMResponse(models.Model):
     card_code_response = models.CharField(max_length='8', choices=CARD_CODE_RESPONSES, help_text=u'Card Code Verification response')
 
     class Meta:
-        app_label = __name__.split(".")[0]
+        app_label = 'billing'

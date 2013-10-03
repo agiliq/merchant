@@ -100,11 +100,11 @@ class EWayGatewayTestCase(TestCase):
         def receive(sender, **kwargs):
             received_signals.append(kwargs.get("signal"))
 
-        transaction_was_unsuccessful.connect(receive)
+        transaction_was_successful.connect(receive)
 
         resp = self.merchant.purchase(1, self.credit_card,
                                       options=fake_options)
-        self.assertEquals(received_signals, [transaction_was_unsuccessful])
+        self.assertEquals(received_signals, [transaction_was_successful])
 
     def testPaymentUnSuccessfulSignal(self):
         received_signals = []

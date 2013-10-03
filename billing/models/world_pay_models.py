@@ -45,4 +45,4 @@ class WorldPayResponse(models.Model):
     ip_address = models.IPAddressField(blank=True, null=True)
 
     class Meta:
-        app_label = __name__.split(".")[0]
+        app_label = 'billing'

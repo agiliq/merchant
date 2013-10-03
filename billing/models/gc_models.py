@@ -62,4 +62,4 @@ class GCNewOrderNotification(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        app_label = __name__.split(".")[0]
+        app_label = 'billing'

@@ -16,20 +16,19 @@ class PaylaneTransaction(models.Model):
     acquirer_error = models.CharField(max_length=40, blank=True)
     acquirer_description = models.CharField(max_length=300, blank=True)
 
+    class Meta:
+        app_label = 'billing'
+
     def __unicode__(self):
         return u'Transaction for %s (%s)' % (self.customer_name, self.customer_email)
-
-    class Meta:
-        app_label = __name__.split(".")[0]
-
 
 class PaylaneAuthorization(models.Model):
     sale_authorization_id = models.BigIntegerField(db_index=True)
     first_authorization = models.BooleanField(default=False)
     transaction = models.OneToOneField(PaylaneTransaction)
 
+    class Meta:
+        app_label = 'billing'
+
     def __unicode__(self):
         return u'Authorization: %s' % (self.sale_authorization_id)
-
-    class Meta:
-        app_label = __name__.split(".")[0]
