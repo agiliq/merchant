@@ -28,11 +28,11 @@ def verify_mod10(ccnum):
 
 class PinChargeForm(forms.ModelForm):
     number = CardNumberField()
-    expiry_month = forms.IntegerField(min_value=1, 
+    expiry_month = forms.IntegerField(min_value=1,
                             max_value=12,
                             widget=forms.NumberInput(attrs={'placeholder':'MM'}))
-    expiry_year = forms.IntegerField(min_value=date.today().year, 
-                            max_value=date.today().year+20, 
+    expiry_year = forms.IntegerField(min_value=date.today().year,
+                            max_value=date.today().year+20,
                             widget=forms.NumberInput(attrs={'placeholder':'YYYY'}))
     cvc = forms.IntegerField(min_value=0, max_value=9999)
     email = forms.EmailField()
@@ -55,7 +55,7 @@ class PinChargeForm(forms.ModelForm):
                 value = getattr(user, field, None)
                 if value:
                     self.fields[field].initial = value
-                    
+
     def get_credit_card(self):
         d = self.cleaned_data
         d['month'] = d['expiry_month']

@@ -1,4 +1,3 @@
-import os.path, pkgutil
 from django.utils.importlib import import_module
 from django.conf import settings
 from .utils.credit_card import CardNotSupported
@@ -129,13 +128,3 @@ def get_gateway(gateway, *args, **kwargs):
     # We either hit the cache or load our class object, let's return an instance
     # of it.
     return clazz(*args, **kwargs)
-
-def list_gateways(active_only=False):
-    from billing import gateways
-    gateway_list = []
-    for member in get_module_names(gateways):
-        if member.find('_gateway') > 0:
-            gateway = member.replace('_gateway', '')
-            if not active_only or get_gateway(gateway):
-                gateway_list.append(gateway)
-    return gateway_list

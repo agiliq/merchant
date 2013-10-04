@@ -3,7 +3,6 @@ try:
 except ImportError:
     from django.utils import simplejson as json
 
-import pprint
 import requests
 from copy import copy
 from django.conf import settings
@@ -34,7 +33,7 @@ class PinGateway(Gateway):
         try:
             self.test_mode = settings.MERCHANT_TEST_MODE
             mode = 'TEST' if self.test_mode else 'LIVE'
-            self.secret_key = settings.MERCHANT_SETTINGS["pin"][mode]['SECRET']
+            self.secret_key = settings.MERCHANT_SETTINGS["pin"]['SECRET']
             self.endpoint = self.endpoints[mode]
         except (AttributeError, KeyError):
             raise GatewayNotConfigured("The '%s' gateway is not correctly "
@@ -55,8 +54,6 @@ class PinGateway(Gateway):
             success = resp.get('success', False)
         status, signal = SSIG[success]
         signal.send(sender=self, type=signal_type, response=resp)
-        if settings.DEBUG:
-            pprint.pprint(resp)
         return {'status': status, 'response': resp, 'obj': obj}
 
     def _pin_base(self, money, options):

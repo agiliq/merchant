@@ -47,9 +47,9 @@ Example:
        from billing.integrations.stripe_integration import StripeIntegration
 
        class StripeExampleIntegration(StripeIntegration):
-           def transaction(self, request):
+           class transaction(self, request):
                # The token is received in the POST request
-               resp = self.gateway.purchase(100, request.POST["stripeToken"])
+               resp = self.stripe_gateway.purchase(100, request.POST["stripeToken"])
 	       if resp["status"] == "SUCCESS":
                    # Redirect if the transaction is successful
                    ...

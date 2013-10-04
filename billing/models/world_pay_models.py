@@ -43,3 +43,6 @@ class WorldPayResponse(models.Model):
 
     card_type = models.CharField(max_length=64, blank=True)
     ip_address = models.IPAddressField(blank=True, null=True)
+
+    class Meta:
+        app_label = __name__.split(".")[0]
