@@ -1,5 +1,4 @@
-VERSION = (0, 0, 9, "a", 0)  # following PEP 386
-DEV_N = None
+VERSION = '0.0.9a'
 
 import os
 import sys
@@ -15,16 +14,6 @@ def read(fname):
 standard_exclude = ('*.py', '*.pyc', '*$py.class', '*~', '.*', '*.bak')
 standard_exclude_directories = ('.*', 'CVS', '_darcs', './build',
                                 './dist', 'EGG-INFO', '*.egg-info')
-
-def get_version():
-    version = "%s.%s" % (VERSION[0], VERSION[1])
-    if VERSION[2]:
-        version = "%s.%s" % (version, VERSION[2])
-    if VERSION[3] != "f":
-        version = "%s%s%s" % (version, VERSION[3], VERSION[4])
-        if DEV_N:
-            version = "%s.dev%s" % (version, DEV_N)
-    return version
 
 # (c) 2005 Ian Bicking and contributors; written for Paste (http://pythonpaste.org)
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
@@ -111,7 +100,7 @@ def find_package_data(
 
 setup(
     name="django-merchant",
-    version=get_version(),
+    version=VERSION,
     description="A Django app that provides helpers for multiple pluggable payment backends.",
     long_description=read("README.rst"),
     author="Agiliq Solutions",
