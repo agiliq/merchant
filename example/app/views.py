@@ -74,7 +74,7 @@ def paypal(request):
 
 
 def eway(request):
-    amount = 1
+    amount = 100
     response = None
     if request.method == 'POST':
         form = CreditCardForm(request.POST)

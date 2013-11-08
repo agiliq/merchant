@@ -65,15 +65,23 @@ class EWayGatewayTestCase(TestCase):
         self.assertEquals(self.credit_card.card_type, Visa)
 
     def testPurchase(self):
-        resp = self.merchant.purchase(1, self.credit_card,
+        resp = self.merchant.purchase(100, self.credit_card,
                                       options=fake_options)
-        # Eway test gateway sets the transaction status as failure
-        # in test mode
+        self.assertEquals(resp["status"], "SUCCESS")
+        self.assertNotEquals(resp["response"].ewayTrxnStatus, True)
+        self.assertEquals(resp["response"].ewayTrxnError,
+                          "00,Transaction Approved(Test Gateway)")
+        self.assertNotEquals(resp["response"].ewayTrxnNumber, "0")
+        self.assertTrue(resp["response"].ewayReturnAmount, "100")
+
+    def testFailure(self):
+        resp = self.merchant.purchase(105, self.credit_card,
+                                      options=fake_options)
         self.assertEquals(resp["status"], "FAILURE")
         self.assertEquals(resp["response"].ewayTrxnError,
-                          "1,Do Not Honour(Test Gateway)")
+                          "05,Do Not Honour(Test Gateway)")
         self.assertNotEquals(resp["response"].ewayTrxnNumber, "0")
-        self.assertTrue(resp["response"].ewayReturnAmount, "1")
+        self.assertTrue(resp["response"].ewayReturnAmount, "100")
 
     def testDirectPayment(self):
         credit_card_details = {
