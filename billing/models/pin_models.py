@@ -1,10 +1,5 @@
 from django.db import models
-try:
-    from django.contrib.auth import get_user_model
-except ImportError: # django < 1.5
-    from django.contrib.auth.models import User
-else:
-    User = get_user_model()
+from django.conf import settings
 
 
 class PinCard(models.Model):
@@ -22,7 +17,7 @@ class PinCard(models.Model):
     address_state = models.CharField(max_length=255)
     address_country = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, related_name='pin_cards', blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='pin_cards', blank=True, null=True)
 
     def __unicode__(self):
         return 'Card %s' % self.display_number
@@ -36,7 +31,7 @@ class PinCustomer(models.Model):
     card = models.ForeignKey("billing.PinCard", related_name='customers')
     email = models.EmailField()
     created_at = models.DateTimeField()
-    user = models.OneToOneField(User, related_name='pin_customer', blank=True, null=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='pin_customer', blank=True, null=True)
 
     def __unicode__(self):
         return 'Customer %s' % self.email
@@ -58,7 +53,7 @@ class PinCharge(models.Model):
     created_at = models.DateTimeField()
     status_message = models.CharField(max_length=255)
     error_message = models.CharField(max_length=255, null=True, blank=True)
-    user = models.ForeignKey(User, related_name='pin_charges', blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='pin_charges', blank=True, null=True)
 
     def __unicode__(self):
         return 'Charge %s' % self.email
@@ -76,7 +71,7 @@ class PinRefund(models.Model):
     created_at = models.DateTimeField()
     status_message = models.CharField(max_length=255)
     error_message = models.CharField(max_length=255, null=True, blank=True)
-    user = models.ForeignKey(User, related_name='pin_refunds', blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='pin_refunds', blank=True, null=True)
 
     def __unicode__(self):
         return 'Refund %s' % self.charge.email
