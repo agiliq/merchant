@@ -1,6 +1,7 @@
+from django.conf import settings
 from django.test import TestCase
+from django.utils.unittest.case import skipIf
 from billing import get_gateway, CreditCard
-from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 
 VISA_SUCCESS = '4200000000000000'
 VISA_FAILURE = '4100000000000001'
@@ -20,6 +21,8 @@ OPTIONS = {
     },
 }
 
+
+@skipIf(not settings.MERCHANT_SETTINGS.get("pin", None), "gateway not configured")
 class PinGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("pin")

@@ -1,4 +1,7 @@
+from django.conf import settings
 from django.test import TestCase
+from django.utils.unittest.case import skipIf
+
 from billing import get_gateway, CreditCard
 from billing.signals import *
 from billing.models import EwayResponse
@@ -40,7 +43,7 @@ fake_options = {
     }
 }
 
-
+@skipIf(not settings.MERCHANT_SETTINGS.get("eway", None), "gateway not configured")
 class EWayGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("eway")

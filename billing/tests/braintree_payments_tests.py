@@ -1,6 +1,8 @@
 import braintree
 
+from django.conf import settings
 from django.test import TestCase
+from django.utils.unittest.case import skipIf
 
 from billing import get_gateway, CreditCard
 from billing.signals import *
@@ -8,6 +10,7 @@ from billing.gateway import CardNotSupported, InvalidData
 from billing.utils.credit_card import Visa
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("braintree_payments", None), "gateway not configured")
 class BraintreePaymentsGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("braintree_payments")

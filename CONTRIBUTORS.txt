@@ -14,6 +14,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Daniel Sokolowski <https://github.com/danols>
 * Donald Stufft <https://github.com/dstufft>
 * Dmitry Molotkov <https://github.com/aldarund>
+* FoxyProxy, Inc. <http://getfoxyproxy.org/>
 * Greg McGuire <https://github.com/gmcguire>
 * igorn <https://github.com/igonef>
 * Issac Kelly <http://www.issackelly.com/>
@@ -33,5 +34,6 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Si Feng <https://github.com/devfeng>
 * Steve Phillips <https://github.com/elimisteve>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
+* Tom Aratyn <tom@aratyn.name>
 * Venkata Ramana <arjunchitturi@gmail.com>
 * Jordi Llonch <https://github.com/llonchj>
