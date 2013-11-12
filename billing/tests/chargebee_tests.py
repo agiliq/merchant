@@ -1,9 +1,13 @@
+from django.conf import settings
 from django.test import TestCase
+from django.utils.unittest.case import skipIf
+
 from billing import get_gateway, CreditCard
 from billing.signals import transaction_was_successful, \
     transaction_was_unsuccessful
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("chargebee", None), "gateway not configured")
 class ChargebeeGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("chargebee")

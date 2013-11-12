@@ -1,13 +1,18 @@
 from datetime import date
+
+from django.conf import settings
 from django.test import TestCase
+from django.utils.unittest.case import skipIf
+
 from billing import get_gateway, CreditCard
 from billing.signals import *
-from billing.models import AuthorizeAIMResponse
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
 
 from beanstream.billing import Address
 
+
+@skipIf(not settings.MERCHANT_SETTINGS.get("beanstream", None), "gateway not configured")
 class BeanstreamGatewayTestCase(TestCase):
     approved_cards = {'visa': {'number':      '4030000010001234', 'cvd': '123'},
                        '100_visa': {'number': '4504481742333', 'cvd': '123'},

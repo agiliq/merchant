@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # vim:tabstop=4:expandtab:sw=4:softtabstop=4
-from unittest import skipIf
 
-from django.test import TestCase
 from django.conf import settings
+from django.test import TestCase
+from django.utils.unittest.case import skipIf
 
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa, CreditCard
@@ -13,6 +13,8 @@ from billing.utils.paylane import *
 from billing.models import PaylaneTransaction, PaylaneAuthorization
 
 #This is needed because Paylane doesn't like too many requests in a very short time
+
+
 THROTTLE_CONTROL_SECONDS = 60
 
 # VISA test card numbers

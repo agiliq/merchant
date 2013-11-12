@@ -5,8 +5,10 @@ from django.test import TestCase
 from django.template import Template, Context
 
 from billing import get_integration
+from django.utils.unittest.case import skipIf
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("google_checkout", None), "gateway not configured")
 class GoogleCheckoutTestCase(TestCase):
     def setUp(self):
         self.gc = get_integration("google_checkout")
@@ -62,7 +64,7 @@ class GoogleCheckoutTestCase(TestCase):
         good_xml = """<?xml version="1.0" encoding="utf-8"?><checkout-shopping-cart xmlns="http://checkout.google.com/schema/2"><shopping-cart><items><item><item-name>name of the item</item-name><item-description>Item description</item-description><unit-price currency="USD">0.0</unit-price><quantity>1</quantity><merchant-item-id>999AXZ</merchant-item-id><subscription period="YEARLY" type="merchant"><payments><subscription-payment><maximum-charge currency="USD">9.99</maximum-charge></subscription-payment></payments></subscription><digital-content><display-disposition>OPTIMISTIC</display-disposition><description>Congratulations! Your subscription is being set up. Feel free to log onto &amp;amp;lt;a href=\'http://example.com/offsite/my_content/\'&amp;amp;gt;example.com/offsite/my_content/&amp;amp;lt;/a&amp;amp;gt; and try it out!</description></digital-content></item></items><merchant-private-data>test@example.com</merchant-private-data></shopping-cart><checkout-flow-support><merchant-checkout-flow-support><continue-shopping-url>http://127.0.0.1:8000/offsite/google-checkout/</continue-shopping-url></merchant-checkout-flow-support></checkout-flow-support></checkout-shopping-cart>"""
         self.assertEquals(xml, good_xml)
 
-
+@skipIf(not settings.MERCHANT_SETTINGS.get("google_checkout", None), "gateway not configured")
 class GoogleCheckoutShippingTestCase(TestCase):
     def setUp(self):
         self.gc = get_integration("google_checkout")
@@ -213,6 +215,7 @@ class GoogleCheckoutShippingTestCase(TestCase):
         self.assertEquals(xml, good_xml)
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("google_checkout", None), "gateway not configured")
 class GoogleCheckoutTaxTestCase(TestCase):
     """ Test the tax code """
 

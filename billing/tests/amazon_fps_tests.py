@@ -1,13 +1,15 @@
 from xml.dom import minidom
 from urllib2 import urlparse
 
+from django.conf import settings
 from django.test import TestCase
 from django.template import Template, Context
-from django.conf import settings
+from django.utils.unittest.case import skipIf
 
 from billing import get_integration
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("amazon_fps", None), "gateway not configured")
 class AmazonFPSTestCase(TestCase):
     urls = "billing.tests.test_urls"
 
