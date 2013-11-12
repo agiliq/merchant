@@ -1,13 +1,14 @@
 """
 Braintree Payments Transparent Redirect Tests.
 """
-from django.test import TestCase
-from django.utils.html import strip_spaces_between_tags
-from billing import get_integration
-from django.template import Template, Context
 from django.conf import settings
+from django.test import TestCase
+from django.utils.unittest.case import skipIf
+
+from billing import get_integration
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("braintree_payments", None), "gateway not configured")
 class BraintreePaymentsIntegrationTestCase(TestCase):
     urls = "billing.tests.test_urls"
 

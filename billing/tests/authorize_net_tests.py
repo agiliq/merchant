@@ -1,7 +1,9 @@
 import mock
 import urllib2
 
+from django.conf import settings
 from django.test import TestCase
+from django.utils.unittest.case import skipIf
 
 from billing import get_gateway, CreditCard
 from billing.signals import *
@@ -11,6 +13,7 @@ from billing.gateways.authorize_net_gateway import MockAuthorizeAIMResponse
 from billing.utils.credit_card import Visa
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("authroize_net", None), "gateway not configured")
 class AuthorizeNetAIMGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("authorize_net")

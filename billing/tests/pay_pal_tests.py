@@ -2,10 +2,12 @@ import datetime
 from urllib2 import urlparse
 from xml.dom import minidom
 
+from django.conf import settings
 from django.test.client import RequestFactory
 from django.template import Template, Context
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.utils.unittest.case import skipIf
 
 from paypal.pro.models import PayPalNVP
 
@@ -29,7 +31,7 @@ fake_options = {
     },
 }
 
-
+@skipIf(not settings.MERCHANT_SETTINGS.get("pay_pal", None), "gateway not configured")
 class PayPalGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("pay_pal")
@@ -91,6 +93,7 @@ class PayPalGatewayTestCase(TestCase):
         self.assertNotEquals(resp["status"], "SUCCESS")
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("pay_pal", None), "gateway not configured")
 class PayPalWebsiteStandardsTestCase(TestCase):
     urls = "billing.tests.test_urls"
 

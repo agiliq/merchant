@@ -2,10 +2,11 @@ from django.test import TestCase
 from billing import get_gateway, CreditCard
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
+from django.utils.unittest.case import skipIf
 import stripe
 from django.conf import settings
 
-
+@skipIf(not settings.MERCHANT_SETTINGS.get("stripe", None), "gateway not configured")
 class StripeGatewayTestCase(TestCase):
     def setUp(self):
         self.merchant = get_gateway("stripe")

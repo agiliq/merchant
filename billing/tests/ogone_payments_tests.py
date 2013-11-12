@@ -1,7 +1,11 @@
+from django.conf import settings
 from django.test import TestCase
+from django.utils.unittest.case import skipIf
+
 from billing import get_integration
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("ogone_payments", None), "gateway not configured")
 class OgonePaymentsTestCase(TestCase):
     def setUp(self):
         self.op = get_integration("ogone_payments")
