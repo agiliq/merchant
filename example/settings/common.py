@@ -99,6 +99,7 @@ INSTALLED_APPS = (
     'stripe',
     'paypal.pro',
     'crispy_forms',
+    'raven.contrib.django.raven_compat'
 )
 
 STATIC_URL = "/static/"
@@ -106,3 +107,28 @@ STATIC_ROOT = os.path.join(os.path.dirname(__file__), "static")
 STATICFILES_FINDER = ("django.contrib.staticfiles.finders.FileSystemFinder",
                       "django.contrib.staticfiles.finders.AppDirectoriesFinder")
 USE_TZ = True
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
+
+ALLOWED_HOSTS = ['agiliq.com']

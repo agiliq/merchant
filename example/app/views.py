@@ -12,6 +12,7 @@ from app.forms import CreditCardForm
 from app.urls import (authorize_net_obj, google_checkout_obj, world_pay_obj, pay_pal_obj,
                       amazon_fps_obj, fps_recur_obj, braintree_obj,
                       stripe_obj, ogone_obj)
+from app.utils import randomword
 from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from billing.utils.paylane import PaylanePaymentCustomer, \
