@@ -17,20 +17,25 @@ You can use any of the following methods to install merchant.
 Post-installation
 ------------------
 
-* Install the dependencies for the gateways as prescribed in the individual 
+* Install the dependencies for the gateways as prescribed in the individual
   gateway doc.
 * Reference the `billing` app in your settings `INSTALLED_APPS`.
+
+Configuration
+--------------
+
+To configure a gateway/integration add the corresponding key to
+`MERCHANT_SETTINGS`. Take a look at `local.py-dist` for reference.
 
 Running the Test Suite
 -----------------------
 
-By default, the test suite is configured to run tests for all the gateways and 
-integrations::
+By default, the test suite is configured to run tests for all the gateways and
+integrations which are configured::
 
     python manage.py test billing
 
-This might fail if you have not configured (either the settings attributes or 
-the dependencies) the gateways and integrations.
+Tests for gateways and integrations which are not configured will be skipped.
 
 If you are planning to integrate your app with a specific gateway/integration
 then you might wish to run only that apps test suite. For example, to run the
