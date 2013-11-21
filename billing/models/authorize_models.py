@@ -72,3 +72,6 @@ class AuthorizeAIMResponse(models.Model):
 
     class Meta:
         app_label = __name__.split(".")[0]
+
+    def __unicode__(self):
+        return "%s, $%s" % (self.get_response_code_display(), self.amount)
