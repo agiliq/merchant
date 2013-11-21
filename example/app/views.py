@@ -410,7 +410,8 @@ def bitcoin(request):
     return render(request, "app/bitcoin.html", {
         "title": "Bitcoin",
         "amount": amount,
-        "address": address
+        "address": address,
+        "settings": settings
     })
 
 def bitcoin_done(request):

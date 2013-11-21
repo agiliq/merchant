@@ -1,7 +1,7 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-<form class="form-horizontal well" method="post" action="/bitcoin/done/">
+<form class="form-horizontal well" method="post" action="{{ settings.URL_PREFIX }}{% url 'app_bitcoin_done' %}">
     {% csrf_token %}
     <fieldset>
         <legend>Using Payment Backend: {{ title }}</legend>
