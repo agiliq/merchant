@@ -37,3 +37,4 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Tom Aratyn <tom@aratyn.name>
 * Venkata Ramana <arjunchitturi@gmail.com>
 * Jordi Llonch <https://github.com/llonchj>
+* Zahim Anass <https://github.com/kamotos>
