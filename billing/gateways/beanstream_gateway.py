@@ -27,7 +27,7 @@ class BeanstreamGateway(Gateway):
         ("approvedPage", False), # URL (encoded). Unlimited a/n characters. Beanstream provides default approved or declined transaction pages. For a seamless transaction flow, design unique pages and specify the approved transaction redirection URL here.
         ("declinedPage", False), # URL (encoded). Unlimited a/n characters. Specify the URL for your custom declined transaction notification page here.
 
-        ("trnCardOwner", True), #* Max 64 a/n characters This field must contain the full name of the card holder exactly as it appears on their credit card. 
+        ("trnCardOwner", True), #* Max 64 a/n characters This field must contain the full name of the card holder exactly as it appears on their credit card.
         ("trnCardNumber", True), # Max 20 digits Capture the customer's credit card number.
         ("trnExpMonth", True), # 2 digits (January = 01) The card expiry month with January as 01 and December as 12.
         ("trnExpYear", True), # 2 digits (2011=11) Card expiry years must be entered as a number less than 50. In combination, trnExpYear and trnExpMonth must reflect a date in the future.
@@ -239,7 +239,23 @@ class BeanstreamGateway(Gateway):
 
     def recurring(self, money, creditcard, options=None):
         """Setup a recurring transaction"""
-        raise NotImplementedError
+        card = self.convert_cc(creditcard)
+        frequency_period = options['frequency_period']
+        frequency_increment = options['frequency_increment']
+        billing_address = options.get('billing_address', None) # must be a beanstream.billing.Address instance
+
+        txn = self.beangw.create_recurring_billing_account(
+            money, card, frequency_period, frequency_increment, billing_address)
+        resp = self._parse_resp(txn.commit())
+        if resp["status"] == "SUCCESS":
+            transaction_was_successful.send(sender=self,
+                                            type="recurring",
+                                            response=resp["response"])
+        else:
+            transaction_was_unsuccessful.send(sender=self,
+                                              type="recurring",
+                                              response=resp["response"])
+        return resp
 
     def store(self, credit_card, options=None):
         """Store the credit card and user profile information
@@ -253,7 +269,7 @@ class BeanstreamGateway(Gateway):
         status = "FAILURE"
         response = None
         if resp.approved() or resp.resp["responseCode"] == ["17"]:
-            status = "SUCCESS" 
+            status = "SUCCESS"
         else:
             response = resp
 
