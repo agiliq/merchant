@@ -68,7 +68,7 @@ class AuthorizeNetDpmIntegration(Integration):
     def authorizenet_notify_handler(self, request):
         response_from_authorize_net = self.verify_response(request)
         if not response_from_authorize_net:
-            return HttpResponseForbidden
+            return HttpResponseForbidden()
         result = request.POST["x_response_reason_text"]
         if request.POST['x_response_code'] == '1':
             transaction_was_successful.send(sender=self,
