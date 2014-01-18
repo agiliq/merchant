@@ -1,3 +1,4 @@
+import calendar
 import re
 import datetime
 
@@ -40,7 +41,7 @@ class CreditCard(object):
 
     def is_expired(self):
         """Check whether the credit card is expired or not"""
-        return datetime.date.today() > datetime.date(self.year, self.month, 1)
+        return datetime.date.today() > datetime.date(self.year, self.month, calendar.monthrange(self.year, self.month)[1])
 
     def valid_essential_attributes(self):
         """Validate that all the required attributes of card are given"""
