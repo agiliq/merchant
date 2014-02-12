@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<request timestamp="{{ timestamp }}" type="auth">
+  <merchantid>{{ merchant_id }}</merchantid>
+  <account>{{ sub_account }}</account>
+  <channel>ECOM</channel>
+  <orderid>{{ order_id }}</orderid>
+  <amount currency="{{ currency_code }}">{{ amount_normalized }}</amount>
+  <card>
+    <number>{{ card.number }}</number>
+    <expdate>{{ card.month_normalized }}{{ card.year_normalized }}</expdate>
+    <chname>{{ card.first_name }} {{ card.last_name }}</chname>
+    <type>{{ card.name_normalized }}</type>
+    <cvn>
+      <number>{{ card.verification_value }}</number>
+      <presind>{% if card.verification_value %}1{% else %}3{% endif %}</presind>
+    </cvn>
+  </card>
+  <autosettle flag="1" />
+  <tssinfo>
+    {% if customer_number %}
+    <custnum>{{ customer_number }}</custnum>
+    {% endif %}
+    {% if billing_address %}
+    <address type="billing">
+      <code>{{ billing_address.zip_postal_code }}</code>
+      <country>{{ billing_address.country }}</country>
+    </address>
+    {% endif %}
+    {% if shipping_address %}
+    <address type="shipping">
+      <code>{{ shipping_address.zip_postal_code }}</code>
+      <country>{{ shipping_address.country }}</country>
+    </address>
+    {% endif %}
+  </tssinfo>
+  <sha1hash>{{ sha1_hash }}</sha1hash>
+</request>

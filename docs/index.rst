@@ -28,6 +28,7 @@ Contents:
     * :doc:`Beanstream  <gateways/beanstream_gateway>`
     * :doc:`Chargebee  <gateways/chargebee_gateway>`
     * :doc:`Bitcoin <gateways/bitcoin_gateway>`
+    * :doc:`Global Iris <gateways/global_iris_gateway>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 
