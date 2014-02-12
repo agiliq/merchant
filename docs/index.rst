@@ -68,6 +68,7 @@ Contents:
     * :doc:`Beanstream  <gateways/beanstream_gateway>`
     * :doc:`Chargebee  <gateways/chargebee_gateway>`
     * :doc:`Bitcoin <gateways/bitcoin_gateway>`
+    * :doc:`Global Iris <gateways/global_iris_gateway>`
 
   * :doc:`Off-site Processing <offsite_processing>`
 
@@ -79,6 +80,7 @@ Contents:
     * :doc:`Stripe  <offsite/stripe_integration>`
     * :doc:`eWAY <offsite/eway_au>`
     * :doc:`Authorize.Net Direct Post Method <offsite/authorize_net_dpm>`
+    * :doc:`Global Iris RealMPI <offsite/global_iris_real_mpi_integration>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`

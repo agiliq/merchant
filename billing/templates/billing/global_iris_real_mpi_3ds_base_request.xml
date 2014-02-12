@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<request timestamp="{{ timestamp }}" type="{% block requesttype %}{% endblock %}">
+  <merchantid>{{ merchant_id }}</merchantid>
+  <account>{{ account }}</account>
+  <orderid>{{ order_id }}</orderid>
+  <amount currency="{{ currency }}">{{ amount_normalized }}</amount>
+  <card>
+    <number>{{ card.number }}</number>
+    <expdate>{{ card.month_normalized }}{{ card.year_normalized }}</expdate>
+    <chname>{{ card.first_name }} {{ card.last_name }}</chname>
+    <type>{{ card.name_normalized }}</type>
+  </card>
+  {% block body %}{% endblock %}
+  <sha1hash>{{ sha1_hash }}</sha1hash>
+</request>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<request timestamp="{{ timestamp }}" type="auth">
+  <merchantid>{{ merchant_id }}</merchantid>
+  <account>{{ account }}</account>
+  <channel>ECOM</channel>
+  <orderid>{{ order_id }}</orderid>
+  <amount currency="{{ currency }}">{{ amount_normalized }}</amount>
+  <card>
+    <number>{{ card.number }}</number>
+    <expdate>{{ card.month_normalized }}{{ card.year_normalized }}</expdate>
+    <chname>{{ card.first_name }} {{ card.last_name }}</chname>
+    <type>{{ card.name_normalized }}</type>
+    <cvn>
+      <number>{{ card.verification_value }}</number>
+      <presind>{% if card.verification_value %}1{% else %}3{% endif %}</presind>
+    </cvn>
+  </card>
+  <autosettle flag="1" />
+  {% if mpi %}
+  <mpi>
+    <eci>{{ mpi.eci }}</eci>
+    {% if mpi.cavv %}
+    <cavv>{{ mpi.cavv }}</cavv>
+    {% endif %}
+    {% if mpi.xid %}
+    <xid>{{ mpi.xid }}</xid>
+    {% endif %}
+  </mpi>
+  {% endif %}
+  <tssinfo>
+    {% if customer %}
+    <custnum>{{ customer }}</custnum>
+    {% endif %}
+    {% if billing_address %}
+    <address type="billing">
+      <code>{{ billing_address.zip }}</code>
+      <country>{{ billing_address.country }}</country>
+    </address>
+    {% endif %}
+    {% if shipping_address %}
+    <address type="shipping">
+      <code>{{ shipping_address.zip }}</code>
+      <country>{{ shipping_address.country }}</country>
+    </address>
+    {% endif %}
+  </tssinfo>
+  <sha1hash>{{ sha1_hash }}</sha1hash>
+</request>
