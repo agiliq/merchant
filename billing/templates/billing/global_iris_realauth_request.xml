@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <request timestamp="{{ timestamp }}" type="auth">
   <merchantid>{{ merchant_id }}</merchantid>
-  <account>{{ sub_account }}</account>
+  <account>{{ account }}</account>
   <channel>ECOM</channel>
   <orderid>{{ order_id }}</orderid>
-  <amount currency="{{ currency_code }}">{{ amount_normalized }}</amount>
+  <amount currency="{{ currency }}">{{ amount_normalized }}</amount>
   <card>
     <number>{{ card.number }}</number>
     <expdate>{{ card.month_normalized }}{{ card.year_normalized }}</expdate>
@@ -17,18 +17,18 @@
   </card>
   <autosettle flag="1" />
   <tssinfo>
-    {% if customer_number %}
-    <custnum>{{ customer_number }}</custnum>
+    {% if customer %}
+    <custnum>{{ customer }}</custnum>
     {% endif %}
     {% if billing_address %}
     <address type="billing">
-      <code>{{ billing_address.zip_postal_code }}</code>
+      <code>{{ billing_address.zip }}</code>
       <country>{{ billing_address.country }}</country>
     </address>
     {% endif %}
     {% if shipping_address %}
     <address type="shipping">
-      <code>{{ shipping_address.zip_postal_code }}</code>
+      <code>{{ shipping_address.zip }}</code>
       <country>{{ shipping_address.country }}</country>
     </address>
     {% endif %}
