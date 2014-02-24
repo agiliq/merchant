@@ -346,6 +346,12 @@ class GlobalIrisRealMpiIntegrationTestCase(BetterXMLCompareMixin, GlobalIrisTest
         self.assertEqual(retval.response_code, "110")
         self.assertEqual(retval.message, "Not Enrolled")
         self.assertEqual(retval.url, None)
+        gateway = self.mk_gateway()
+        card = self.get_visa_card()
+        gateway.validate_card(card)
+        proceed, extra = retval.proceed_with_auth(card)
+        self.assertEqual(proceed, True),
+        self.assertEqual(extra, {'mpi': {'eci': 6}})
 
     def test_send_3ds_verifyenrolled(self):
         integration = self.mk_integration()
