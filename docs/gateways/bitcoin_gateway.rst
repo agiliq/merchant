@@ -1,6 +1,6 @@
--------------
+---------------
 Bitcoin Gateway
--------------
+---------------
 
 The Bitcoin gateway implements the `Bitcoin digital currency`_.
 

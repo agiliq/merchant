@@ -5,8 +5,8 @@ WePay Payments
 `WePay.com`_ is a service that lets you accept payments not just from 
 credit cards but also from bank accounts.
 
-WePay works slightly differently and is a hybrid between a :doc:`Gateway <gateways>`
-and an :doc:`Integration <offsite_processing>` but should still be fairly easy to use.
+WePay works slightly differently and is a hybrid between a :doc:`Gateway </gateways>`
+and an :doc:`Integration </offsite_processing>` but should still be fairly easy to use.
 
 .. note::
 
