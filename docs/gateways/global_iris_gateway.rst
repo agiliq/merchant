@@ -3,8 +3,10 @@ Global Iris
 ===========
 
 This gateway is an implementation of `Global Iris
-<https://resourcecentre.globaliris.com/>`_, previously known as HSBC Merchant
-Services or Global Payments.
+<https://resourcecentre.globaliris.com/>`_ RealAuth, previously known as HSBC
+Merchant Services or Global Payments.
+
+Normally you will use this in conjunction with the :doc:`Global Iris RealMPI </offsite/global_iris_real_mpi_integration>`.
 
 Usage
 -----
@@ -35,7 +37,7 @@ server(s) IP address(es).
 
   In addition, you may have been provided with separate accounts for different
   credit card types. These can be configured using additional dictionaries,
-  with a key composed of 'LIVE_' or 'TEST_' followed by the following strings:
+  with a key composed of ``'LIVE_'`` or ``'TEST_'`` followed by the following strings:
 
   * 'VISA' for Visa
   * 'MC' for MasterCard

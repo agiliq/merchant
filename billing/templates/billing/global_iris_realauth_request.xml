@@ -16,6 +16,17 @@
     </cvn>
   </card>
   <autosettle flag="1" />
+  {% if mpi %}
+  <mpi>
+    <eci>{{ mpi.eci }}</eci>
+    {% if mpi.cavv %}
+    <cavv>{{ mpi.cavv }}</cavv>
+    {% endif %}
+    {% if mpi.xid %}
+    <xid>{{ mpi.xid }}</xid>
+    {% endif %}
+  </mpi>
+  {% endif %}
   <tssinfo>
     {% if customer %}
     <custnum>{{ customer }}</custnum>

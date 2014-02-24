@@ -22,8 +22,12 @@ class CreditCard(object):
     card_name = None
 
     def __init__(self, **kwargs):
-        self.first_name = kwargs["first_name"]
-        self.last_name = kwargs["last_name"]
+        if ("first_name" not in kwargs
+            or "last_name" not in kwargs) and "cardholders_name" not in kwargs:
+            raise TypeError("You must provide cardholders_name or first_name and last_name")
+        self.first_name = kwargs.get("first_name", None)
+        self.last_name = kwargs.get("last_name", None)
+        self.cardholders_name = kwargs.get("cardholders_name", None)
         self.month = int(kwargs["month"])
         self.year = int(kwargs["year"])
         self.number = kwargs["number"]
@@ -44,12 +48,13 @@ class CreditCard(object):
 
     def valid_essential_attributes(self):
         """Validate that all the required attributes of card are given"""
-        return self.first_name and \
-               self.last_name and \
-               self.month and \
-               self.year and \
-               self.number and \
-               self.verification_value and True
+        return (((self.first_name and
+                  self.last_name) or
+                 self.cardholders_name)
+                and self.month
+                and self.year
+                and self.number
+                and self.verification_value)
 
     def is_valid(self):
         """Check the validity of the card"""

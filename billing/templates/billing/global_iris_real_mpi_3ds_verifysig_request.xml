@@ -1,0 +1,7 @@
+{% extends "billing/global_iris_real_mpi_3ds_base_request.xml" %}
+
+{% block requesttype %}3ds-verifysig{% endblock %}
+
+{% block body %}
+<pares>{{ pares }}</pares>
+{% endblock %}

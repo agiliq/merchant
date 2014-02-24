@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>3D secure</title>
+<script language="javascript" >
+<!--
+function OnLoadEvent() {
+document.form.submit();
+}
+//-->
+</script>
+</head>
+<body onLoad="OnLoadEvent()">
+<form name="form" action="{{ enrolled_response.url }}" method="post">
+<input type="hidden" NAME="PaReq" value="{{ enrolled_response.pareq }}">
+<input type="hidden" NAME="TermUrl" value="{{ term_url }}">
+<input type="hidden" NAME="MD" value="{{ merchant_data }}">
+<noscript><input type="submit" value="Press to continue"></noscript>
+</form>
+</body>
+</html>

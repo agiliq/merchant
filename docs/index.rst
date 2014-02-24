@@ -40,6 +40,7 @@ Contents:
     * :doc:`Stripe  <offsite/stripe_integration>`
     * :doc:`eWAY <offsite/eway_au>`
     * :doc:`Authorize.Net Direct Post Method <offsite/authorize_net_dpm>`
+    * :doc:`Global Iris RealMPI <offsite/global_iris_real_mpi_integration>`
 
 * :doc:`Signals <signals>`
 * :doc:`Writing your own gateway <custom_gateway>`

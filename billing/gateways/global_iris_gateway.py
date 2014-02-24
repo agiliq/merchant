@@ -29,15 +29,12 @@ class Config(object):
         self.account = config_dict['ACCOUNT']
 
 
-class GlobalIrisGateway(Gateway):
+class GlobalIrisBase(object):
 
     default_currency = "GBP"
     supported_countries = ["GB"]
     supported_cardtypes = [Visa, MasterCard, AmericanExpress]
     homepage_url = "https://resourcecentre.globaliris.com/"
-    display_name = "Global Iris"
-
-    base_url = "https://remote.globaliris.com/RealAuth"
 
     def __init__(self, config=None, test_mode=None):
         if config is None:
@@ -62,16 +59,10 @@ class GlobalIrisGateway(Gateway):
 
         raise KeyError("Couldn't find key %s in config %s" % (' or '.join(setting_names), self.config))
 
-    def get_signature(self, data, config):
-        d = data.copy()
-        d['merchant_id'] = config.merchant_id
-        val1 = "{timestamp}.{merchant_id}.{order_id}.{amount_normalized}.{currency}.{card.number}".format(**d)
-        hash1 = sha.sha(val1).hexdigest()
-        val2 = "{0}.{1}".format(hash1, config.shared_secret)
-        hash2 = sha.sha(val2).hexdigest()
-        return hash2
+    def make_timestamp(self, dt):
+        return dt.strftime('%Y%m%d%H%M%S')
 
-    def build_xml(self, data):
+    def standardize_data(self, data):
         config = self.get_config(data['card'])
         all_data = {
             'currency': self.default_currency,
@@ -82,8 +73,7 @@ class GlobalIrisGateway(Gateway):
         all_data.update(data)
         if not 'timestamp' in all_data:
             all_data['timestamp'] = datetime.now()
-        all_data['timestamp'] = all_data['timestamp'].strftime('%Y%m%d%H%M%S')
-
+        all_data['timestamp'] = self.make_timestamp(all_data['timestamp'])
         currency = all_data['currency']
         if currency in ['GBP', 'USD', 'EUR']:
             all_data['amount_normalized'] = int(all_data['amount'] * Decimal('100.00'))
@@ -95,9 +85,33 @@ class GlobalIrisGateway(Gateway):
         card.year_normalized = "%02d" % (year if year < 100 else int(str(year)[-2:]))
         card.name_normalized = CARD_NAMES[card.card_type]
 
-        # sign
-        all_data['sha1_hash'] = self.get_signature(all_data, config)
+        all_data['sha1_hash'] = self.get_standard_signature(all_data, config)
+        return all_data
 
+    def get_signature(self, data, config, signing_string):
+        d = data.copy()
+        d['merchant_id'] = config.merchant_id
+        val1 = signing_string.format(**d)
+        hash1 = sha.sha(val1).hexdigest()
+        val2 = "{0}.{1}".format(hash1, config.shared_secret)
+        hash2 = sha.sha(val2).hexdigest()
+        return hash2
+
+    def get_standard_signature(self, data, config):
+        return self.get_signature(data, config, "{timestamp}.{merchant_id}.{order_id}.{amount_normalized}.{currency}.{card.number}")
+
+    def do_request(self, xml):
+        return requests.post(self.base_url, xml)
+
+
+class GlobalIrisGateway(GlobalIrisBase, Gateway):
+
+    display_name = "Global Iris"
+
+    base_url = "https://remote.globaliris.com/RealAuth"
+
+    def build_xml(self, data):
+        all_data = self.standardize_data(data)
         return render_to_string("billing/global_iris_realauth_request.xml", all_data).encode('utf-8')
 
     def purchase(self, money, credit_card, options=None):
@@ -113,7 +127,7 @@ class GlobalIrisGateway(Gateway):
             }
         data.update(options)
         xml = self.build_xml(data)
-        return self.handle_response(self._do_request(xml), "purchase")
+        return self.handle_response(self.do_request(xml), "purchase")
 
     def _failure(self, type, message, response, response_code=None):
         transaction_was_unsuccessful.send(self, type=type, response=response, response_code=response_code)
@@ -146,6 +160,3 @@ class GlobalIrisGateway(Gateway):
 
         else:
             return self._failure(type, message, response, response_code=response_code)
-
-    def _do_request(self, xml):
-        return requests.post(self.base_url, xml)

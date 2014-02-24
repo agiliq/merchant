@@ -20,14 +20,16 @@ Attribute Reference
 Method Reference
 -----------------
 
-* `__init__`: This method expects 6 **compulsory** keyword arguments. They are
+* `__init__`: This method expects 6 keyword arguments. They are
 
   * `first_name`: The first name of the credit card holder.
   * `last_name`: The last name of the credit card holder.
-  * `month`: The expiration month of the credit card as an integer.
-  * `year`: The expiration year of the credit card as an integer.
-  * `number`: The credit card number (generally 16 digits).
-  * `verification_value`: The card security code (CVV2).
+  * `cardholders_name`: The full name of the credit card holder, as an
+    alternative to supplying `first_name` and `last_name`.
+  * `month`: The expiration month of the credit card as an integer. **Required**
+  * `year`: The expiration year of the credit card as an integer. **Required**
+  * `number`: The credit card number (generally 16 digits). **Required**
+  * `verification_value`: The card security code (CVV2). **Required**
 * `is_luhn_valid`: Checks the validity of the credit card number by using the 
   `Luhn's algorithm` and returns a boolean. This method takes no arguments.
 * `is_expired`: Checks if the expiration date of the card is beyond today and
@@ -47,6 +49,10 @@ Method Reference
 
 Subclasses
 ----------
+
+Normally you do not use the subclasses directly. Instead, you use `CreditCard`,
+and call gateway.validate_card() which will add a `card_type` attribute which is
+the subclass.
 
 The various credit cards and debit cards supported by Merchant_ are:
 
