@@ -10,7 +10,7 @@ Braintree Payments Transparent Redirect
    This integration makes use of the official `braintree`_ python package offered
    by Braintree Payments. Please install it before you use this integration.
 
-Refer to the :doc:`Braintree Payments Server to Server <gateways/braintree_payments>` Gateway for the settings attributes.
+Refer to the :doc:`Braintree Payments Server to Server </gateways/braintree_payments>` Gateway for the settings attributes.
 
 Here are the methods and attributes implemented on the ``BraintreePaymentsIntegration`` class:
 

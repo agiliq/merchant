@@ -104,12 +104,12 @@ The following tax methods are supported: default-tax-table and alternate-tax-tab
 
 default-tax-table:
 ^^^^^^^^^^^^^^^^^^
-Here are the examples from the `Google Checkouts Developer Docs <https://developers.google.com/checkout/developer/Google_Checkout_XML_API_Taxes#XML_Examples_for_Tax_Tables>`_ converted to django-merchant
+Here are the examples from the `Google Checkouts Developer Docs Tax Tables examples <https://developers.google.com/checkout/developer/Google_Checkout_XML_API_Taxes#XML_Examples_for_Tax_Tables>`_ converted to django-merchant
 
 These are only showing the shipping methods section, you still need items and everything else.
 
 Example 1: Charging a single tax rate in one state:
-**************************************************
+***************************************************
 The following example explains how to charge a single tax rate in one state. The example is for a merchant in Connecticut, where there is a 6 percent sales tax. The example contains a single tax rule. In addition, since shipping charges in Connecticut are taxed, the <shipping-taxed> tag is included in this request with a value of true. (If shipping charges are not subject to tax in a state where you charge tax, you can omit the <shipping-taxed> tag from the tax rule for that state or set the tag's value to false.)
 
 XML:
@@ -694,7 +694,7 @@ The following shipping methods are supported: flat-rate-shipping, merchant-calcu
 
 Flat-rate shipping + Pickup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Here are the examples from the `Google Checkouts Developer Docs <https://developers.google.com/checkout/developer/Google_Checkout_XML_API_Flat_Rate_Shipping>`_ converted to django-merchant.
+Here are the examples from the `Google Checkouts Developer Docs Flat Rate Shipping examples <https://developers.google.com/checkout/developer/Google_Checkout_XML_API_Flat_Rate_Shipping>`_ converted to django-merchant.
 
 These are only showing the shipping methods section, you still need items and everything else.
 

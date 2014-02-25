@@ -3,13 +3,53 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. _index:
+
 Welcome to Merchant's documentation!
 ======================================
 
 Contents:
 
+
 .. toctree::
-   :maxdepth: 2
+   :hidden:
+
+   index
+   overview
+   install
+   credit_card
+   gateways
+
+   onsite_processing
+
+   gateways/authorize_net
+   gateways/beanstream_gateway
+   gateways/bitcoin_gateway
+   gateways/braintree_payments
+   gateways/chargebee_gateway
+   gateways/eway_gateway
+   gateways/paylane_gateway
+   gateways/paypal_gateway
+   gateways/stripe_payment
+   gateways/we_pay_gateway
+
+   offsite_processing
+
+   offsite/paypal
+   offsite/google_checkout
+   offsite/rbs_worldpay
+   offsite/amazon_fps
+   offsite/braintree_payments
+   offsite/stripe_integration
+   offsite/eway_au
+   offsite/authorize_net_dpm
+
+   signals
+   custom_gateway
+   customize
+   contributing
+   changelist
+
 
 * :doc:`Overview <overview>`
 * :doc:`Install Merchant <install>`
