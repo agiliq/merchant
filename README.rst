@@ -24,6 +24,7 @@ Following gateways are supported:
 * WePay
 * Beanstream
 * Chargebee
+* Global Iris
 
 Off-Site Processing
 --------------------
@@ -36,6 +37,7 @@ Off-Site Processing
 * Stripe.js
 * eWAY
 * Authorize.net Direct Post Method
+* Global Iris RealMPI
 
 Other
 -----
