@@ -103,6 +103,7 @@ def encode_credit_card_as_json(obj):
         return {'__credit_card__': True,
                 'first_name': obj.first_name,
                 'last_name': obj.last_name,
+                'cardholders_name': obj.cardholders_name,
                 'month': obj.month,
                 'year': obj.year,
                 'number': obj.number,
