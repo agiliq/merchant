@@ -4,10 +4,12 @@ from xml.dom import minidom
 from django.test import TestCase
 from django.template import Template, Context
 from django.conf import settings
+from django.utils.unittest.case import skipIf
 
 from billing import get_integration
 
 
+@skipIf(not settings.MERCHANT_SETTINGS.get("world_pay", None), "WorldPay integration not configured")
 class WorldPayTestCase(TestCase):
     def setUp(self):
         self.wp = get_integration("world_pay")
