@@ -8,7 +8,7 @@
   <card>
     <number>{{ card.number }}</number>
     <expdate>{{ card.month_normalized }}{{ card.year_normalized }}</expdate>
-    <chname>{{ card.first_name }} {{ card.last_name }}</chname>
+    <chname>{% if card.cardholders_name %}{{ card.cardholders_name }}{% else %}{{ card.first_name }} {{ card.last_name }}{% endif %}</chname>
     <type>{{ card.name_normalized }}</type>
     <cvn>
       <number>{{ card.verification_value }}</number>
