@@ -31,6 +31,15 @@
     {% if customer %}
     <custnum>{{ customer }}</custnum>
     {% endif %}
+    {% if product_id %}
+    <prodid>{{ product_id }}</prodid>
+    {% endif %}
+    {% if varref %}
+    <varref>{{ varref }}</varref>
+    {% endif %}
+    {% if customer_ip_address %}
+    <custipaddress>{{ customer_ip_address }}</custipaddress>
+    {% endif %}
     {% if billing_address %}
     <address type="billing">
       <code>{{ billing_address.zip }}</code>

@@ -77,6 +77,14 @@ server(s) IP address(es).
 
     * ``customer``: string that uniquely identifies the customer
 
+    * ``product_id``: product code assigned to the product
+
+    * ``varref``: addition any reference assigned to the customer, which can
+      allow checking of previous transactions by this customer, through the use
+      of the RealScore service
+
+    * ``customer_ip_address``: IP address of the customer, dotted decimal notation
+
 * You may want to run the tests::
 
     ./manage.py test billing

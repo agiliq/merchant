@@ -85,7 +85,10 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
                 'billing_address': {
                     'zip': 'ABC 123',
                     'country': 'GB',
-                    }
+                    },
+                'product_id': '678',
+                'customer_ip_address': '123.4.6.23',
+                'varref': 'abc',
                 })
 
         self.assertXMLEqual(u"""<?xml version="1.0" encoding="UTF-8" ?>
@@ -108,6 +111,9 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
   <autosettle flag="1" />
   <tssinfo>
     <custnum>567</custnum>
+    <prodid>678</prodid>
+    <varref>abc</varref>
+    <custipaddress>123.4.6.23</custipaddress>
     <address type="billing">
       <code>ABC 123</code>
       <country>GB</country>
