@@ -83,7 +83,8 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
                 'card': card,
                 'customer': '567',
                 'billing_address': {
-                    'zip': 'ABC 123',
+                    'street_address': "45 The Way",
+                    'post_code': "ABC 123",
                     'country': 'GB',
                     },
                 'product_id': '678',
@@ -115,7 +116,7 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
     <varref>abc</varref>
     <custipaddress>123.4.6.23</custipaddress>
     <address type="billing">
-      <code>ABC 123</code>
+      <code>123|45</code>
       <country>GB</country>
     </address>
   </tssinfo>
@@ -252,6 +253,12 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
             else:
                 self.assertEqual(response['status'], 'FAILURE')
                 self.assertEqual(received_signals, [transaction_was_unsuccessful])
+
+    def test_address_to_code(self):
+        gateway = GlobalIrisGateway()
+        self.assertEqual(gateway.address_to_code("382, The Road", "WB1 A42"),
+                         "142|382")
+
 
 
 @skipIf(not settings.MERCHANT_SETTINGS.get("global_iris", None), "integration not configured")

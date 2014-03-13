@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 import sha
+import string
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -85,8 +86,29 @@ class GlobalIrisBase(object):
         card.year_normalized = "%02d" % (year if year < 100 else int(str(year)[-2:]))
         card.name_normalized = CARD_NAMES[card.card_type]
 
+        def fix_address(address_dict):
+            if 'post_code' in address_dict and 'street_address' in address_dict:
+                address_dict['code'] = self.address_to_code(address_dict['street_address'],
+                                                            address_dict['post_code'])
+
+        if 'billing_address' in data:
+            fix_address(data['billing_address'])
+        if 'shipping_address' in data:
+            fix_address(data['shipping_address'])
+
         all_data['sha1_hash'] = self.get_standard_signature(all_data, config)
         return all_data
+
+    def address_to_code(self, street_address, post_code):
+        """
+        Returns a post 'code' in format required by RealAuth, from
+        the street address and the post code.
+        """
+        # See https://resourcecentre.globaliris.com/documents/pdf.html?id=102, p27
+        get_digits = lambda s: ''.join(c for c in s if c in string.digits)
+        return "{0}|{1}".format(get_digits(post_code),
+                                get_digits(street_address),
+                                )
 
     def get_signature(self, data, config, signing_string):
         d = data.copy()

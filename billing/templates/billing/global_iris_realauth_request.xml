@@ -42,13 +42,13 @@
     {% endif %}
     {% if billing_address %}
     <address type="billing">
-      <code>{{ billing_address.zip }}</code>
+      <code>{{ billing_address.code }}</code>
       <country>{{ billing_address.country }}</country>
     </address>
     {% endif %}
     {% if shipping_address %}
     <address type="shipping">
-      <code>{{ shipping_address.zip }}</code>
+      <code>{{ shipping_address.code }}</code>
       <country>{{ shipping_address.country }}</country>
     </address>
     {% endif %}

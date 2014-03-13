@@ -70,7 +70,11 @@ server(s) IP address(es).
 
     * ``billing_address`` and ``shipping_address``: dictionaries with the items:
 
-      * ``zip``: ZIP or post code.
+      * ``street_address``: first line of address (includes house number)
+
+      * ``post_code``: post code of address. (``street_address`` and ``post_code`` must both
+          be supplied for AVS checks).
+
       * ``country``: 2 letter ISO country code.
 
     * ``currency``: which can be ``'GBP'``, ``'USD'`` or ``'EUR'`` (defaults to ``'GBP'``).

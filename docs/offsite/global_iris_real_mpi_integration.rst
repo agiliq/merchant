@@ -164,7 +164,7 @@ In some_project/views.py::
            'order_id': transaction_id,
            'card': card,
            'amount': order.balance, # TODO
-           # Other 'merchant data' can be put here.
+           # Other 'merchant data' can be put here. (see Gateway docs)
            # It will be serialised to JSON, so must be supported by the JSON encoder.
            # The JSON encoder has special support for:
            # * CreditCard objects
