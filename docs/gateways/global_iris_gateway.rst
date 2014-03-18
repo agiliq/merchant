@@ -70,12 +70,24 @@ server(s) IP address(es).
 
     * ``billing_address`` and ``shipping_address``: dictionaries with the items:
 
-      * ``zip``: ZIP or post code.
+      * ``street_address``: first line of address (includes house number)
+
+      * ``post_code``: post code of address. (``street_address`` and ``post_code`` must both
+          be supplied for AVS checks).
+
       * ``country``: 2 letter ISO country code.
 
     * ``currency``: which can be ``'GBP'``, ``'USD'`` or ``'EUR'`` (defaults to ``'GBP'``).
 
     * ``customer``: string that uniquely identifies the customer
+
+    * ``product_id``: product code assigned to the product
+
+    * ``varref``: addition any reference assigned to the customer, which can
+      allow checking of previous transactions by this customer, through the use
+      of the RealScore service
+
+    * ``customer_ip_address``: IP address of the customer, dotted decimal notation
 
 * You may want to run the tests::
 
