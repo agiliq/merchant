@@ -191,18 +191,21 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
                 }, config)
         self.assertEqual(sig, "9e5b49f4df33b52efa646cce1629bcf8e488f7bb")
 
-    def test_parse_xml(self):
-        gateway = GlobalIrisGateway(config={'TEST': dict(SHARED_SECRET="mysecret",
-                                                         MERCHANT_ID="thestore",
-                                                         ACCOUNT="theaccount")
-                                            },
-                                    test_mode=True)
+    def test_parse_fail_xml(self):
+        gateway = self.mk_gateway()
         fail_resp = Dummy200Response('<?xml version="1.0" ?>\r\n<response timestamp="20140212143606">\r\n<result>504</result>\r\n<message>There is no such merchant id.</message>\r\n<orderid>1</orderid>\r\n</response>\r\n')
         retval = gateway.handle_response(fail_resp, "purchase")
         self.assertEqual(retval['status'], 'FAILURE')
         self.assertEqual(retval['message'], 'There is no such merchant id.')
         self.assertEqual(retval['response_code'], "504")
         self.assertEqual(retval['response'], fail_resp)
+
+    def test_parse_success_xml(self):
+        gateway = self.mk_gateway()
+        success_resp = Dummy200Response('<?xml version="1.0" encoding="UTF-8"?>\r\n\r\n<response timestamp="20140327170816">\r\n  <merchantid>wolfandbadgertest</merchantid>\r\n  <account>internet</account>\r\n  <orderid>2014-03-27_17_08_15_871579556348273697313729</orderid>\r\n  <authcode>12345</authcode>\r\n  <result>00</result>\r\n  <cvnresult>U</cvnresult>\r\n  <avspostcoderesponse>U</avspostcoderesponse>\r\n  <avsaddressresponse>U</avsaddressresponse>\r\n  <batchid>169005</batchid>\r\n  <message>[ test system ] Authorised</message>\r\n  <pasref>13959400966589445</pasref>\r\n  <timetaken>0</timetaken>\r\n  <authtimetaken>0</authtimetaken>\r\n  <cardissuer>\r\n    <bank>AIB BANK</bank>\r\n    <country>IRELAND</country>\r\n    <countrycode>IE</countrycode>\r\n    <region>EUR</region>\r\n  </cardissuer>\r\n  <tss>\r\n    <result>89</result>\r\n    <check id="1001">9</check>\r\n    <check id="1002">9</check>\r\n    <check id="1004">9</check>\r\n    <check id="1005">9</check>\r\n    <check id="1006">9</check>\r\n    <check id="1007">9</check>\r\n    <check id="1008">9</check>\r\n    <check id="1009">9</check>\r\n    <check id="1200">9</check>\r\n    <check id="2001">9</check>\r\n    <check id="2003">0</check>\r\n    <check id="3100">9</check>\r\n    <check id="3101">9</check>\r\n    <check id="3200">9</check>\r\n    <check id="1010">9</check>\r\n    <check id="3202">0</check>\r\n    <check id="1011">9</check>\r\n  </tss>\r\n  <sha1hash>cfb5882353fea0a06919c0f86d9f037b99434026</sha1hash>\r\n</response>\r\n')
+        retval = gateway.handle_response(success_resp, "purchase")
+        self.assertEqual(retval['status'], 'SUCCESS')
+        self.assertEqual(retval['response_code'], '00')
 
     def test_config_for_card_type(self):
         """
