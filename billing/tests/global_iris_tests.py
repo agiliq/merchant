@@ -76,7 +76,7 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
                           verification_value='123',
                           )
         gateway.validate_card(card)
-        xml = gateway.build_xml({
+        data = {
                 'timestamp': datetime(2001, 4, 27, 12, 45, 23),
                 'order_id': '345',
                 'amount': Decimal('20.00'),
@@ -90,7 +90,9 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
                 'product_id': '678',
                 'customer_ip_address': '123.4.6.23',
                 'varref': 'abc',
-                })
+                }
+
+        xml = gateway.build_xml(data)
 
         self.assertXMLEqual(u"""<?xml version="1.0" encoding="UTF-8" ?>
 <request timestamp="20010427124523" type="auth">
@@ -122,6 +124,53 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
   </tssinfo>
   <sha1hash>eeaeaf2751a86edcf0d77e906b2daa08929e7cbe</sha1hash>
 </request>""".encode('utf-8'), xml)
+
+        # Test when we have MPI data (in the format returned
+        # from GlobalIris3dsVerifySig.proceed_with_auth)
+        mpi_data = {'mpi':{'eci': '5',
+                           'xid': 'crqAeMwkEL9r4POdxpByWJ1/wYg=',
+                           'cavv': 'AAABASY3QHgwUVdEBTdAAAAAAAA=',
+                    }}
+        data.update(mpi_data)
+
+        xml2 = gateway.build_xml(data)
+
+        self.assertXMLEqual(u"""<?xml version="1.0" encoding="UTF-8" ?>
+<request timestamp="20010427124523" type="auth">
+  <merchantid>thestore</merchantid>
+  <account>theaccount</account>
+  <channel>ECOM</channel>
+  <orderid>345</orderid>
+  <amount currency="GBP">2000</amount>
+  <card>
+    <number>4903034000057389</number>
+    <expdate>0714</expdate>
+    <chname>Mickey Mouse</chname>
+    <type>VISA</type>
+    <cvn>
+      <number>123</number>
+      <presind>1</presind>
+    </cvn>
+  </card>
+  <autosettle flag="1" />
+  <mpi>
+    <eci>5</eci>
+    <cavv>AAABASY3QHgwUVdEBTdAAAAAAAA=</cavv>
+    <xid>crqAeMwkEL9r4POdxpByWJ1/wYg=</xid>
+  </mpi>
+  <tssinfo>
+    <custnum>567</custnum>
+    <prodid>678</prodid>
+    <varref>abc</varref>
+    <custipaddress>123.4.6.23</custipaddress>
+    <address type="billing">
+      <code>123|45</code>
+      <country>GB</country>
+    </address>
+  </tssinfo>
+  <sha1hash>eeaeaf2751a86edcf0d77e906b2daa08929e7cbe</sha1hash>
+</request>""".encode('utf-8'), xml2)
+
 
     def test_signature(self):
         gateway = self.mk_gateway()
