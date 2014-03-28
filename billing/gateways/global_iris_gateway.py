@@ -161,13 +161,15 @@ class GlobalIrisGateway(GlobalIrisBase, Gateway):
             retval['response_code'] = response_code
         return retval
 
-    def _success(self, type, message, response, response_code=None):
+    def _success(self, type, message, response, response_code=None, **kwargs):
         transaction_was_successful.send(self, type=type, response=response, response_code=response_code)
-        return {"status": "SUCCESS",
-                "message": message,
-                "response": response,
-                "response_code": response_code,
-                }
+        retval = {"status": "SUCCESS",
+                  "message": message,
+                  "response": response,
+                  "response_code": response_code,
+                  }
+        retval.update(kwargs)
+        return retval
 
     def handle_response(self, response, type):
         if response.status_code != 200:
@@ -178,7 +180,22 @@ class GlobalIrisGateway(GlobalIrisBase, Gateway):
         response_code = xml.find('result').text
         message = xml.find('message').text
         if response_code == '00':
-            return self._success(type, message, response, response_code=response_code)
+            kwargs = {}
+            merge_xml_to_dict(xml, kwargs, ['avsaddressresponse', 'avspostcoderesponse', 'cvnresult'])
+            cardissuer = xml.find('cardissuer')
+            if cardissuer is not None:
+                cardissuer_data = {}
+                merge_xml_to_dict(cardissuer, cardissuer_data, ['bank', 'country', 'countrycode', 'region'])
+                kwargs['cardissuer'] = cardissuer_data
+
+            return self._success(type, message, response, response_code=response_code, **kwargs)
 
         else:
             return self._failure(type, message, response, response_code=response_code)
+
+
+def merge_xml_to_dict(node, d, attrs):
+    for n in attrs:
+        elem = node.find(n)
+        if elem is not None:
+            d[n] = elem.text

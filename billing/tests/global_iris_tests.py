@@ -206,6 +206,15 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
         retval = gateway.handle_response(success_resp, "purchase")
         self.assertEqual(retval['status'], 'SUCCESS')
         self.assertEqual(retval['response_code'], '00')
+        self.assertEqual(retval['avsaddressresponse'], 'U')
+        self.assertEqual(retval['avspostcoderesponse'], 'U')
+        self.assertEqual(retval['cvnresult'], 'U')
+        self.assertEqual(retval['cardissuer'], {'bank': 'AIB BANK',
+                                                'country': 'IRELAND',
+                                                'countrycode': 'IE',
+                                                'region': 'EUR',
+                                                })
+
 
     def test_config_for_card_type(self):
         """
