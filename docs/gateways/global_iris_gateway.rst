@@ -89,6 +89,26 @@ server(s) IP address(es).
 
     * ``customer_ip_address``: IP address of the customer, dotted decimal notation
 
+  If you are using the RealMPI integration, as described above, then the RealAuth
+  response may contain a number of other attributes that might be useful:
+
+    * ``avsaddressresponse``: AVS response code for address, as documented in https://resourcecentre.globaliris.com/documents/pdf.html?id=102
+
+    * ``avspostcoderesponse``: AVS response code for post code.
+
+    * ``cvnresult``: (no documentation known for this)
+
+    * ``cardissuer``: dictionary that may contain these keys:
+
+      * ``bank``
+
+      * ``country``
+
+      * ``country_code``
+
+      * ``region``
+
+
 * You may want to run the tests::
 
     ./manage.py test billing

@@ -76,7 +76,7 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
                           verification_value='123',
                           )
         gateway.validate_card(card)
-        xml = gateway.build_xml({
+        data = {
                 'timestamp': datetime(2001, 4, 27, 12, 45, 23),
                 'order_id': '345',
                 'amount': Decimal('20.00'),
@@ -90,7 +90,9 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
                 'product_id': '678',
                 'customer_ip_address': '123.4.6.23',
                 'varref': 'abc',
-                })
+                }
+
+        xml = gateway.build_xml(data)
 
         self.assertXMLEqual(u"""<?xml version="1.0" encoding="UTF-8" ?>
 <request timestamp="20010427124523" type="auth">
@@ -123,6 +125,53 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
   <sha1hash>eeaeaf2751a86edcf0d77e906b2daa08929e7cbe</sha1hash>
 </request>""".encode('utf-8'), xml)
 
+        # Test when we have MPI data (in the format returned
+        # from GlobalIris3dsVerifySig.proceed_with_auth)
+        mpi_data = {'mpi':{'eci': '5',
+                           'xid': 'crqAeMwkEL9r4POdxpByWJ1/wYg=',
+                           'cavv': 'AAABASY3QHgwUVdEBTdAAAAAAAA=',
+                    }}
+        data.update(mpi_data)
+
+        xml2 = gateway.build_xml(data)
+
+        self.assertXMLEqual(u"""<?xml version="1.0" encoding="UTF-8" ?>
+<request timestamp="20010427124523" type="auth">
+  <merchantid>thestore</merchantid>
+  <account>theaccount</account>
+  <channel>ECOM</channel>
+  <orderid>345</orderid>
+  <amount currency="GBP">2000</amount>
+  <card>
+    <number>4903034000057389</number>
+    <expdate>0714</expdate>
+    <chname>Mickey Mouse</chname>
+    <type>VISA</type>
+    <cvn>
+      <number>123</number>
+      <presind>1</presind>
+    </cvn>
+  </card>
+  <autosettle flag="1" />
+  <mpi>
+    <eci>5</eci>
+    <cavv>AAABASY3QHgwUVdEBTdAAAAAAAA=</cavv>
+    <xid>crqAeMwkEL9r4POdxpByWJ1/wYg=</xid>
+  </mpi>
+  <tssinfo>
+    <custnum>567</custnum>
+    <prodid>678</prodid>
+    <varref>abc</varref>
+    <custipaddress>123.4.6.23</custipaddress>
+    <address type="billing">
+      <code>123|45</code>
+      <country>GB</country>
+    </address>
+  </tssinfo>
+  <sha1hash>eeaeaf2751a86edcf0d77e906b2daa08929e7cbe</sha1hash>
+</request>""".encode('utf-8'), xml2)
+
+
     def test_signature(self):
         gateway = self.mk_gateway()
         card = CreditCard(number='5105105105105100',
@@ -142,18 +191,30 @@ class GlobalIrisGatewayTestCase(BetterXMLCompareMixin, GlobalIrisTestBase, TestC
                 }, config)
         self.assertEqual(sig, "9e5b49f4df33b52efa646cce1629bcf8e488f7bb")
 
-    def test_parse_xml(self):
-        gateway = GlobalIrisGateway(config={'TEST': dict(SHARED_SECRET="mysecret",
-                                                         MERCHANT_ID="thestore",
-                                                         ACCOUNT="theaccount")
-                                            },
-                                    test_mode=True)
+    def test_parse_fail_xml(self):
+        gateway = self.mk_gateway()
         fail_resp = Dummy200Response('<?xml version="1.0" ?>\r\n<response timestamp="20140212143606">\r\n<result>504</result>\r\n<message>There is no such merchant id.</message>\r\n<orderid>1</orderid>\r\n</response>\r\n')
         retval = gateway.handle_response(fail_resp, "purchase")
         self.assertEqual(retval['status'], 'FAILURE')
         self.assertEqual(retval['message'], 'There is no such merchant id.')
         self.assertEqual(retval['response_code'], "504")
         self.assertEqual(retval['response'], fail_resp)
+
+    def test_parse_success_xml(self):
+        gateway = self.mk_gateway()
+        success_resp = Dummy200Response('<?xml version="1.0" encoding="UTF-8"?>\r\n\r\n<response timestamp="20140327170816">\r\n  <merchantid>wolfandbadgertest</merchantid>\r\n  <account>internet</account>\r\n  <orderid>2014-03-27_17_08_15_871579556348273697313729</orderid>\r\n  <authcode>12345</authcode>\r\n  <result>00</result>\r\n  <cvnresult>U</cvnresult>\r\n  <avspostcoderesponse>U</avspostcoderesponse>\r\n  <avsaddressresponse>U</avsaddressresponse>\r\n  <batchid>169005</batchid>\r\n  <message>[ test system ] Authorised</message>\r\n  <pasref>13959400966589445</pasref>\r\n  <timetaken>0</timetaken>\r\n  <authtimetaken>0</authtimetaken>\r\n  <cardissuer>\r\n    <bank>AIB BANK</bank>\r\n    <country>IRELAND</country>\r\n    <countrycode>IE</countrycode>\r\n    <region>EUR</region>\r\n  </cardissuer>\r\n  <tss>\r\n    <result>89</result>\r\n    <check id="1001">9</check>\r\n    <check id="1002">9</check>\r\n    <check id="1004">9</check>\r\n    <check id="1005">9</check>\r\n    <check id="1006">9</check>\r\n    <check id="1007">9</check>\r\n    <check id="1008">9</check>\r\n    <check id="1009">9</check>\r\n    <check id="1200">9</check>\r\n    <check id="2001">9</check>\r\n    <check id="2003">0</check>\r\n    <check id="3100">9</check>\r\n    <check id="3101">9</check>\r\n    <check id="3200">9</check>\r\n    <check id="1010">9</check>\r\n    <check id="3202">0</check>\r\n    <check id="1011">9</check>\r\n  </tss>\r\n  <sha1hash>cfb5882353fea0a06919c0f86d9f037b99434026</sha1hash>\r\n</response>\r\n')
+        retval = gateway.handle_response(success_resp, "purchase")
+        self.assertEqual(retval['status'], 'SUCCESS')
+        self.assertEqual(retval['response_code'], '00')
+        self.assertEqual(retval['avsaddressresponse'], 'U')
+        self.assertEqual(retval['avspostcoderesponse'], 'U')
+        self.assertEqual(retval['cvnresult'], 'U')
+        self.assertEqual(retval['cardissuer'], {'bank': 'AIB BANK',
+                                                'country': 'IRELAND',
+                                                'countrycode': 'IE',
+                                                'region': 'EUR',
+                                                })
+
 
     def test_config_for_card_type(self):
         """
