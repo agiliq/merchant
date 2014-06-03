@@ -6,9 +6,9 @@ tmp
 *.db
 *.*~
 #*#
+local.py
 example/tmp
 example/localsettings.py
-example/settings/local.py
 
 docs/_build/*
 
