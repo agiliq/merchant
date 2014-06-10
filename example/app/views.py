@@ -1,4 +1,8 @@
+import mock
 import datetime
+import decimal
+
+from bitcoinrpc.data import TransactionInfo
 
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -19,6 +23,10 @@ from billing.utils.paylane import PaylanePaymentCustomer, \
     PaylanePaymentCustomerAddress
 
 from app.conf import GATEWAY_INITIAL, INTEGRATION_INITIAL
+
+BTC_TEST_AMOUNT = decimal.Decimal('0.01')
+BTC_TEST_ADDRESS = 'n2RL9NRRGvKNqovb14qacSfbz6zQBkzDbU'
+BTC_TEST_SUCCESSFUL_TXNS = [TransactionInfo(address=BTC_TEST_ADDRESS, amount=BTC_TEST_AMOUNT)]
 
 def render(request, template, template_vars={}):
     return render_to_response(template, template_vars, RequestContext(request))
@@ -412,34 +420,42 @@ def offsite_eway_done(request):
 
 
 def bitcoin(request):
-    amount = 0.01
-    bitcoin_obj = get_gateway("bitcoin")
-    address = request.session.get("bitcoin_address", None)
-    if not address:
-        address = bitcoin_obj.get_new_address()
-        request.session["bitcoin_address"] = address
-    return render(request, "app/bitcoin.html", {
-        "title": "Bitcoin",
-        "amount": amount,
-        "address": address,
-        "settings": settings
-    })
+    with mock.patch('bitcoinrpc.connection.BitcoinConnection') as MockBitcoinConnection:
+        connection = MockBitcoinConnection()
+        connection.getnewaddress.return_value = BTC_TEST_ADDRESS
+        connection.listtransactions.return_value = BTC_TEST_SUCCESSFUL_TXNS
+        amount = 0.01
+        bitcoin_obj = get_gateway("bitcoin")
+        address = request.session.get("bitcoin_address", None)
+        if not address:
+            address = bitcoin_obj.get_new_address()
+            request.session["bitcoin_address"] = address
+        return render(request, "app/bitcoin.html", {
+            "title": "Bitcoin",
+            "amount": amount,
+            "address": address,
+            "settings": settings
+        })
 
 def bitcoin_done(request):
-    amount = 0.01
-    bitcoin_obj = get_gateway("bitcoin")
-    address = request.session.get("bitcoin_address", None)
-    if not address:
-        return HttpResponseRedirect(reverse("app_bitcoin"))
-    result = bitcoin_obj.purchase(amount, address)
-    if result['status'] == 'SUCCESS':
-        del request.session["bitcoin_address"]
-    return render(request, "app/bitcoin_done.html", {
-        "title": "Bitcoin",
-        "amount": amount,
-        "address": address,
-        "result": result
-    })
+    with mock.patch('bitcoinrpc.connection.BitcoinConnection') as MockBitcoinConnection:
+        connection = MockBitcoinConnection()
+        connection.getnewaddress.return_value = BTC_TEST_ADDRESS
+        connection.listtransactions.return_value = BTC_TEST_SUCCESSFUL_TXNS
+        amount = 0.01
+        bitcoin_obj = get_gateway("bitcoin")
+        address = request.session.get("bitcoin_address", None)
+        if not address:
+            return HttpResponseRedirect(reverse("app_bitcoin"))
+        result = bitcoin_obj.purchase(amount, address)
+        if result['status'] == 'SUCCESS':
+            del request.session["bitcoin_address"]
+        return render(request, "app/bitcoin_done.html", {
+            "title": "Bitcoin",
+            "amount": amount,
+            "address": address,
+            "result": result
+        })
 
 
 def offsite_ogone(request):
