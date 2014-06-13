@@ -2,7 +2,7 @@ Django==1.5.1
 FormEncode==1.2.6
 bitcoin-python==0.3
 stripe==1.7.10
-django-paypal==0.1.2
+django-paypal==0.1.3
 boto==2.8.0
 braintree==2.20.0
 wepay==0.1.5
