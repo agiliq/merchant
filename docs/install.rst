@@ -19,13 +19,14 @@ Post-installation
 
 * Install the dependencies for the gateways as prescribed in the individual
   gateway doc.
-* Reference the `billing` app in your settings `INSTALLED_APPS`.
+* Reference the ``billing`` app in your settings ``INSTALLED_APPS``.
+* Run ``python manage.py syncdb`` to create the new required database tables
 
 Configuration
 --------------
 
 To configure a gateway/integration add the corresponding key to
-`MERCHANT_SETTINGS`. Take a look at `local.py-dist` for reference.
+``MERCHANT_SETTINGS``. Take a look at ``local.py-dist`` for reference.
 
 Running the Test Suite
 -----------------------
@@ -39,7 +40,7 @@ Tests for gateways and integrations which are not configured will be skipped.
 
 If you are planning to integrate your app with a specific gateway/integration
 then you might wish to run only that apps test suite. For example, to run the
-`Google Checkout Integration` test case::
+``Google Checkout Integration`` test case::
 
     python manage.py test billing.GoogleCheckoutTestCase
 
