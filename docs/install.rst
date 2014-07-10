@@ -20,6 +20,7 @@ Post-installation
 * Install the dependencies for the gateways as prescribed in the individual
   gateway doc.
 * Reference the `billing` app in your settings `INSTALLED_APPS`.
+* Run `python manage.py syncdb` to create the new required database tables
 
 Configuration
 --------------
