@@ -1,6 +1,8 @@
 from django.utils.importlib import import_module
 from django.conf import settings
+
 from .utils.credit_card import CardNotSupported
+
 
 gateway_cache = {}
 
@@ -118,13 +120,20 @@ def get_gateway(gateway, *args, **kwargs):
             except ImportError:
                 pass
         if not gateway_module:
-            raise GatewayModuleNotFound("Missing gateway: %s" % (gateway))
-        gateway_class_name = "".join(gateway_filename.title().split("_"))
-        try:
-            clazz = getattr(gateway_module, gateway_class_name)
-        except AttributeError:
-            raise GatewayNotConfigured("Missing %s class in the gateway module." % gateway_class_name)
-        gateway_cache[gateway] = clazz
+            raise GatewayModuleNotFound("Missing gateway: %s" % gateway)
+
+        for module_func_name in dir(gateway_module):
+            module_class = getattr(gateway_module, module_func_name)
+            if isinstance(module_class, type) and \
+                    issubclass(module_class, Gateway) and (module_class is not Gateway):
+                clazz = module_class
+                break
+        if clazz:
+            gateway_cache[gateway] = clazz
+        else:
+            raise GatewayNotConfigured(
+                "Missing inherit Gateway class in the gateway %s module." % gateway_module)
+
     # We either hit the cache or load our class object, let's return an instance
     # of it.
     return clazz(*args, **kwargs)

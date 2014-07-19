@@ -22,3 +22,7 @@ build/*
 .project
 .pydevproject
 
+
+.idea/
+
+
