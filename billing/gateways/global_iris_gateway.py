@@ -76,7 +76,7 @@ class GlobalIrisBase(object):
             all_data['timestamp'] = datetime.now()
         all_data['timestamp'] = self.make_timestamp(all_data['timestamp'])
         currency = all_data['currency']
-        if currency in ['GBP', 'USD', 'EUR']:
+        if currency in ['GBP', 'USD', 'EUR', 'AUD']:
             all_data['amount_normalized'] = int(all_data['amount'] * Decimal('100.00'))
         else:
             raise ValueError("Don't know how to normalise amounts in currency %s" % currency)
