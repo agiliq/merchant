@@ -46,7 +46,7 @@ class PinCharge(models.Model):
     token = models.CharField(unique=True, max_length=32, editable=False)
     card = models.ForeignKey("billing.PinCard", related_name='charges', editable=False)
     customer = models.ForeignKey("billing.PinCustomer", related_name='customers', null=True, blank=True, editable=False)
-    success = models.BooleanField()
+    success = models.BooleanField(default=False)
     amount = models.DecimalField(max_digits=16, decimal_places=2)
     currency = models.CharField(max_length=3)
     description = models.CharField(max_length=255)
@@ -67,7 +67,7 @@ class PinCharge(models.Model):
 class PinRefund(models.Model):
     token = models.CharField(unique=True, max_length=32)
     charge = models.ForeignKey("billing.PinCharge", related_name='refunds')
-    success = models.BooleanField()
+    success = models.BooleanField(default=False)
     amount = models.DecimalField(max_digits=16, decimal_places=2)
     currency = models.CharField(max_length=3)
     created_at = models.DateTimeField()
