@@ -95,11 +95,6 @@ class BeanstreamGateway(Gateway):
             credit_card.number,
             credit_card.month, credit_card.year,
             credit_card.verification_value)
-        if not hasattr(card, 'is_valid'):
-            # there is no is_valid on the beanstream credit card object
-            def is_valid():
-                return True
-            card.is_valid = is_valid
         if validate:
             self.validate_card(card)
         return card
