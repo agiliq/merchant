@@ -228,7 +228,6 @@ class RebillEwayClient(object):
             else:
                 return self.client.service.CreateCustomer(**kwargs)
         except WebFault as wf:
-            print wf
             return wf
 
     def update_hosted_customer(self, **kwargs):

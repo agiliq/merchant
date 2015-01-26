@@ -47,7 +47,7 @@ class ClientTestCase(unittest.TestCase):
         self.rebill_customer.CustomerURL = "http://www.google.com.au"
 
         new_rebill_customer = self.rebill_test.create_rebill_customer(self.rebill_customer)
-        print "create rebill customer", new_rebill_customer
+        print("create rebill customer", new_rebill_customer)
         self.assertEqual(new_rebill_customer.Result, "Success")
 
     def test_create_rebill_customer_with_kwargs(self):
@@ -70,7 +70,7 @@ class ClientTestCase(unittest.TestCase):
                                                                            customerURL="http://www.google.com.au",
                                                                            customerComments="Now!",
                                                                            )
-        print "create rebill customer with kwargs", new_rebill_customer_with_kwargs
+        print("create rebill customer with kwargs", new_rebill_customer_with_kwargs)
         self.assertEqual(new_rebill_customer_with_kwargs.Result, "Success")
 
     def test_update_rebill_customer(self):
@@ -94,12 +94,12 @@ class ClientTestCase(unittest.TestCase):
                                                                                customerURL="http://www.google.com.au",
                                                                                customerComments="Now!",
                                                                                )
-        print "update rebill customer", updated_rebill_customer
+        print("update rebill customer", updated_rebill_customer)
         self.assertEqual(updated_rebill_customer.Result, "Success")
 
     def test_delete_rebill_customer(self):
         deleted_rebill_customer = self.rebill_test.delete_rebill_customer("10292")
-        print "delete rebill customer", deleted_rebill_customer
+        print("delete rebill customer", deleted_rebill_customer)
         self.assertEqual(deleted_rebill_customer.Result, "Success")
 
     def test_create_rebill_event(self):
@@ -120,7 +120,7 @@ class ClientTestCase(unittest.TestCase):
         self.rebill_event.RebillEndDate = self.rebill_end_date.strftime("%d/%m/%Y")
 
         new_rebill_event = self.rebill_test.create_rebill_event(self.rebill_event)
-        print "create rebill event", new_rebill_event
+        print("create rebill event", new_rebill_event)
         self.assertEqual(new_rebill_event.Result, "Success")
 
     def test_create_rebill_event_with_kwargs(self):
@@ -140,7 +140,7 @@ class ClientTestCase(unittest.TestCase):
                                                                                  RebillIntervalType="1",
                                                                                  RebillEndDate=self.rebill_end_date.strftime("%d/%m/%Y")
                                                                                  )
-        print "create rebill event with kwargs", new_rebill_event_with_kwargs
+        print("create rebill event with kwargs", new_rebill_event_with_kwargs)
         self.assertEqual(new_rebill_event_with_kwargs.Result, "Success")
 
     def test_update_rebill_event(self):
@@ -161,32 +161,32 @@ class ClientTestCase(unittest.TestCase):
                                                                          RebillIntervalType="1",
                                                                          RebillEndDate=self.rebill_end_date.strftime("%d/%m/%Y")
                                                                          )
-        print "update rebill event", updated_rebill_event
+        print("update rebill event", updated_rebill_event)
         self.assertEqual(updated_rebill_event.Result, "Success")
 
     def test_delete_rebill_event(self):
         deleted_rebill_event = self.rebill_test.delete_rebill_event("10292", "80001208")
-        print "delete rebill event", deleted_rebill_event
+        print("delete rebill event", deleted_rebill_event)
         self.assertEqual(deleted_rebill_event.Result, "Success")
 
     def test_query_next_transaction(self):
         query_next_transaction_result = self.rebill_test.query_next_transaction("60001545", "80001227")
-        print "test_query_next_transaction", query_next_transaction_result
+        print("test_query_next_transaction", query_next_transaction_result)
         self.assertFalse(query_next_transaction_result == None)
 
     def test_query_rebill_customer(self):
         query_rebill_customer_result = self.rebill_test.query_rebill_customer("60001545")
-        print "test_query_rebill_customer", query_rebill_customer_result
+        print("test_query_rebill_customer", query_rebill_customer_result)
         self.assertFalse(query_rebill_customer_result == None)
 
     def test_query_rebill_event(self):
         query_rebill_result = self.rebill_test.query_rebill_event("60001545", "80001227")
-        print "test_query_rebill_event", query_rebill_result
+        print("test_query_rebill_event", query_rebill_result)
         self.assertFalse(query_rebill_result == None)
 
     def test_query_transactions(self):
         query_transactions_result = self.rebill_test.query_transactions("60001545", "80001208")
-        print "test_query_transactions", query_transactions_result
+        print("test_query_transactions", query_transactions_result)
         self.assertFalse(query_transactions_result == None)
 
     def test_create_hosted_customer(self):
@@ -213,7 +213,7 @@ class ClientTestCase(unittest.TestCase):
         self.hosted_customer.CCExpiryYear = "12"
 
         new_hosted_customer_id = self.hosted_test.create_hosted_customer(self.hosted_customer)
-        print "create new hosted customer", new_hosted_customer_id
+        print("create new hosted customer", new_hosted_customer_id)
         self.assertFalse(isinstance(new_hosted_customer_id, WebFault))
 
     def test_create_hosted_customer_with_kwargs(self):
@@ -240,7 +240,7 @@ class ClientTestCase(unittest.TestCase):
                                                                           CCExpiryMonth="07",
                                                                           CCExpiryYear="12"
                                                                           )
-        print "create new hosted customer with kwargs", new_hosted_customer_id
+        print("create new hosted customer with kwargs", new_hosted_customer_id)
         self.assertFalse(isinstance(new_hosted_customer_id, WebFault))
 
     def test_update_hosted_customer(self):
@@ -268,22 +268,22 @@ class ClientTestCase(unittest.TestCase):
                                                                           CCExpiryMonth="07",
                                                                           CCExpiryYear="12"
                                                                           )
-        print "update hosted customer", updated_hosted_customer
+        print("update hosted customer", updated_hosted_customer)
         self.assertTrue(updated_hosted_customer)
 
     def test_process_payment(self):
         payment_result = self.hosted_test.process_payment("9876543211000", "100", "test", "test")
-        print "test_process_payment", payment_result
+        print("test_process_payment", payment_result)
         self.assertFalse(isinstance(payment_result, WebFault))
 
     def test_query_customer(self):
         query_result = self.hosted_test.query_customer("9876543211000")
-        print "test_query_customer", query_result
+        print("test_query_customer", query_result)
         self.assertFalse(query_result == None)
 
     def test_query_payment(self):
         query_payment_result = self.hosted_test.query_payment("9876543211000")
-        print "test_query_payment", query_payment_result
+        print("test_query_payment", query_payment_result)
         self.assertFalse(query_payment_result == None)
 
 if __name__ == '__main__':

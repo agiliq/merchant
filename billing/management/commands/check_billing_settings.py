@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
             if isinstance(required_settings, dict):
                 if 'optional' in required_settings:
-                    print '%s takes optional parameter %s' % (gateway, required_settings['optional'])
+                    print('%s takes optional parameter %s' % (gateway, required_settings['optional']))
                 required_settings = required_settings['required']
 
             for rs in required_settings:

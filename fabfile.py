@@ -6,7 +6,7 @@ env.hosts = ["merchant.agiliq.com"]
 env.user = "agiliq"
 
 def describe():
-    print "This is a fab file to automate deployments for the merchant server."
+    print("This is a fab file to automate deployments for the merchant server.")
 
 def deploy():
     with cd("/home/agiliq/envs/merchant/src/merchant"):
