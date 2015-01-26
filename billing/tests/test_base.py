@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.test import TestCase
 from django.template import Template, Context, TemplateSyntaxError
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from billing.utils.credit_card import CreditCard
 from billing import get_gateway, GatewayNotConfigured, get_integration, IntegrationNotConfigured

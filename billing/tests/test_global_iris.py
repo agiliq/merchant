@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.test import TestCase
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from billing.tests.utils import BetterXMLCompareMixin
 from billing.gateway import get_gateway

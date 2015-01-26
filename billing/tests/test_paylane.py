@@ -3,7 +3,7 @@
 
 from django.conf import settings
 from django.test import TestCase
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa, CreditCard

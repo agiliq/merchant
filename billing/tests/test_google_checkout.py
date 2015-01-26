@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.template import Template, Context
 
 from billing import get_integration
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 
 @skipIf(not settings.MERCHANT_SETTINGS.get("google_checkout", None), "gateway not configured")

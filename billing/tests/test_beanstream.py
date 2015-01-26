@@ -2,7 +2,7 @@ from datetime import date
 
 from django.conf import settings
 from django.test import TestCase
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from billing import get_gateway, CreditCard
 from billing.signals import *

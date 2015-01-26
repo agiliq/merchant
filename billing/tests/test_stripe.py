@@ -2,7 +2,7 @@ from django.test import TestCase
 from billing import get_gateway, CreditCard
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 import stripe
 from django.conf import settings
 

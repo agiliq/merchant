@@ -4,7 +4,7 @@ from xml.dom import minidom
 from django.test import TestCase
 from django.template import Template, Context
 from django.conf import settings
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from billing import get_integration
 

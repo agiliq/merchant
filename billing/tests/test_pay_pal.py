@@ -7,7 +7,7 @@ from django.test.client import RequestFactory
 from django.template import Template, Context
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from paypal.pro.models import PayPalNVP
 
