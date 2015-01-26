@@ -2,13 +2,17 @@
 Changes
 ========
 
+0.4 (upcoming)
+--------------
+
+* Added python3 support
+* Removed google checkout
+
 0.3
 ----
 
 * Django 1.7 suport (**potentially backwards incompatible changes**)
 * Updated the example `requirements.txt`
-* Added python3 support
-* Removed google checkout
 
 0.2
 ---
