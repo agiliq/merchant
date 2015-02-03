@@ -1,5 +1,7 @@
 VERSION = '0.3'
 
+from __future__ import print_function
+
 import os
 import sys
 from fnmatch import fnmatchcase

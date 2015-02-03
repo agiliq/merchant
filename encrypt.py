@@ -4,6 +4,8 @@
 Add merchant settings as encryped env vars to .travis.yml
 """
 
+from __future__ import print_function
+
 import os
 
 from django.core.management import setup_environ

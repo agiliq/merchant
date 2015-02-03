@@ -1,4 +1,4 @@
-from __future__ import with_statement
+from __future__ import with_statement, print_function
 from fabric.api import *
 from fabric.contrib.console import confirm
 
