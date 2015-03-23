@@ -153,11 +153,11 @@ class AmazonFpsIntegration(Integration):
         resp = self.fps_connection.verify_signature(UrlEndPoint="%s://%s%s" % (parsed_url.scheme,
                                                                   parsed_url.netloc,
                                                                   parsed_url.path),
-                                                    HttpParameters=request.raw_post_data)
+                                                    HttpParameters=request.body)
         if not resp.VerifySignatureResult.VerificationStatus == "Success":
             return HttpResponseForbidden()
 
-        data = dict(map(lambda x: x.split("="), request.raw_post_data.split("&")))
+        data = dict(map(lambda x: x.split("="), request.body.split("&")))
         for (key, val) in data.iteritems():
             data[key] = urllib.unquote_plus(val)
         if AmazonFPSResponse.objects.filter(transactionId=data["transactionId"]).count():
