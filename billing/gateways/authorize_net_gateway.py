@@ -1,5 +1,8 @@
+try:
+    import urllib2
+except ImportError:
+    pass
 import urllib
-import urllib2
 import datetime
 
 from collections import namedtuple
@@ -175,7 +178,7 @@ class AuthorizeNetGateway(Gateway):
         post['encap_char'] = ENCAP_CHAR
 
         post.update(parameters)
-        return urllib.urlencode(dict(('x_%s' % (k), v) for k, v in post.iteritems()))
+        return urllib.urlencode(dict(('x_%s' % (k), v) for k, v in post.items()))
 
     # this shoud be moved to a requests lib file
     def request(self, url, data, headers=None):

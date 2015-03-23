@@ -23,8 +23,9 @@ class PayPalIntegration(Integration):
     def __init__(self):
         merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
         if not merchant_settings or not merchant_settings.get("pay_pal"):
-            raise IntegrationNotConfigured("The '%s' integration is not \
-                                    correctly configured." % self.display_name)
+            raise IntegrationNotConfigured(
+                "The '%s' integration is not "
+                "correctly configured." % self.display_name)
         pay_pal_settings = merchant_settings["pay_pal"]
         self.encrypted = False
         if pay_pal_settings.get("ENCRYPTED"):

@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-import sha
+from hashlib import sha1
 import string
 
 from django.conf import settings
@@ -114,9 +114,9 @@ class GlobalIrisBase(object):
         d = data.copy()
         d['merchant_id'] = config.merchant_id
         val1 = signing_string.format(**d)
-        hash1 = sha.sha(val1).hexdigest()
+        hash1 = sha1(val1).hexdigest()
         val2 = "{0}.{1}".format(hash1, config.shared_secret)
-        hash2 = sha.sha(val2).hexdigest()
+        hash2 = sha1(val2).hexdigest()
         return hash2
 
     def get_standard_signature(self, data, config):

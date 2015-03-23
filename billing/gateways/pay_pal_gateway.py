@@ -5,9 +5,10 @@ from paypal.pro.exceptions import PayPalFailure
 
 from django.conf import settings
 
-from billing import Gateway
-from billing.utils.credit_card import Visa, MasterCard, AmericanExpress, Discover
-from billing.signals import *
+from billing import Gateway, GatewayNotConfigured
+from billing.utils.credit_card import (Visa, MasterCard, AmericanExpress,
+                                       Discover, InvalidCard)
+from billing.signals import transaction_was_successful, transaction_was_unsuccessful
 
 
 class PayPalGateway(Gateway):
@@ -82,7 +83,7 @@ class PayPalGateway(Gateway):
             transaction_was_successful.send(sender=self,
                                             type="purchase",
                                             response=response)
-        except PayPalFailure, e:
+        except PayPalFailure as e:
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
                                               response=e)
@@ -130,7 +131,7 @@ class PayPalGateway(Gateway):
             transaction_was_successful.send(sender=self,
                                             type="purchase",
                                             response=response)
-        except PayPalFailure, e:
+        except PayPalFailure as e:
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
                                               response=e)

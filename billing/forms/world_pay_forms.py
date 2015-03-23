@@ -14,8 +14,8 @@ class WPHostedPaymentForm(forms.Form):
                 hash_str += "%s" % self.initial[field]
                 if not signature_fields.index(field) == len(signature_fields) - 1:
                     hash_str += ":"
-            md5_hash = md5("%s:%s" % (settings.MERCHANT_SETTINGS["world_pay"]["MD5_SECRET_KEY"],
-                                     hash_str)).hexdigest()
+            md5_hash = md5("{0}:{1}".format(settings.MERCHANT_SETTINGS["world_pay"]["MD5_SECRET_KEY"],
+                                            hash_str).encode()).hexdigest()
             self.initial["signature"] = self.initial.get("signature") or md5_hash
 
     # recurring(future pay) parameters

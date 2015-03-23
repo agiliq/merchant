@@ -1,4 +1,7 @@
-from urllib2 import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 from xml.dom import minidom
 
 from django.test import TestCase
@@ -41,7 +44,7 @@ class WorldPayTestCase(TestCase):
         self.assertDictContainsSubset(values_dict, fields)
 
         form_action_url = dom.getElementsByTagName('form')[0].attributes['action'].value
-        parsed = urlparse.urlparse(form_action_url)
+        parsed = urlparse(form_action_url)
 
         self.assertEquals(parsed.scheme, 'https')
         self.assertEquals(parsed.netloc, 'select-test.worldpay.com')

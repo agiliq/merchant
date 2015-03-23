@@ -356,7 +356,7 @@ class GlobalIrisRealMpiIntegrationTestCase(BetterXMLCompareMixin, GlobalIrisTest
             {'order_id': 1,
              'amount': Decimal('24.99'),
              'card': card,
-             'timestamp': datetime(2010,6, 25, 17, 23, 05),
+             'timestamp': datetime(2010,6, 25, 17, 23, 5),
              })
         self.assertXMLEqual(actual_xml, expected)
 
@@ -488,7 +488,7 @@ class GlobalIrisRealMpiIntegrationTestCase(BetterXMLCompareMixin, GlobalIrisTest
                                                          {'order_id': 1,
                                                           'amount': Decimal('24.99'),
                                                           'card': card,
-                                                          'timestamp': datetime(2010,6, 25, 17, 23, 05),
+                                                          'timestamp': datetime(2010,6, 25, 17, 23, 5),
                                                           })
         self.assertXMLEqual(actual_xml, expected)
 

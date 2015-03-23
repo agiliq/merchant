@@ -1,5 +1,9 @@
 import datetime
-from urllib2 import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    # Python3
+    from urllib.parse import urlparse
 from xml.dom import minidom
 
 from django.conf import settings
@@ -123,7 +127,7 @@ class PayPalWebsiteStandardsTestCase(TestCase):
         self.assertDictContainsSubset(values_dict, fields)
 
         form_action_url = dom.getElementsByTagName('form')[0].attributes['action'].value
-        parsed = urlparse.urlparse(form_action_url)
+        parsed = urlparse(form_action_url)
 
         self.assertEquals(parsed.scheme, 'https')
         self.assertEquals(parsed.netloc, 'www.sandbox.paypal.com')
