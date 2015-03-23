@@ -31,7 +31,6 @@ Off-Site Processing
 
 * Paypal
 * RBS WorldPay
-* Google Checkout
 * Amazon FPS
 * Braintree Payments (Transparent Redirect)
 * Stripe.js
