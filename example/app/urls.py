@@ -3,7 +3,6 @@ from billing import get_integration
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
-google_checkout_obj = get_integration("google_checkout")
 authorize_net_obj = get_integration("authorize_net_dpm")
 pay_pal_obj = get_integration("pay_pal")
 amazon_fps_obj = get_integration("fps")
@@ -31,7 +30,6 @@ urlpatterns = patterns('app.views',
 urlpatterns += patterns('app.views',
     url(r'offsite/authorize_net/$', 'offsite_authorize_net', name='app_offsite_authorize_net'),
     url(r'offsite/paypal/$', 'offsite_paypal', name='app_offsite_paypal'),
-    url(r'offsite/google-checkout/$', 'offsite_google_checkout', name='app_offsite_google_checkout'),
     url(r'offsite/world_pay/$', 'offsite_world_pay', name='app_offsite_world_pay'),
     url(r'offsite/amazon_fps/$', 'offsite_amazon_fps', name='app_offsite_amazon_fps'),
     url(r'offsite/braintree/$', 'offsite_braintree', name='app_offsite_braintree'),
@@ -51,9 +49,6 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
     (r'^paypal-ipn-handler/', include(pay_pal_obj.urls)),
 )
-urlpatterns += patterns('',
-    (r'^', include(google_checkout_obj.urls)),
-)
 
 urlpatterns += patterns('',
     (r'^fps/', include(amazon_fps_obj.urls)),
@@ -71,9 +66,6 @@ urlpatterns += patterns('',
     url(r'offsite/paypal/done/$',
         csrf_exempt(TemplateView.as_view(template_name="app/payment_done.html")),
         name='app_offsite_paypal_done'),
-    url(r'offsite/google-checkout/done/$',
-        TemplateView.as_view(template_name="app/payment_done.html"),
-        name='app_offsite_google_checkout_done'),
 )
 
 urlpatterns += patterns('app.views',
