@@ -26,6 +26,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Konrad Rotkiewicz <https://github.com/krotkiewicz>
 * Lalit Chandnani <https://github.com/lalitchandnani>
 * Luke Plant <http://lukeplant.me.uk/>
+* Manjunath <https://github.com/manjunath24>
 * Markus Gattol <markus.gattol@sunoano.org>
 * Matt McClanahan <https://github.com/mattmcc>
 * Mikey Ryan <https://github.com/mikery>
