@@ -11,6 +11,7 @@ example/tmp
 example/localsettings.py
 
 docs/_build/*
+.idea
 
 *_flymake.py*
 #*
