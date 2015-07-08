@@ -37,6 +37,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Shabda Raaj <shabda@agiliq.com>
 * Si Feng <https://github.com/devfeng>
 * Steve Phillips <https://github.com/elimisteve>
+* Steven Tychen <https://github.com/tyc85>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
 * Tom Aratyn <tom@aratyn.name>
 * Venkata Ramana <arjunchitturi@gmail.com>
