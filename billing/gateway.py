@@ -58,7 +58,10 @@ class Gateway(object):
         # might not pass Luhn's test.
         if self.test_mode:
             return True
-        return credit_card.is_valid()
+        valid_method = getattr(credit_card, 'is_valid', False)
+        if valid_method:
+            return valid_method()
+        return True
 
     def purchase(self, money, credit_card, options=None):
         """One go authorize and capture transaction"""
