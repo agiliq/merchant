@@ -1,4 +1,4 @@
-from django.utils.importlib import import_module
+from importlib import import_module
 from django.conf import settings
 from .utils.credit_card import CardNotSupported
 

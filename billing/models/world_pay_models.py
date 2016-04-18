@@ -42,7 +42,7 @@ class WorldPayResponse(models.Model):
     future_pay_id = models.CharField(max_length=64, blank=True)
 
     card_type = models.CharField(max_length=64, blank=True)
-    ip_address = models.IPAddressField(blank=True, null=True)
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
 
     class Meta:
         app_label = __name__.split(".")[0]
