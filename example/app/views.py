@@ -13,7 +13,7 @@ from billing import CreditCard, get_gateway, get_integration
 from billing.gateway import CardNotSupported
 
 from app.forms import CreditCardForm
-from app.urls import (authorize_net_obj, google_checkout_obj, world_pay_obj, pay_pal_obj,
+from app.urls import (authorize_net_obj, world_pay_obj, pay_pal_obj,
                       amazon_fps_obj, fps_recur_obj, braintree_obj,
                       stripe_obj, ogone_obj)
 from app.utils import randomword
@@ -306,35 +306,6 @@ def offsite_paypal(request):
     template_vars = {"obj": pay_pal_obj, 'title': 'PayPal Offsite'}
     return render(request, 'app/offsite_paypal.html', template_vars)
 
-def offsite_google_checkout(request):
-    return_url = request.build_absolute_uri(reverse('app_offsite_google_checkout_done'))
-    fields = {
-            'items': [{
-                'amount': 1,
-                'name': 'name of the item',
-                'description': 'Item description',
-                'id': '999AXZ',
-                'currency': 'USD',
-                'quantity': 1,
-                "subscription": {
-                "type": "merchant",                     # valid choices is ["merchant", "google"]
-                "period": "YEARLY",                     # valid choices is ["DAILY", "WEEKLY", "SEMI_MONTHLY", "MONTHLY", "EVERY_TWO_MONTHS"," QUARTERLY", "YEARLY"]
-                "payments": [{
-                        "maximum-charge": 9.99,         # Item amount must be "0.00"
-                        "currency": "USD"
-                }]
-            },
-            "digital-content": {
-                "display-disposition": "OPTIMISTIC",    # valid choices is ['OPTIMISTIC', 'PESSIMISTIC']
-                "description": "Congratulations! Your subscription is being set up. Continue: {return_url}".format(return_url=return_url)
-            },
-        }],
-        'return_url': return_url
-    }
-    google_checkout_obj.add_fields(fields)
-    template_vars = {'title': 'Google Checkout', "gc_obj": google_checkout_obj}
-
-    return render(request, 'app/google_checkout.html', template_vars)
 
 def offsite_world_pay(request):
     fields = {"instId": settings.MERCHANT_SETTINGS["world_pay"]["INSTALLATION_ID_TEST"],
@@ -345,6 +316,7 @@ def offsite_world_pay(request):
     world_pay_obj.add_fields(fields)
     template_vars = {'title': 'WorldPay', "wp_obj": world_pay_obj}
     return render(request, 'app/world_pay.html', template_vars)
+
 
 def offsite_amazon_fps(request):
     url_scheme = "http"

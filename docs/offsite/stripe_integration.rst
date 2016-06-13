@@ -25,7 +25,7 @@ Here are the methods and attributes implemented on the ``StripeIntegration`` cla
 
      from billing import get_integration
 
-     stripe = get_integration("stripe")
+     stripe_obj = get_integration("stripe")
 
      urlpatterns += patterns('',
         (r'^stripe/', include(stripe_obj.urls)),

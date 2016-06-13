@@ -37,7 +37,7 @@ class Integration(object):
         self.fields[key] = value
 
     def add_fields(self, params):
-        for (key, val) in params.iteritems():
+        for (key, val) in params.items():
             self.add_field(key, val)
 
     @property

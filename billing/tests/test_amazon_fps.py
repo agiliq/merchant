@@ -1,10 +1,13 @@
 from xml.dom import minidom
-from urllib2 import urlparse
+try:
+    from urlparse import urlparse, parse_qsl
+except ImportError:
+    from urllib.parse import urlparse, parse_qsl
 
 from django.conf import settings
 from django.test import TestCase
 from django.template import Template, Context
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from billing import get_integration
 
@@ -30,8 +33,8 @@ class AmazonFPSTestCase(TestCase):
         # get the integration link url
         dom = minidom.parseString(html)
         url = dom.getElementsByTagName('a')[0].attributes['href'].value
-        parsed = urlparse.urlparse(url)
-        query_dict = dict(urlparse.parse_qsl(parsed.query))
+        parsed = urlparse(url)
+        query_dict = dict(parse_qsl(parsed.query))
 
         self.assertEquals(parsed.scheme, 'https')
         self.assertEquals(parsed.netloc, 'authorize.payments-sandbox.amazon.com')

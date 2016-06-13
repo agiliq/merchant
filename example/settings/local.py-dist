@@ -27,12 +27,6 @@ MERCHANT_SETTINGS = {
         "PASSWORD" : '',
         },
 
-    # GOOGLE CHECKOUT SETTINGS
-    "google_checkout": {
-        "MERCHANT_ID" : '' ,
-        "MERCHANT_KEY" : ''
-        },
-
     # WORLDPAY settings
     "world_pay": {
         "HOSTED_URL_TEST" : "https://select-test.wp3.rbsworldpay.com/wcc/purchase",

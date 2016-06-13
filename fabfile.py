@@ -1,4 +1,4 @@
-from __future__ import with_statement
+from __future__ import with_statement, print_function
 from fabric.api import *
 from fabric.contrib.console import confirm
 
@@ -6,7 +6,7 @@ env.hosts = ["merchant.agiliq.com"]
 env.user = "agiliq"
 
 def describe():
-    print "This is a fab file to automate deployments for the merchant server."
+    print("This is a fab file to automate deployments for the merchant server.")
 
 def deploy():
     with cd("/home/agiliq/envs/merchant/src/merchant"):

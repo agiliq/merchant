@@ -94,7 +94,7 @@ class OgonePaymentsIntegration(Integration):
         return urlpatterns
 
     def add_fields(self, params):
-        for (key, val) in params.iteritems():
+        for (key, val) in params.items():
             if isinstance(val, dict):
                 new_params = {}
                 for k in val:

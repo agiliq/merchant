@@ -5,6 +5,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 
 * Andy Zhang <https://github.com/andyiso>
 * Ashok Raavi <ashok.raavi@gmail.com>
+* Ben Murden <https://github.com/TigerDX>
 * Bradley Ayers <bradley.ayers@gmail.com>
 * Celso Pinto <https://github.com/cpinto>
 * Chenhouwu <https://github.com/chenhouwu>
@@ -15,6 +16,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Donald Stufft <https://github.com/dstufft>
 * Dmitry Molotkov <https://github.com/aldarund>
 * FoxyProxy, Inc. <http://getfoxyproxy.org/>
+* Freakypie <https://github.com/freakypie>
 * Greg McGuire <https://github.com/gmcguire>
 * igorn <https://github.com/igonef>
 * Issac Kelly <http://www.issackelly.com/>
@@ -24,6 +26,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Konrad Rotkiewicz <https://github.com/krotkiewicz>
 * Lalit Chandnani <https://github.com/lalitchandnani>
 * Luke Plant <http://lukeplant.me.uk/>
+* Manjunath <https://github.com/manjunath24>
 * Markus Gattol <markus.gattol@sunoano.org>
 * Matt McClanahan <https://github.com/mattmcc>
 * Mikey Ryan <https://github.com/mikery>
@@ -34,6 +37,7 @@ Thanks go out to all the contributors listed in alphabetical order:
 * Shabda Raaj <shabda@agiliq.com>
 * Si Feng <https://github.com/devfeng>
 * Steve Phillips <https://github.com/elimisteve>
+* Steven Tychen <https://github.com/tyc85>
 * Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
 * Tom Aratyn <tom@aratyn.name>
 * Venkata Ramana <arjunchitturi@gmail.com>

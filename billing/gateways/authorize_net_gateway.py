@@ -1,5 +1,9 @@
-import urllib
-import urllib2
+try:
+    from urllib2 import Request, urlopen, URLError
+    from urllib import urlencode
+except ImportError:
+    from urllib.request import Request, urlopen, URLError
+    from urllib.parse import urlencode
 import datetime
 
 from collections import namedtuple
@@ -175,7 +179,7 @@ class AuthorizeNetGateway(Gateway):
         post['encap_char'] = ENCAP_CHAR
 
         post.update(parameters)
-        return urllib.urlencode(dict(('x_%s' % (k), v) for k, v in post.iteritems()))
+        return urlencode(dict(('x_%s' % (k), v) for k, v in post.items()))
 
     # this shoud be moved to a requests lib file
     def request(self, url, data, headers=None):
@@ -183,11 +187,11 @@ class AuthorizeNetGateway(Gateway):
         gateway RESPONSE_CODE, RESPONSE_REASON_CODE, RESPONSE_REASON_TEXT"""
         if not headers:
             headers = {}
-        conn = urllib2.Request(url=url, data=data, headers=headers)
+        conn = Request(url=url, data=data, headers=headers)
         try:
-            open_conn = urllib2.urlopen(conn)
+            open_conn = urlopen(conn)
             response = open_conn.read()
-        except urllib2.URLError as e:
+        except URLError as e:
             return MockAuthorizeAIMResponse(5, '1', str(e))
         fields = response[1:-1].split('%s%s%s' % (ENCAP_CHAR, DELIM_CHAR, ENCAP_CHAR))
         return save_authorize_response(fields)
@@ -343,11 +347,11 @@ class AuthorizeNetGateway(Gateway):
             url = self.arb_live_url
         headers = {'content-type': 'text/xml'}
 
-        conn = urllib2.Request(url=url, data=xml, headers=headers)
+        conn = Request(url=url, data=xml, headers=headers)
         try:
-            open_conn = urllib2.urlopen(conn)
+            open_conn = urlopen(conn)
             xml_response = open_conn.read()
-        except urllib2.URLError as e:
+        except URLError as e:
             return MockAuthorizeAIMResponse(5, '1', str(e))
 
         response = nodeToDic(parseString(xml_response))['ARBCreateSubscriptionResponse']

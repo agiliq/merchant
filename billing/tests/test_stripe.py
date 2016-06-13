@@ -2,7 +2,7 @@ from django.test import TestCase
 from billing import get_gateway, CreditCard
 from billing.gateway import CardNotSupported
 from billing.utils.credit_card import Visa
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 import stripe
 from django.conf import settings
 
@@ -41,8 +41,10 @@ class StripeGatewayTestCase(TestCase):
     def testStoreWithoutBillingAddress(self):
         resp = self.merchant.store(self.credit_card)
         self.assertEquals(resp["status"], "SUCCESS")
-        self.assertEquals(resp["response"].active_card.exp_month, self.credit_card.month)
-        self.assertEquals(resp["response"].active_card.exp_year, self.credit_card.year)
+        self.assertEquals(resp["response"]["sources"]["data"][0].exp_month,
+                          self.credit_card.month)
+        self.assertEquals(resp["response"]["sources"]["data"][0].exp_year,
+                          self.credit_card.year)
         self.assertTrue(getattr(resp["response"], "id"))
         self.assertTrue(getattr(resp["response"], "created"))
 
@@ -66,7 +68,7 @@ class StripeGatewayTestCase(TestCase):
         options = {"plan_id": plan_id}
         resp = self.merchant.recurring(self.credit_card, options=options)
         self.assertEquals(resp["status"], "SUCCESS")
-        subscription = resp["response"].subscription
+        subscription = resp["response"].subscriptions["data"][0]
         self.assertEquals(subscription.status, "active")
 
     def testCredit(self):

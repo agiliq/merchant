@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.test import TestCase
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from billing.tests.utils import BetterXMLCompareMixin
 from billing.gateway import get_gateway
@@ -356,7 +356,7 @@ class GlobalIrisRealMpiIntegrationTestCase(BetterXMLCompareMixin, GlobalIrisTest
             {'order_id': 1,
              'amount': Decimal('24.99'),
              'card': card,
-             'timestamp': datetime(2010,6, 25, 17, 23, 05),
+             'timestamp': datetime(2010,6, 25, 17, 23, 5),
              })
         self.assertXMLEqual(actual_xml, expected)
 
@@ -488,7 +488,7 @@ class GlobalIrisRealMpiIntegrationTestCase(BetterXMLCompareMixin, GlobalIrisTest
                                                          {'order_id': 1,
                                                           'amount': Decimal('24.99'),
                                                           'card': card,
-                                                          'timestamp': datetime(2010,6, 25, 17, 23, 05),
+                                                          'timestamp': datetime(2010,6, 25, 17, 23, 5),
                                                           })
         self.assertXMLEqual(actual_xml, expected)
 

@@ -6,7 +6,7 @@ from billing.utils.paylane import (
     PaylanePaymentCustomer,
     PaylanePaymentCustomerAddress
 )
-from utils import randomword
+from .utils import randomword
 
 HOST = getattr(settings, "HOST", "http://127.0.0.1")
 
@@ -154,8 +154,8 @@ INTEGRATION_INITIAL = {
     }
 }
 
-for k, v in GATEWAY_INITIAL.iteritems():
+for k, v in GATEWAY_INITIAL.items():
     v.update(COMMON_INITIAL)
 
-for k, v in INTEGRATION_INITIAL.iteritems():
+for k, v in INTEGRATION_INITIAL.items():
     v.update(COMMON_INITIAL)

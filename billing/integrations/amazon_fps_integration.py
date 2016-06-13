@@ -12,7 +12,10 @@ from billing.signals import (transaction_was_successful,
                              transaction_was_unsuccessful)
 from django.core.urlresolvers import reverse
 from billing.models import AmazonFPSResponse
-import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 import urllib
 import time
 import datetime
@@ -153,18 +156,18 @@ class AmazonFpsIntegration(Integration):
         resp = self.fps_connection.verify_signature(UrlEndPoint="%s://%s%s" % (parsed_url.scheme,
                                                                   parsed_url.netloc,
                                                                   parsed_url.path),
-                                                    HttpParameters=request.raw_post_data)
+                                                    HttpParameters=request.body)
         if not resp.VerifySignatureResult.VerificationStatus == "Success":
             return HttpResponseForbidden()
 
-        data = dict(map(lambda x: x.split("="), request.raw_post_data.split("&")))
-        for (key, val) in data.iteritems():
+        data = dict(map(lambda x: x.split("="), request.body.split("&")))
+        for (key, val) in data.items():
             data[key] = urllib.unquote_plus(val)
         if AmazonFPSResponse.objects.filter(transactionId=data["transactionId"]).count():
             resp = AmazonFPSResponse.objects.get(transactionId=data["transactionId"])
         else:
             resp = AmazonFPSResponse()
-        for (key, val) in data.iteritems():
+        for (key, val) in data.items():
             attr_exists = hasattr(resp, key)
             if attr_exists and not callable(getattr(resp, key, None)):
                 if key == "transactionDate":
@@ -185,7 +188,7 @@ class AmazonFpsIntegration(Integration):
 
     def fps_return_url(self, request):
         uri = request.build_absolute_uri()
-        parsed_url = urlparse.urlparse(uri)
+        parsed_url = urlparse(uri)
         resp = self.fps_connection.verify_signature(UrlEndPoint="%s://%s%s" % (parsed_url.scheme,
                                                                   parsed_url.netloc,
                                                                   parsed_url.path),

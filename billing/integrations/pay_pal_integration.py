@@ -2,8 +2,12 @@ from django.conf import settings
 from django.conf.urls import patterns, include
 
 from paypal.standard.conf import POSTBACK_ENDPOINT, SANDBOX_POSTBACK_ENDPOINT
-from paypal.standard.ipn.signals import (payment_was_flagged,
-                                         payment_was_successful)
+from paypal.standard.models import (ST_PP_ACTIVE, ST_PP_CANCELED_REVERSAL,
+                                    ST_PP_COMPLETED, ST_PP_CREATED,
+                                    ST_PP_PAID, ST_PP_PENDING,
+                                    ST_PP_PROCESSED, ST_PP_REFUNDED,
+                                    ST_PP_REWARDED, ST_PP_VOIDED)
+from paypal.standard.ipn.signals import valid_ipn_received
 
 from billing import Integration, IntegrationNotConfigured
 from billing.forms.paypal_forms import (MerchantPayPalPaymentsForm,
@@ -19,8 +23,9 @@ class PayPalIntegration(Integration):
     def __init__(self):
         merchant_settings = getattr(settings, "MERCHANT_SETTINGS")
         if not merchant_settings or not merchant_settings.get("pay_pal"):
-            raise IntegrationNotConfigured("The '%s' integration is not \
-                                    correctly configured." % self.display_name)
+            raise IntegrationNotConfigured(
+                "The '%s' integration is not "
+                "correctly configured." % self.display_name)
         pay_pal_settings = merchant_settings["pay_pal"]
         self.encrypted = False
         if pay_pal_settings.get("ENCRYPTED"):
@@ -54,6 +59,23 @@ class PayPalIntegration(Integration):
         return self.form_class()(initial=self.fields)
 
 
+def txn_handler(sender, **kwargs):
+    if sender.payment_status in [
+            ST_PP_ACTIVE,
+            ST_PP_CANCELED_REVERSAL,
+            ST_PP_COMPLETED,
+            ST_PP_CREATED,
+            ST_PP_PAID,
+            ST_PP_PENDING,
+            ST_PP_PROCESSED,
+            ST_PP_REFUNDED,
+            ST_PP_REWARDED,
+            ST_PP_VOIDED
+    ]:
+        successful_txn_handler(sender, **kwargs)
+    else:
+        unsuccessful_txn_handler(sender, **kwargs)
+
 def unsuccessful_txn_handler(sender, **kwargs):
     transaction_was_unsuccessful.send(sender=sender.__class__,
                                       type="purchase",
@@ -65,5 +87,4 @@ def successful_txn_handler(sender, **kwargs):
                                     type="purchase",
                                     response=sender)
 
-payment_was_flagged.connect(unsuccessful_txn_handler)
-payment_was_successful.connect(successful_txn_handler)
+valid_ipn_received.connect(txn_handler)

@@ -38,7 +38,7 @@ class StripeGateway(Gateway):
                 amount=int(amount * 100),
                 currency=self.default_currency.lower(),
                 card=card)
-        except self.stripe.CardError, error:
+        except self.stripe.CardError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
                                               response=error)
@@ -61,7 +61,7 @@ class StripeGateway(Gateway):
                 }
         try:
             customer = self.stripe.Customer.create(card=card)
-        except (self.stripe.CardError, self.stripe.InvalidRequestError), error:
+        except (self.stripe.CardError, self.stripe.InvalidRequestError) as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="store",
                                               response=error)
@@ -94,17 +94,17 @@ class StripeGateway(Gateway):
                                                 type="recurring",
                                                 response=response)
                 return {"status": "SUCCESS", "response": response}
-            except self.stripe.CardError, error:
+            except self.stripe.CardError as error:
                 transaction_was_unsuccessful.send(sender=self,
                                                   type="recurring",
                                                   response=error)
                 return {"status": "FAILURE", "response": error}
-        except self.stripe.InvalidRequestError, error:
+        except self.stripe.InvalidRequestError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="recurring",
                                               response=error)
             return {"status": "FAILURE", "response": error}
-        except TypeError, error:
+        except TypeError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="recurring",
                                               response=error)
@@ -118,7 +118,7 @@ class StripeGateway(Gateway):
                                               type="unstore",
                                               response=response)
             return {"status": "SUCCESS", "response": response}
-        except self.stripe.InvalidRequestError, error:
+        except self.stripe.InvalidRequestError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="unstore",
                                               response=error)
@@ -132,7 +132,7 @@ class StripeGateway(Gateway):
                                             type="credit",
                                             response=response)
             return {"status": "SUCCESS", "response": response}
-        except self.stripe.InvalidRequestError, error:
+        except self.stripe.InvalidRequestError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="credit",
                                               response=error)
@@ -158,7 +158,7 @@ class StripeGateway(Gateway):
                                             type="authorize",
                                             response=token)
             return {'status': "SUCCESS", "response": token}
-        except self.stripe.InvalidRequestError, error:
+        except self.stripe.InvalidRequestError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="authorize",
                                               response=error)
@@ -175,7 +175,7 @@ class StripeGateway(Gateway):
                                             type="capture",
                                             response=response)
             return {'status': "SUCCESS", "response": response}
-        except self.stripe.InvalidRequestError, error:
+        except self.stripe.InvalidRequestError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="capture",
                                               response=error)

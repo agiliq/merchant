@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
@@ -36,7 +38,7 @@ class Command(BaseCommand):
 
             if isinstance(required_settings, dict):
                 if 'optional' in required_settings:
-                    print '%s takes optional parameter %s' % (gateway, required_settings['optional'])
+                    print('%s takes optional parameter %s' % (gateway, required_settings['optional']))
                 required_settings = required_settings['required']
 
             for rs in required_settings:

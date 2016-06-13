@@ -1,16 +1,15 @@
-Django==1.5.1
+Django==1.8
 FormEncode==1.2.6
 bitcoin-python==0.3
-stripe==1.7.10
-django-paypal==0.1.3
-boto==2.8.0
-braintree==2.20.0
-wepay==0.1.5
-git+git://github.com/arjunc77/django-ogone.git#egg=django-ogone
-git+git://github.com/dragonx/beanstream.git#egg=python-beanstream
-suds==0.4
-requests==1.2.0
-django-crispy-forms==1.2.5
+boto==2.35.2
+braintree==3.8.0
+django-crispy-forms==1.4.0
+-e git://github.com/arjunc77/django-ogone.git@4e728a26ace4741e6bd59fd8995526737c01adfe#egg=django_ogone-master
+django-paypal==0.2
+lxml==3.4.1
 mock==1.0.1
-raven==3.5.2
-lxml==3.3.1
+-e git://github.com/dragonx/beanstream.git@e0e685299da59ed048d137217f65cb6a65058ee6#egg=python_beanstream-master
+raven==5.1.1
+stripe==1.20.2
+suds==0.4
+wepay==0.3.0

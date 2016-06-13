@@ -38,7 +38,7 @@ class WePayGateway(Gateway):
         params.update(options)
         try:
             response = self.we_pay.call('/checkout/create', params, token=token)
-        except WePayError, error:
+        except WePayError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="purchase",
                                               response=error)
@@ -63,7 +63,7 @@ class WePayGateway(Gateway):
                     'client_secret': self.we_pay_settings["CLIENT_SECRET"],
                     'credit_card_id': resp['response']['credit_card_id']
                     }, token=token)
-        except WePayError, error:
+        except WePayError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="authorize",
                                               response=error)
@@ -91,7 +91,7 @@ class WePayGateway(Gateway):
         token = options.pop("access_token", self.we_pay_settings["ACCESS_TOKEN"])
         try:
             response = self.we_pay.call('/checkout/capture', params, token=token)
-        except WePayError, error:
+        except WePayError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="capture",
                                               response=error)
@@ -110,7 +110,7 @@ class WePayGateway(Gateway):
         token = options.pop("access_token", self.we_pay_settings["ACCESS_TOKEN"])
         try:
             response = self.we_pay.call('/checkout/cancel', params, token=token)
-        except WePayError, error:
+        except WePayError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="void",
                                               response=error)
@@ -131,7 +131,7 @@ class WePayGateway(Gateway):
         token = options.pop("access_token", self.we_pay_settings["ACCESS_TOKEN"])
         try:
             response = self.we_pay.call('/checkout/refund', params, token=token)
-        except WePayError, error:
+        except WePayError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="credit",
                                               response=error)
@@ -152,7 +152,7 @@ class WePayGateway(Gateway):
         token = options.pop("access_token", self.we_pay_settings["ACCESS_TOKEN"])
         try:
             response = self.we_pay.call("/preapproval/create", params, token=token)
-        except WePayError, error:
+        except WePayError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="recurring",
                                               response=error)
@@ -178,7 +178,7 @@ class WePayGateway(Gateway):
                     'expiration_year': credit_card.year,
                     'address': options.pop("billing_address")
                     }, token=token)
-        except WePayError, error:
+        except WePayError as error:
             transaction_was_unsuccessful.send(sender=self,
                                               type="store",
                                               response=error)

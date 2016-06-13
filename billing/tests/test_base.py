@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.test import TestCase
 from django.template import Template, Context, TemplateSyntaxError
-from django.utils.unittest.case import skipIf
+from django.utils.unittest import skipIf
 
 from billing.utils.credit_card import CreditCard
 from billing import get_gateway, GatewayNotConfigured, get_integration, IntegrationNotConfigured
@@ -19,47 +19,25 @@ class MerchantTestCase(TestCase):
         self.assertTrue(isinstance(settings.MERCHANT_SETTINGS, dict))
 
     def testRaiseExceptionNotConfigured(self):
-        original_settings = settings.MERCHANT_SETTINGS
-        settings.MERCHANT_SETTINGS = {
-            "google_checkout": {
-                "MERCHANT_ID": '',
-                "MERCHANT_KEY": ''
+        with self.settings(MERCHANT_SETTINGS = {
+                "pay_pal": {
                 }
-            }
-
-        # Test if we can import any other gateway or integration
-        self.assertRaises(IntegrationNotConfigured, lambda: get_integration("stripe"))
-        self.assertRaises(GatewayNotConfigured, lambda: get_gateway("authorize_net"))
-        settings.MERCHANT_SETTINGS = original_settings
+        }):
+            # Test if we can import any other gateway or integration
+            self.assertRaises(IntegrationNotConfigured, lambda: get_integration("stripe"))
+            self.assertRaises(GatewayNotConfigured, lambda: get_gateway("authorize_net"))
 
     def testTemplateTagLoad(self):
-        original_settings = settings.MERCHANT_SETTINGS
-        settings.MERCHANT_SETTINGS = {
-            "google_checkout": {
-                "MERCHANT_ID": '',
-                "MERCHANT_KEY": ''
+        with self.settings(MERCHANT_SETTINGS = {
+                "pay_pal": {
                 }
-            }
-
-        # Raises TemplateSyntaxError: Invalid Block Tag
-        self.assertRaises(TemplateSyntaxError, lambda: Template("{% load render_integration from billing_tags %}{% stripe obj %}"))
+        }):
+            # Raises TemplateSyntaxError: Invalid Block Tag
+            self.assertRaises(TemplateSyntaxError, lambda: Template("{% load render_integration from billing_tags %}{% stripe obj %}"))
 
         tmpl = Template("{% load render_integration from billing_tags %}{% render_integration obj %}")
-        gc = get_integration("google_checkout")
-        fields = {"items": [{
-                    "name": "name of the item",
-                    "description": "Item description",
-                    "amount": 1,
-                    "id": "999AXZ",
-                    "currency": "USD",
-                    "quantity": 1,
-                    }],
-                  "return_url": "http://127.0.0.1:8000/offsite/google-checkout/",
-                  }
-        gc.add_fields(fields)
+        gc = get_integration("stripe")
         self.assertTrue(len(tmpl.render(Context({"obj": gc}))) > 0)
-
-        settings.MERCHANT_SETTINGS = original_settings
 
 
 class CreditCardTestCase(TestCase):

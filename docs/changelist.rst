@@ -2,6 +2,30 @@
 Changes
 ========
 
+0.4 (upcoming)
+--------------
+
+* Added python3 support
+* Removed google checkout
+
+0.3
+----
+
+* Django 1.7 suport (**potentially backwards incompatible changes**)
+* Updated the example `requirements.txt`
+
+0.2
+---
+
+* Unit tests are skipped unless the corresponding gateways are configured
+* Bugfix - Use settings.AUTH_USER_MODEL instead of get_user_model
+* Demo - fill up initial data for all gateways
+
+0.1
+---
+
+* Added PIN payments support
+
 0.09
 ----
 
