@@ -51,7 +51,7 @@ class PinCharge(models.Model):
     currency = models.CharField(max_length=3)
     description = models.CharField(max_length=255)
     email = models.EmailField()
-    ip_address = models.IPAddressField()
+    ip_address = models.GenericIPAddressField()
     created_at = models.DateTimeField()
     status_message = models.CharField(max_length=255)
     error_message = models.CharField(max_length=255, null=True, blank=True)
