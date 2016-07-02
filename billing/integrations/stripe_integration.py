@@ -31,7 +31,8 @@ class StripeIntegration(Integration):
         raise NotImplementedError
 
     def get_urls(self):
-        urlpatterns = patterns('',
+        urlpatterns = [
            url('^stripe_token/$', self.transaction, name="stripe_transaction")
-        )
+           ]
+
         return urlpatterns
