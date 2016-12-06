@@ -10,6 +10,7 @@ class IntegrationModuleNotFound(Exception):
 class IntegrationNotConfigured(Exception):
     pass
 
+
 integration_cache = {}
 
 
@@ -71,10 +72,16 @@ def get_integration(integration, *args, **kwargs):
                 pass
         if not integration_module:
             raise IntegrationModuleNotFound("Missing integration: %s" % (integration))
-        integration_class_name = "".join(integration_filename.title().split("_"))
-        try:
-            klass = getattr(integration_module, integration_class_name)
-        except AttributeError:
-            raise IntegrationNotConfigured("Missing %s class in the integration module." % integration_class_name)
-        integration_cache[integration] = klass
+
+        for module_func_name in dir(integration_module):
+            module_class = getattr(integration_module, module_func_name)
+            if isinstance(module_class, type) and \
+                    issubclass(module_class, Integration) and (module_class is not Integration):
+                klass = module_class
+                break
+        if klass:
+            integration_cache[integration] = klass
+        else:
+            raise IntegrationNotConfigured(
+                "Missing inherit Integration class in the integration %s module." % integration_module)
     return klass(*args, **kwargs)
