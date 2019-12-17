@@ -21,7 +21,7 @@ The signals emitted by Merchant_ are:
   Please consult the individual gateway docs for the response object.
 * `transaction_was_unsuccessful(sender, type=..., response=...)`: This signal
   is dispatched when a payment fails. The `sender` is the object which has 
-  dispatched the signal. `type` is the kind of transation. Current choices for
+  dispatched the signal. `type` is the kind of transaction. Current choices for
   type are:
 
   * `purchase`
