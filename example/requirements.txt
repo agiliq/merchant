@@ -1,4 +1,4 @@
-Django==1.8
+Django==1.11.29
 FormEncode==1.2.6
 bitcoin-python==0.3
 boto==2.35.2
