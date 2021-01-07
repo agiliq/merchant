@@ -6,7 +6,7 @@ braintree==3.8.0
 django-crispy-forms==1.4.0
 -e git://github.com/arjunc77/django-ogone.git@4e728a26ace4741e6bd59fd8995526737c01adfe#egg=django_ogone-master
 django-paypal==0.2
-lxml==3.4.1
+lxml==4.6.2
 mock==1.0.1
 -e git://github.com/dragonx/beanstream.git@e0e685299da59ed048d137217f65cb6a65058ee6#egg=python_beanstream-master
 raven==5.1.1
