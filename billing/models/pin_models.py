@@ -19,7 +19,7 @@ class PinCard(models.Model):
     address_state = models.CharField(max_length=255)
     address_country = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, related_name='pin_cards', blank=True, null=True)
+    user = models.ForeignKey(User, related_name='pin_cards', blank=True, null=True, on_delete=models.CASCADE)
 
     def __unicode__(self):
         return 'Card %s' % self.display_number
@@ -30,10 +30,10 @@ class PinCard(models.Model):
 
 class PinCustomer(models.Model):
     token = models.CharField(unique=True, max_length=32)
-    card = models.ForeignKey("billing.PinCard", related_name='customers')
+    card = models.ForeignKey("billing.PinCard", related_name='customers', on_delete=models.CASCADE)
     email = models.EmailField()
     created_at = models.DateTimeField()
-    user = models.OneToOneField(User, related_name='pin_customer', blank=True, null=True)
+    user = models.OneToOneField(User, related_name='pin_customer', blank=True, null=True,on_delete=models.CASCADE)
 
     def __unicode__(self):
         return 'Customer %s' % self.email
@@ -44,18 +44,18 @@ class PinCustomer(models.Model):
 
 class PinCharge(models.Model):
     token = models.CharField(unique=True, max_length=32, editable=False)
-    card = models.ForeignKey("billing.PinCard", related_name='charges', editable=False)
-    customer = models.ForeignKey("billing.PinCustomer", related_name='customers', null=True, blank=True, editable=False)
+    card = models.ForeignKey("billing.PinCard", related_name='charges', editable=False,on_delete=models.CASCADE)
+    customer = models.ForeignKey("billing.PinCustomer", related_name='customers', null=True, blank=True,on_delete=models.CASCADE, editable=False)
     success = models.BooleanField(default=False)
     amount = models.DecimalField(max_digits=16, decimal_places=2)
     currency = models.CharField(max_length=3)
     description = models.CharField(max_length=255)
     email = models.EmailField()
-    ip_address = models.IPAddressField()
+    ip_address = models.GenericIPAddressField()
     created_at = models.DateTimeField()
     status_message = models.CharField(max_length=255)
     error_message = models.CharField(max_length=255, null=True, blank=True)
-    user = models.ForeignKey(User, related_name='pin_charges', blank=True, null=True)
+    user = models.ForeignKey(User, related_name='pin_charges', blank=True, null=True,on_delete=models.CASCADE)
 
     def __unicode__(self):
         return 'Charge %s' % self.email
@@ -66,14 +66,14 @@ class PinCharge(models.Model):
 
 class PinRefund(models.Model):
     token = models.CharField(unique=True, max_length=32)
-    charge = models.ForeignKey("billing.PinCharge", related_name='refunds')
+    charge = models.ForeignKey("billing.PinCharge", related_name='refunds',on_delete=models.CASCADE)
     success = models.BooleanField(default=False)
     amount = models.DecimalField(max_digits=16, decimal_places=2)
     currency = models.CharField(max_length=3)
     created_at = models.DateTimeField()
     status_message = models.CharField(max_length=255)
     error_message = models.CharField(max_length=255, null=True, blank=True)
-    user = models.ForeignKey(User, related_name='pin_refunds', blank=True, null=True)
+    user = models.ForeignKey(User, related_name='pin_refunds', blank=True, null=True,on_delete=models.CASCADE)
 
     def __unicode__(self):
         return 'Refund %s' % self.charge.email
