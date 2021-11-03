@@ -1,4 +1,5 @@
 from django.conf import settings
+from importlib import import_module
 
 
 
@@ -62,7 +63,12 @@ def get_integration(integration, *args, **kwargs):
     if not klass:
         integration_filename = "%s_integration" % integration
         integration_module = None
-        
+        for app in settings.INSTALLED_APPS:
+            try:
+                integration_module = import_module(".integrations.%s" % integration_filename, package=app)
+                break
+            except ImportError:
+                pass
         if not integration_module:
             raise IntegrationModuleNotFound("Missing integration: %s" % (integration))
         integration_class_name = "".join(integration_filename.title().split("_"))
