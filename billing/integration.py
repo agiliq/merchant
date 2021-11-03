@@ -64,7 +64,7 @@ def get_integration(integration, *args, **kwargs):
         integration_module = None
         for app in settings.INSTALLED_APPS:
             try:
-                integration_module = import_module(".integrations.%s" % integration_filename, package=app)
+                #integration_module = import_module(".integrations.%s" % integration_filename, package=app)
                 break
             except ImportError:
                 pass
