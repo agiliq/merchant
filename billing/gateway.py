@@ -112,10 +112,6 @@ def get_gateway(gateway, *args, **kwargs):
         gateway_filename = "%s_gateway" % gateway
         gateway_module = None
         for app in settings.INSTALLED_APPS:
-            try:
-                #gateway_module = import_module(".gateways.%s" % gateway_filename, package=app)
-            except ImportError:
-                pass
         if not gateway_module:
             raise GatewayModuleNotFound("Missing gateway: %s" % (gateway))
         gateway_class_name = "".join(gateway_filename.title().split("_"))
