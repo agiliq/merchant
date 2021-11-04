@@ -1,10 +1,10 @@
-from coffin.template import Library
+#from coffin.template import Library
 from django.template.loader import render_to_string
 from jinja2 import nodes
 from jinja2.ext import Extension
 
 
-register = Library()
+#register = Library()
 
 
 class MerchantExtension(Extension):
