@@ -38,7 +38,7 @@ class AuthorizeAIMResponse(models.Model):
     response_reason_code = models.IntegerField(blank=True)
     response_reason_text = models.TextField(blank=True)
     authorization_code = models.CharField(max_length=8)
-    address_verification_response = models.CharField(max_length='8', choices=ADDRESS_VERIFICATION_RESPONSE)
+    address_verification_response = models.CharField(max_length=8, choices=ADDRESS_VERIFICATION_RESPONSE)
     transaction_id = models.CharField(max_length=64)
     invoice_number = models.CharField(max_length=64, blank=True)
     description = models.CharField(max_length=255, blank=True)
@@ -68,7 +68,7 @@ class AuthorizeAIMResponse(models.Model):
     shipping_zip_code = models.CharField(max_length=64, blank=True)
     shipping_country = models.CharField(max_length=64, blank=True)
 
-    card_code_response = models.CharField(max_length='8', choices=CARD_CODE_RESPONSES, help_text=u'Card Code Verification response')
+    card_code_response = models.CharField(max_length=8, choices=CARD_CODE_RESPONSES, help_text=u'Card Code Verification response')
 
     class Meta:
         app_label = __name__.split(".")[0]
